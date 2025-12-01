@@ -1,0 +1,23 @@
+/* Variables CSS - Colores de ON THE RUSH */
+:root {
+    --primary-blue: #0f172a;
+    --light-blue: #1e3a8a;
+    --primary-green: #6bc044;
+    --dark-green: #5aa838;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --border-color: #e5e7eb;
+    --white: #ffffff;
+}
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-dark);
+}

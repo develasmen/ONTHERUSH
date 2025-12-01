@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ONTHERUSH.Abstracciones/ONTHERUSH.Abstracciones.csproj" />
+  <Project Path="ONTHERUSH.AccesoADatos/ONTHERUSH.AccesoADatos.csproj" />
+  <Project Path="ONTHERUSH.LogicaDeNegocio/ONTHERUSH.LogicaDeNegocio.csproj" />
+  <Project Path="ONTHERUSH.UI/ONTHERUSH.UI.csproj" />
+</Solution>

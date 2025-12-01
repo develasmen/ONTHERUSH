@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\ONTHERUSH.LogicaDeNegocio\ONTHERUSH.LogicaDeNegocio.csproj" />
+    <ProjectReference Include="..\ONTHERUSH.Abstracciones\ONTHERUSH.Abstracciones.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>
