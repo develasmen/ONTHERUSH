@@ -1,0 +1,85 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Actualizar solicitud de usuario - ON THE RUSH</title>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+    <link rel="stylesheet" href="~/css/auth.css" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Actualizar solicitud de usuario</h1>
+                <p>Revise los datos y autorice o rechace la actualización.</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            @if (ViewBag.Info != null)
+            {
+                <div class="alert alert-warning">
+                    @ViewBag.Info
+                </div>
+            }
+
+            @if (ViewBag.Exito != null)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.Exito
+                </div>
+            }
+
+            <form asp-action="ActualizarSolicitud" asp-controller="Admin" method="post" class="auth-form">
+                <div class="form-group">
+                    <label for="nombreUsuario">Nombre del usuario</label>
+                    <input type="text" id="nombreUsuario" name="nombreUsuario" class="form-input" />
+                </div>
+
+                <div class="form-group">
+                    <label for="nuevoCorreo">Nuevo correo</label>
+                    <input type="email" id="nuevoCorreo" name="nuevoCorreo" class="form-input" />
+                </div>
+
+                <div class="form-group">
+                    <label for="nuevaUbicacion">Nueva ubicación</label>
+                    <input type="text" id="nuevaUbicacion" name="nuevaUbicacion" class="form-input" />
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" id="datosValidos" name="datosValidos" value="true" />
+                    <label for="datosValidos">Los datos son válidos</label>
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" id="autorizar" name="autorizar" value="true" />
+                    <label for="autorizar">Aceptar actualización</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Procesar solicitud
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="window.location.href='@Url.Action("PanelAdministrador", "Admin")'">
+                    Volver al panel de administrador
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

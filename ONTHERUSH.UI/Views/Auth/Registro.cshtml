@@ -1,0 +1,83 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro de usuario - ON THE RUSH</title>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+    <link rel="stylesheet" href="~/css/auth.css" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Registro de usuario</h1>
+                <p>Cree su cuenta para utilizar el sistema de transporte ON THE RUSH.</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            @if (ViewBag.Exito != null)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.Exito
+                </div>
+            }
+
+            <form asp-action="Registro" asp-controller="Auth" method="post" class="auth-form">
+                <div class="form-group">
+                    <label for="cedula">Cédula</label>
+                    <input type="text" id="cedula" name="cedula" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" name="correo" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="ubicacion">Ubicación</label>
+                    <input type="text" id="ubicacion" name="ubicacion" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmarContrasena">Confirmar contraseña</label>
+                    <input type="password" id="confirmarContrasena" name="confirmarContrasena" class="form-input" required />
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Registrar
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="window.location.href='@Url.Action("Login", "Auth")'">
+                    Volver al inicio de sesión
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

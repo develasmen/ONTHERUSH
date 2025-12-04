@@ -1,0 +1,75 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solicitar actualización de ruta - ON THE RUSH</title>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+    <link rel="stylesheet" href="~/css/auth.css" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Solicitar actualización de ruta</h1>
+                <p>Describa el cambio que desea solicitar.</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            @if (ViewBag.Info != null)
+            {
+                <div class="alert alert-warning">
+                    @ViewBag.Info
+                </div>
+            }
+
+            @if (ViewBag.Exito != null)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.Exito
+                </div>
+            }
+
+            <form asp-action="SolicitarActualizacionRuta" asp-controller="Conductor" method="post" class="auth-form">
+                <div class="form-group">
+                    <label for="idRuta">ID de la ruta</label>
+                    <input type="text" id="idRuta" name="idRuta" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="motivo">Motivo de la actualización</label>
+                    <textarea id="motivo" name="motivo" class="form-input" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" id="hayCambios" name="hayCambios" value="true" />
+                    <label for="hayCambios">He realizado cambios en esta solicitud</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Enviar
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="window.location.href='@Url.Action("PanelConductor", "Conductor")'">
+                    Volver al panel de conductor
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

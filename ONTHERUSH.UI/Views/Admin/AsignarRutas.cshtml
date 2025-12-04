@@ -1,0 +1,80 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asignar rutas a conductores - ON THE RUSH</title>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+    <link rel="stylesheet" href="~/css/auth.css" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Asignar rutas a conductores</h1>
+                <p>Seleccione el conductor y la ruta.</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            @if (ViewBag.Info != null)
+            {
+                <div class="alert alert-warning">
+                    @ViewBag.Info
+                </div>
+            }
+
+            @if (ViewBag.Exito != null)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.Exito
+                </div>
+            }
+
+            <form asp-action="AsignarRutas" asp-controller="Admin" method="post" class="auth-form">
+                <div class="form-group">
+                    <label for="idConductor">ID Conductor</label>
+                    <input type="text" id="idConductor" name="idConductor" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="ruta">Ruta</label>
+                    <input type="text" id="ruta" name="ruta" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" id="conductorDisponible" name="conductorDisponible" value="true" />
+                    <label for="conductorDisponible">Conductor disponible</label>
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" id="esActualizacionRuta" name="esActualizacionRuta" value="true" />
+                    <label for="esActualizacionRuta">Es una actualización de ruta</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Asignar al conductor
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="window.location.href='@Url.Action("PanelAdministrador", "Admin")'">
+                    Volver al panel de administrador
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

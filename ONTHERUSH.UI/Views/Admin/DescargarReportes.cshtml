@@ -1,0 +1,66 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Descargar reportes - ON THE RUSH</title>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Descargar reportes de conductores</h1>
+                <p>Seleccione el conductor y el estado del reporte.</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            @if (ViewBag.Exito != null)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.Exito
+                </div>
+            }
+
+            <form asp-action="DescargarReportes" asp-controller="Admin" method="post" class="auth-form">
+                <div class="form-group">
+                    <label for="idConductor">ID Conductor</label>
+                    <input type="text" id="idConductor" name="idConductor" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="estadoReporte">Estado del reporte (simulación)</label>
+                    <select id="estadoReporte" name="estadoReporte" class="form-input">
+                        <option value="disponible">Disponible</option>
+                        <option value="error">Error al generar</option>
+                        <option value="nodisponible">No disponible</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Descargar
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="window.location.href='@Url.Action("PanelAdministrador", "Admin")'">
+                    Volver al panel de administrador
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Inicio de sesión - ON THE RUSH</title>
+    <title>Inicio de sesión administrador - ON THE RUSH</title>
 
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/components/buttons.css" />
@@ -18,14 +18,14 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <h1>Inicio de sesión</h1>
-                <p>Ingrese con su cuenta de usuario para continuar.</p>
+                <h1>Inicio de sesión (Administrador)</h1>
+                <p>Ingrese sus credenciales de administrador.</p>
             </div>
 
-            @if (TempData["MensajeSesion"] != null)
+            @if (TempData["MensajeSesionAdmin"] != null)
             {
                 <div class="alert alert-info">
-                    @TempData["MensajeSesion"]
+                    @TempData["MensajeSesionAdmin"]
                 </div>
             }
 
@@ -36,7 +36,7 @@
                 </div>
             }
 
-            <form asp-action="Login" asp-controller="Auth" method="post" class="auth-form">
+            <form asp-action="Login" asp-controller="Admin" method="post" class="auth-form">
                 <div class="form-group">
                     <label for="correo">Correo electrónico</label>
                     <input type="email" id="correo" name="correo" class="form-input" required />
@@ -51,22 +51,11 @@
                     Iniciar sesión
                 </button>
 
-                <div class="auth-links" style="margin-top:15px;">
-                    <a href="@Url.Action("Registro", "Auth")">¿No tienes cuenta? Regístrate</a>
-                    |
-                    <a href="@Url.Action("OlvidoContrasena", "Auth")">Olvidé mi contraseña</a>
-                </div>
-
-                <hr />
-
-                <div class="auth-links" style="margin-top:10px;">
-                    <strong>Accesos para otros roles:</strong><br />
-                    <a href="@Url.Action("Login", "Admin")">Soy administrador</a> |
-                    <a href="@Url.Action("Login", "Conductor")">Soy conductor</a>
+                <div class="auth-links">
+                    <a href="@Url.Action("Registro", "Admin")">Registrar nuevo administrador</a>
                 </div>
             </form>
         </div>
     </div>
 </body>
 </html>
-

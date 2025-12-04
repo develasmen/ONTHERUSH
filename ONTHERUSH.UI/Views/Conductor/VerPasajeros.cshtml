@@ -1,0 +1,88 @@
+@{
+    Layout = null;
+    var pasajeros = ViewBag.Pasajeros as string[];
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ver pasajeros de la ruta - ON THE RUSH</title>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+    <link rel="stylesheet" href="~/css/auth.css" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Ver pasajeros</h1>
+                <p>Ingrese la ruta para ver la lista de pasajeros agendados.</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            @if (ViewBag.Info != null)
+            {
+                <div class="alert alert-warning">
+                    @ViewBag.Info
+                </div>
+            }
+
+            @if (ViewBag.Exito != null)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.Exito
+                </div>
+            }
+
+            <form asp-action="VerPasajeros" asp-controller="Conductor" method="post" class="auth-form">
+                <div class="form-group">
+                    <label for="idRuta">ID de la ruta</label>
+                    <input type="text" id="idRuta" name="idRuta" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="estadoLista">Estado (simulación)</label>
+                    <select id="estadoLista" name="estadoLista" class="form-input">
+                        <option value="ok">Lista disponible</option>
+                        <option value="error">Error al cargar</option>
+                        <option value="vacia">Sin pasajeros</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Ver pasajeros
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="window.location.href='@Url.Action("PanelConductor", "Conductor")'">
+                    Volver al panel de conductor
+                </button>
+            </form>
+
+            @if (pasajeros != null)
+            {
+                <h3 style="margin-top:20px;">Pasajeros en la ruta:</h3>
+                <ul>
+                    @foreach (var p in pasajeros)
+                    {
+                        <li>@p</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</body>
+</html>
+
+

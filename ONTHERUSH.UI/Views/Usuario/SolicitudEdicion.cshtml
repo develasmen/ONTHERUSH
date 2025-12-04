@@ -1,0 +1,93 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solicitud de edición de datos - ON THE RUSH</title>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+    <link rel="stylesheet" href="~/css/auth.css" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Solicitud de edición de información</h1>
+                <p>Complete los datos que desea actualizar y envíe la solicitud.</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            @if (ViewBag.Info != null)
+            {
+                <div class="alert alert-warning">
+                    @ViewBag.Info
+                </div>
+            }
+
+            @if (ViewBag.Exito != null)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.Exito
+                </div>
+            }
+
+            <form asp-action="SolicitudEdicion" asp-controller="Usuario" method="post" class="auth-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" name="correo" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="ubicacion">Ubicación</label>
+                    <input type="text" id="ubicacion" name="ubicacion" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="detalleCambios">Detalle de los cambios solicitados</label>
+                    <textarea id="detalleCambios"
+                              name="detalleCambios"
+                              class="form-input"
+                              rows="3"
+                              placeholder="Describa los cambios que desea realizar (teléfono, dirección, etc.)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" id="huboCambios" name="huboCambios" value="true" />
+                    <label for="huboCambios">
+                        He modificado mis datos en esta solicitud
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Enviar solicitud
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="window.location.href='@Url.Action("PanelUsuario", "Auth")'">
+                    Volver al panel de usuario
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
+

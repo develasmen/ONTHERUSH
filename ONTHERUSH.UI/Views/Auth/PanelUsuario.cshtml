@@ -1,0 +1,152 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de usuario - ON THE RUSH</title>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+
+    <style>
+        .dashboard-wrapper {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-title {
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .role-badge {
+            background: #e3f2fd;
+            color: #0d47a1;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .dashboard-subtitle {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .dash-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            padding: 18px 18px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+            .dash-card h3 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+
+            .dash-card p {
+                font-size: 14px;
+                color: #666;
+                margin-bottom: 14px;
+            }
+
+        .dash-footer {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        body {
+            background: #f4f5fb;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+
+        <div class="dashboard-header">
+            <div>
+                <div class="dashboard-title">Panel de Usuario</div>
+                <div class="dashboard-subtitle">
+                    Gestione sus reservas y datos personales dentro del sistema ON THE RUSH.
+                </div>
+            </div>
+            <span class="role-badge">Rol: Usuario</span>
+        </div>
+
+        @if (TempData["MensajeBienvenida"] != null)
+        {
+            <div class="alert alert-success" style="margin-bottom:20px;">
+                @TempData["MensajeBienvenida"]
+            </div>
+        }
+
+        <div class="card-grid">
+            <div class="dash-card">
+                <h3>Reservar transporte</h3>
+                <p>Realice una nueva reserva indicando sus datos y la información del viaje.</p>
+                <a href="@Url.Action("ReservaTransporte", "Usuario")" class="btn btn-primary">
+                    Ir a reservas
+                </a>
+            </div>
+
+            <div class="dash-card">
+                <h3>Solicitar edición de datos</h3>
+                <p>Envíe una solicitud para actualizar su información personal registrada.</p>
+                <a href="@Url.Action("SolicitudEdicion", "Usuario")" class="btn btn-secondary">
+                    Editar mis datos
+                </a>
+            </div>
+
+            <div class="dash-card">
+                <h3>Mis reservas</h3>
+                <p>Visualización de reservas de transporte (módulo en construcción).</p>
+                <button type="button" class="btn btn-secondary" disabled>
+                    Próximamente
+                </button>
+            </div>
+
+            <div class="dash-card">
+                <h3>Cerrar sesión</h3>
+                <p>Cierre su sesión de forma segura y vuelva a la pantalla de inicio.</p>
+                <a href="@Url.Action("CerrarSesionUsuario", "Auth", new { estado = "activa" })"
+                   class="btn btn-outline-danger">
+                    Cerrar sesión
+                </a>
+            </div>
+        </div>
+
+        <div class="dash-footer">
+            <small>ON THE RUSH · Usuario</small>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
