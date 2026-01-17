@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ONTHERUSH.AccesoADatos.Data;
 using ONTHERUSH.AccesoADatos.Models;
+using ONTHERUSH.AccesoADatos.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,15 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    
+    await DbInitializer.Initialize(services, userManager, roleManager);
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -53,7 +63,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// IMPORTANTE: Authentication debe ir antes de Authorization
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 
