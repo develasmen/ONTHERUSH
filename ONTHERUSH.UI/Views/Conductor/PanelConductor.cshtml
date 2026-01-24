@@ -131,12 +131,11 @@
             </div>
 
             <div class="dash-card">
-                <h3>Cerrar sesión</h3>
-                <p>Finalice su sesión como conductor y vuelva al inicio.</p>
-                <a href="@Url.Action("CerrarSesion", "Conductor", new { estado = "activa" })"
-                   class="btn btn-outline-danger">
-                    Cerrar sesión
-                </a>
+                <form asp-action="Logout" asp-controller="Auth" method="post">
+                    <button type="submit" class="btn btn-outline-danger">
+                        Cerrar sesión
+                    </button>
+                </form>
             </div>
         </div>
 

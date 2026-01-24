@@ -1,82 +1,112 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ONTHERUSH.AccesoADatos.Data;
+using ONTHERUSH.AccesoADatos.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ONTHERUSH.UI.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class AdminController : Controller
     {
-        public IActionResult Login()
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
+
+        public AdminController(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext context)
+        {
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _context = context;
+        }
+
+        public IActionResult PanelAdministrador()
         {
             return View();
         }
 
-        [HttpPost]
-        public IActionResult Login(string correo, string contrasena)
+        public async Task<IActionResult> GestionarUsuarios()
         {
-
-            if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasena))
+            var todosLosUsuarios = await _userManager.Users.ToListAsync();
+            var usuariosSinRol = new List<ApplicationUser>();
+            
+            foreach (var user in todosLosUsuarios)
             {
-                ViewBag.Error = "Por favor llene todos los campos.";
-                return View();
+                var roles = await _userManager.GetRolesAsync(user);
+                if (!roles.Any())
+                {
+                    usuariosSinRol.Add(user);
+                }
             }
 
-            var adminDemoCorreo = "admin@demo.com";
-            var adminDemoPass = "admin123";
+            return View(usuariosSinRol);
+        }
 
-            if (correo == adminDemoCorreo && contrasena == adminDemoPass)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AsignarRol(string userId, string rol)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(rol))
             {
-                TempData["MensajeBienvenidaAdmin"] = "Inicio de sesión exitoso. Bienvenido al panel de administradores.";
-                return RedirectToAction("PanelAdministrador");
+                TempData["Error"] = "Datos invÃ¡lidos.";
+                return RedirectToAction("GestionarUsuarios");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                TempData["Error"] = "Usuario no encontrado.";
+                return RedirectToAction("GestionarUsuarios");
+            }
+
+            if (!await _roleManager.RoleExistsAsync(rol))
+            {
+                TempData["Error"] = "Rol no vÃ¡lido.";
+                return RedirectToAction("GestionarUsuarios");
+            }
+
+            var result = await _userManager.AddToRoleAsync(user, rol);
+
+            if (result.Succeeded)
+            {
+                if (rol == "Conductor")
+                {
+                    var conductor = new Conductor
+                    {
+                        UserId = user.Id,
+                        Estado = true,
+                        FechaContratacion = DateTime.Now
+                    };
+                    _context.Conductores.Add(conductor);
+                    await _context.SaveChangesAsync();
+                }
+                else if (rol == "Administrador")
+                {
+                    var administrador = new Administrador
+                    {
+                        UserId = user.Id,
+                        Cargo = "Administrador General",
+                        FechaContratacion = DateTime.Now
+                    };
+                    _context.Administradores.Add(administrador);
+                    await _context.SaveChangesAsync();
+                }
+
+                TempData["Exito"] = $"Rol '{rol}' asignado exitosamente a {user.Nombre} {user.Apellido}.";
             }
             else
             {
-                ViewBag.Error = "Las credenciales estan incorrectas.";
-                return View();
+                TempData["Error"] = "Error al asignar el rol.";
             }
+
+            return RedirectToAction("GestionarUsuarios");
         }
 
-        public IActionResult Registro()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Registro(
-            string nombre,
-            string correo,
-            string contrasena,
-            string confirmarContrasena)
-        {
-
-            if (string.IsNullOrWhiteSpace(nombre) ||
-                string.IsNullOrWhiteSpace(correo) ||
-                string.IsNullOrWhiteSpace(contrasena) ||
-                string.IsNullOrWhiteSpace(confirmarContrasena))
-            {
-                ViewBag.Error = "Por favor llene todos los campos.";
-                return View();
-            }
-
-            if (contrasena != confirmarContrasena)
-            {
-                ViewBag.Error = "Las contraseñas no coinciden.";
-                return View();
-            }
-
-            var adminDemoCorreo = "admin@demo.com";
-            if (correo == adminDemoCorreo)
-            {
-                ViewBag.Error = "Las credenciales ya están registradas.";
-                return View();
-            }
-
-
-            ViewBag.Exito = "Registro exitoso. El administrador ha sido registrado.";
-
-            return View();
-        }
-
-
-        public IActionResult PanelAdministrador()
+        public IActionResult Login()
         {
             return View();
         }
@@ -86,125 +116,14 @@ namespace ONTHERUSH.UI.Controllers
             return View();
         }
 
-
-        [HttpPost]
-        public IActionResult DescargarReportes(string idConductor, string estadoReporte)
-        {
-
-
-            if (string.IsNullOrWhiteSpace(idConductor))
-            {
-                ViewBag.Error = "Por favor ingrese un identificador de conductor.";
-                return View();
-            }
-
-            if (estadoReporte == "error")
-            {
-
-                ViewBag.Error = "Hubo un error al descargar el reporte, porfavor volver a intentar.";
-                return View();
-            }
-            else if (estadoReporte == "nodisponible")
-            {
-          
-                ViewBag.Error = "El reporte seleccionado no se encuentra disponible.";
-                return View();
-            }
-            else
-            {
-       
-                ViewBag.Exito = "El reporte se ha descargado en formato xls (simulado).";
-                return View();
-            }
-        }
-
         public IActionResult ActualizarSolicitud()
         {
-            return View();
-        }
-
-
-        [HttpPost]
-        public IActionResult ActualizarSolicitud(
-            string nombreUsuario,
-            string nuevoCorreo,
-            string nuevaUbicacion,
-            bool datosValidos,
-            bool autorizar)
-        {
-       
-            if (!datosValidos)
-            {
-                ViewBag.Error = "Los datos son invalidos, por favor revisar.";
-                return View();
-            }
-
-            if (autorizar)
-            {
-                ViewBag.Exito = "La informacion ha sido actualizada exitosamente.";
-            }
-            else
-            {
-                ViewBag.Info = "La autorizacion ha sido rechazada.";
-            }
-
             return View();
         }
 
         public IActionResult AsignarRutas()
         {
             return View();
-        }
-
-        [HttpPost]
-        public IActionResult AsignarRutas(
-            string idConductor,
-            string ruta,
-            bool conductorDisponible,
-            bool esActualizacionRuta)
-        {
-            if (string.IsNullOrWhiteSpace(idConductor) || string.IsNullOrWhiteSpace(ruta))
-            {
-                ViewBag.Error = "Por favor complete todos los datos de la ruta y del conductor.";
-                return View();
-            }
-
-            if (!conductorDisponible)
-            {
-                ViewBag.Error = "El conductor no esta disponible";
-                return View();
-            }
-
-            if (esActualizacionRuta)
-            {
-                ViewBag.Info = "Sesión no activa";
-                return View();
-            }
-
-            ViewBag.Exito = "La ruta ha sido asignada exitosamente al conductor.";
-
-            return View();
-        }
-
-        public IActionResult CerrarSesion(string estado)
-        {
-            switch (estado)
-            {
-                case "activa":
-                    TempData["MensajeSesionAdmin"] = "Sesión cerrada correctamente.";
-                    break;
-
-                case "inactiva":
-                    TempData["MensajeSesionAdmin"] = "Sesión no activa";
-                    break;
-
-                case "sinSesion":
-                default:
-                    TempData["MensajeSesionAdmin"] = "No hay ninguna sesión activa.";
-                    break;
-            }
-
-            return RedirectToAction("Login");
         }
     }
 }
