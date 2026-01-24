@@ -115,6 +115,14 @@
             </div>
 
             <div class="dash-card">
+                <h3>Gestionar usuarios</h3>
+                <p>Apruebe usuarios pendientes y asigne roles al sistema.</p>
+                <a href="@Url.Action("GestionarUsuarios", "Admin")" class="btn btn-primary">
+                    Gestionar usuarios
+                </a>
+            </div>
+
+            <div class="dash-card">
                 <h3>Solicitudes de usuarios</h3>
                 <p>Revise y apruebe o rechace las solicitudes de actualización de datos.</p>
                 <a href="@Url.Action("ActualizarSolicitud", "Admin")" class="btn btn-secondary">
@@ -133,10 +141,11 @@
             <div class="dash-card">
                 <h3>Cerrar sesión</h3>
                 <p>Cierre la sesión de administrador y regrese a la pantalla de inicio.</p>
-                <a href="@Url.Action("CerrarSesion", "Admin", new { estado = "activa" })"
-                   class="btn btn-outline-danger">
-                    Cerrar sesión
-                </a>
+                <form asp-action="Logout" asp-controller="Auth" method="post">
+                    <button type="submit" class="btn btn-outline-danger">
+                        Cerrar sesión
+                    </button>
+                </form>
             </div>
         </div>
 
