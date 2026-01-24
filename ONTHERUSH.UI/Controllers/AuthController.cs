@@ -1,48 +1,40 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
+using ONTHERUSH.AccesoADatos.Models;
 
 namespace ONTHERUSH.UI.Controllers
 {
     public class AuthController : Controller
     {
-        public IActionResult Login()
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public AuthController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager)
         {
-            return View();
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
-        [HttpPost]
-        public IActionResult Login(string correo, string contrasena)
-        {
-            if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasena))
-            {
-                ViewBag.Error = "Por favor llenar todos los campos requeridos.";
-                return View();
-            }
-
-            var correoDemo = "usuario@demo.com";
-            var contrasenaDemo = "1234";
-
-            if (correo == correoDemo && contrasena == contrasenaDemo)
-            {
-                TempData["MensajeBienvenida"] = "Inicio de sesión exitoso. ¡Bienvenido al panel de usuario!";
-                return RedirectToAction("PanelUsuario");
-            }
-            else
-            {
-                ViewBag.Error = "Las credenciales son incorrectas, por favor intentar de nuevo.";
-                return View();
-            }
-        }
-
+        // GET: Registro
         public IActionResult Registro()
         {
             return View();
         }
 
+
+        // POST: Registro
         [HttpPost]
-        public IActionResult Registro(
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Registro(
             string cedula,
             string nombre,
+            string apellido,
             string correo,
             string ubicacion,
             string contrasena,
@@ -50,90 +42,129 @@ namespace ONTHERUSH.UI.Controllers
         {
             if (string.IsNullOrWhiteSpace(cedula) ||
                 string.IsNullOrWhiteSpace(nombre) ||
+                string.IsNullOrWhiteSpace(apellido) ||
                 string.IsNullOrWhiteSpace(correo) ||
-                string.IsNullOrWhiteSpace(ubicacion) ||
                 string.IsNullOrWhiteSpace(contrasena) ||
                 string.IsNullOrWhiteSpace(confirmarContrasena))
             {
-                ViewBag.Error = "Por favor llenar todos los campos requeridos.";
+                ViewBag.Error = "Por favor completa los campos requeridos.";
                 return View();
             }
 
             if (contrasena != confirmarContrasena)
             {
-                ViewBag.Error = "Las contraseñas no coinciden.";
+                ViewBag.Error = "Las contraseÃ±a no es correcta.";
                 return View();
             }
 
-            ViewBag.Exito = "Registro exitoso. ¡Su cuenta ha sido creada!";
+            // Registro de Usuario
+            var user = new ApplicationUser
+            {
+                UserName = correo,
+                Email = correo,
+                Nombre = nombre,
+                Apellido = apellido,
+                Cedula = cedula,
+                Direccion = ubicacion,
+                EmailConfirmed = true,
+                Estado = true
+            };
 
-            return View();
+            var result = await _userManager.CreateAsync(user, contrasena);
+
+            if (result.Succeeded)
+                {
+                    ViewBag.Exito = "Registro exitoso. Su cuenta estÃ¡ pendiente de aprobaciÃ³n por un administrador.";
+                    return View();
+                }
+            else
+            {
+                // log de errores del Identity
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                ViewBag.Error = "Error al crear la cuenta.";
+                return View();
+            }
         }
-        public IActionResult OlvidoContrasena()
+
+
+
+
+
+
+
+
+
+
+
+        // GET: Login
+        public IActionResult Login()
         {
             return View();
         }
 
+        // POST: Login
         [HttpPost]
-        public IActionResult OlvidoContrasena(string correo)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(string correo, string contrasena)
         {
-            if (string.IsNullOrWhiteSpace(correo))
+            if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasena))
             {
-                ViewBag.Error = "Por favor ingresar un correo electrónico.";
+                ViewBag.Error = "Por favor ingrese su correo y contraseÃ±a.";
                 return View();
             }
 
-            if (!EsCorreoValido(correo))
+            var user = await _userManager.FindByEmailAsync(correo);
+            
+            if (user == null)
             {
-                ViewBag.Error = "Formato de correo inválido.";
+                ViewBag.Error = "Credenciales incorrectas.";
                 return View();
             }
 
-            var correoDemoRegistrado = "usuario@demo.com";
-
-            if (!string.Equals(correo, correoDemoRegistrado, System.StringComparison.OrdinalIgnoreCase))
+            // Verificar aprobacion de Administrador
+            var roles = await _userManager.GetRolesAsync(user);
+            if (!roles.Any())
             {
-                ViewBag.Error = "Correo no encontrado.";
+                ViewBag.Error = "Su cuenta estÃ¡ pendiente de aprobaciÃ³n por un administrador.";
                 return View();
             }
 
-            ViewBag.Exito = "Se ha enviado un correo con el enlace para restablecer su contraseña.";
+            var result = await _signInManager.PasswordSignInAsync(user, contrasena, isPersistent: false, lockoutOnFailure: false);
 
-            return View();
-        }
-
-        private bool EsCorreoValido(string correo)
-        {
-            var regex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-            return regex.IsMatch(correo);
-        }
-
-      
-        public IActionResult PanelUsuario()
-        {
-            return View();
-        }
-
-      
-        public IActionResult CerrarSesionUsuario(string estado)
-        {
-            switch (estado)
+            if (result.Succeeded)
             {
-                case "activa":
-                    TempData["MensajeSesion"] = "Sesión cerrada correctamente.";
-                    break;
-
-                case "expirada":
-                    TempData["MensajeSesion"] = "Sesión expirada";
-                    break;
-
-                case "inactiva":
-                default:
-                    TempData["MensajeSesion"] = "Sesión no activa";
-                    break;
+                if (roles.Contains("Administrador"))
+                {
+                    return RedirectToAction("PanelAdministrador", "Admin");
+                }
+                else if (roles.Contains("Conductor"))
+                {
+                    return RedirectToAction("PanelConductor", "Conductor");
+                }
+                else if (roles.Contains("Pasajero"))
+                {
+                    return RedirectToAction("ReservaTransporte", "Usuario");
+                }
+                
+                return RedirectToAction("Index", "Home");
             }
+            else
+            {
+                ViewBag.Error = "Credenciales incorrectas.";
+                return View();
+            }
+        }
 
-            return RedirectToAction("Login");
+        // GET: Logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Login", "Auth");
         }
     }
 }
