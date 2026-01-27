@@ -1,0 +1,24 @@
+@{
+    ViewData["Title"] = "Recuperar contraseña";
+}
+
+<h2>Recuperar contraseña</h2>
+
+<form asp-action="RecuperarContrasena" method="post">
+    @Html.AntiForgeryToken()
+
+    <label>Correo electrónico</label>
+    <input type="email" name="correo" required />
+
+    <button type="submit">Generar enlace</button>
+</form>
+
+@if (ViewBag.Exito != null)
+{
+    <p style="color:green">@ViewBag.Exito</p>
+}
+
+@if (ViewBag.Error != null)
+{
+    <p style="color:red">@ViewBag.Error</p>
+}

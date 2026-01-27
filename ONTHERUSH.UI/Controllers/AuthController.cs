@@ -73,10 +73,10 @@ namespace ONTHERUSH.UI.Controllers
             var result = await _userManager.CreateAsync(user, contrasena);
 
             if (result.Succeeded)
-                {
-                    ViewBag.Exito = "Registro exitoso. Su cuenta está pendiente de aprobación por un administrador.";
-                    return View();
-                }
+            {
+                ViewBag.Exito = "Registro exitoso. Su cuenta está pendiente de aprobación por un administrador.";
+                return View();
+            }
             else
             {
                 // log de errores del Identity
@@ -88,16 +88,6 @@ namespace ONTHERUSH.UI.Controllers
                 return View();
             }
         }
-
-
-
-
-
-
-
-
-
-
 
         // GET: Login
         public IActionResult Login()
@@ -117,7 +107,7 @@ namespace ONTHERUSH.UI.Controllers
             }
 
             var user = await _userManager.FindByEmailAsync(correo);
-            
+
             if (user == null)
             {
                 ViewBag.Error = "Credenciales incorrectas.";
@@ -148,7 +138,7 @@ namespace ONTHERUSH.UI.Controllers
                 {
                     return RedirectToAction("ReservaTransporte", "Usuario");
                 }
-                
+
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -157,6 +147,103 @@ namespace ONTHERUSH.UI.Controllers
                 return View();
             }
         }
+
+        // acá empieza la parte de cambiar la contraseña
+        public IActionResult RecuperarContrasena()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecuperarContrasena(string correo)
+        {
+            if (string.IsNullOrWhiteSpace(correo))
+            {
+                ViewBag.Error = "Por favor ingrese su correo.";
+                return View();
+            }
+
+            var user = await _userManager.FindByEmailAsync(correo);
+
+            if (user == null)
+            {
+                ViewBag.Exito = "Si el correo existe, se generará un enlace para restablecer la contraseña.";
+                return View();
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var tokenUrl = System.Net.WebUtility.UrlEncode(token);
+
+            var link = Url.Action(
+                "RestablecerContrasena",
+                "Auth",
+                new { email = correo, token = tokenUrl },
+                protocol: Request.Scheme
+            );
+
+            ViewBag.Exito = $"Enlace generado. Copie y pegue en el navegador: {link}";
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult RestablecerContrasena(string email, string token)
+        {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
+            {
+                ViewBag.Error = "Enlace inválido.";
+                return View();
+            }
+
+            ViewBag.Email = email;
+            ViewBag.Token = token;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RestablecerContrasena(string email, string token, string nuevaContrasena, string confirmarContrasena)
+        {
+            if (string.IsNullOrWhiteSpace(nuevaContrasena) || string.IsNullOrWhiteSpace(confirmarContrasena))
+            {
+                ViewBag.Error = "Debe completar ambos campos.";
+                ViewBag.Email = email;
+                ViewBag.Token = token;
+                return View();
+            }
+
+            if (nuevaContrasena != confirmarContrasena)
+            {
+                ViewBag.Error = "Las contraseñas no coinciden.";
+                ViewBag.Email = email;
+                ViewBag.Token = token;
+                return View();
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                ViewBag.Exito = "Contraseña actualizada (si el usuario existe).";
+                return View();
+            }
+
+            var decodedToken = System.Net.WebUtility.UrlDecode(token);
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, nuevaContrasena);
+
+            if (result.Succeeded)
+            {
+                ViewBag.Exito = "Contraseña actualizada correctamente. Ya puede iniciar sesión.";
+                return View();
+            }
+
+            ViewBag.Error = string.Join(" | ", result.Errors.Select(e => e.Description));
+            ViewBag.Email = email;
+            ViewBag.Token = token;
+            return View();
+        }
+
+
 
         // GET: Logout
         [HttpPost]
