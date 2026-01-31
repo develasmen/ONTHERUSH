@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ONTHERUSH.AccesoADatos.Models;
+using ONTHERUSH.UI.Services;
 
 namespace ONTHERUSH.UI.Controllers
 {
@@ -10,15 +11,19 @@ namespace ONTHERUSH.UI.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly EmailService _emailService;
+
 
         public AuthController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            EmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _emailService = emailService;
         }
 
         // GET: Registro
@@ -148,7 +153,8 @@ namespace ONTHERUSH.UI.Controllers
             }
         }
 
-        // acá empieza la parte de cambiar la contraseña
+        // GET: RecuperarContrasena
+        [HttpGet]
         public IActionResult RecuperarContrasena()
         {
             return View();
@@ -166,9 +172,11 @@ namespace ONTHERUSH.UI.Controllers
 
             var user = await _userManager.FindByEmailAsync(correo);
 
+            // Mensaje genérico SIEMPRE (seguridad)
+            ViewBag.Exito = "Si el correo existe, se enviará un enlace para restablecer la contraseña.";
+
             if (user == null)
             {
-                ViewBag.Exito = "Si el correo existe, se generará un enlace para restablecer la contraseña.";
                 return View();
             }
 
@@ -182,7 +190,26 @@ namespace ONTHERUSH.UI.Controllers
                 protocol: Request.Scheme
             );
 
-            ViewBag.Exito = $"Enlace generado. Copie y pegue en el navegador: {link}";
+            try
+            {
+                await _emailService.EnviarAsync(
+                    correo,
+                    "Restablecer contraseña - ONTHERUSH",
+                    $@"
+                <p>Hola,</p>
+                <p>Recibimos una solicitud para restablecer tu contraseña.</p>
+                <p>Haz clic en el siguiente enlace para cambiarla:</p>
+                <p><a href='{link}'>Restablecer contraseña</a></p>
+                <p>Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
+            "
+                );
+            }
+            catch
+            {
+                // No revelamos el error real al usuario (pero no caemos)
+                // Si querés: aquí podés loggear a consola.
+            }
+
             return View();
         }
 
@@ -222,9 +249,10 @@ namespace ONTHERUSH.UI.Controllers
 
             var user = await _userManager.FindByEmailAsync(email);
 
+            // Mensaje genérico por seguridad
             if (user == null)
             {
-                ViewBag.Exito = "Contraseña actualizada (si el usuario existe).";
+                ViewBag.Exito = "Si el enlace era válido, la contraseña fue actualizada.";
                 return View();
             }
 
