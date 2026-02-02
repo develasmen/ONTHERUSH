@@ -153,7 +153,7 @@ namespace ONTHERUSH.UI.Controllers
             }
         }
 
-        // GET: RecuperarContrasena
+        // Modulo de recuperacion de la contraseña
         [HttpGet]
         public IActionResult RecuperarContrasena()
         {
@@ -172,7 +172,6 @@ namespace ONTHERUSH.UI.Controllers
 
             var user = await _userManager.FindByEmailAsync(correo);
 
-            // Mensaje genérico SIEMPRE (seguridad)
             ViewBag.Exito = "Si el correo existe, se enviará un enlace para restablecer la contraseña.";
 
             if (user == null)
@@ -200,14 +199,12 @@ namespace ONTHERUSH.UI.Controllers
                 <p>Recibimos una solicitud para restablecer tu contraseña.</p>
                 <p>Haz clic en el siguiente enlace para cambiarla:</p>
                 <p><a href='{link}'>Restablecer contraseña</a></p>
-                <p>Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
+                <p>Si no solicitaste este cambio, por favor ponerse en contacto con soporte.</p>
             "
                 );
             }
             catch
             {
-                // No revelamos el error real al usuario (pero no caemos)
-                // Si querés: aquí podés loggear a consola.
             }
 
             return View();
@@ -249,7 +246,6 @@ namespace ONTHERUSH.UI.Controllers
 
             var user = await _userManager.FindByEmailAsync(email);
 
-            // Mensaje genérico por seguridad
             if (user == null)
             {
                 ViewBag.Exito = "Si el enlace era válido, la contraseña fue actualizada.";

@@ -1,75 +1,94 @@
 @{
     ViewData["Title"] = "Recuperar contraseña";
 }
+@{
+    ViewData["Title"] = "Recuperar contraseña";
+}
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-5">
+<link rel="stylesheet" href="~/css/auth.css" />
 
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-body p-4 p-md-5">
+<div class="auth-page">
+    <div class="auth-card">
 
-                    <div class="text-center mb-4">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10"
-                             style="width:64px;height:64px;">
-                            <span class="fs-3">🔐</span>
-                        </div>
-                        <h2 class="mt-3 mb-1 fw-bold">Recuperar contraseña</h2>
-                        <p class="text-muted mb-0">
-                            Ingresá tu correo y te enviaremos un enlace para restablecerla.
-                        </p>
-                    </div>
+        <div class="auth-brand">
+            <div class="auth-logo">ON</div>
+            <div class="auth-brand-text">
+                <div class="auth-app">ONTHERUSH</div>
+                <div class="auth-sub">Recuperación de acceso</div>
+            </div>
+        </div>
 
-                    @* Mensajes *@
-                    @if (ViewBag.Exito != null)
-                    {
-                        <div class="alert alert-success d-flex align-items-center" role="alert">
-                            <span class="me-2">✅</span>
-                            <div>@ViewBag.Exito</div>
-                        </div>
-                    }
+        <div class="auth-header">
+            <h2>Recuperar contraseña</h2>
+            <p>
+                Ingresá tu correo y te enviaremos un enlace para restablecer tu contraseña.
+            </p>
+        </div>
 
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger d-flex align-items-center" role="alert">
-                            <span class="me-2">⚠️</span>
-                            <div>@ViewBag.Error</div>
-                        </div>
-                    }
+        @* Mensajes *@
+        @if (ViewBag.Exito != null)
+        {
+            <div class="auth-alert auth-alert-success" role="alert">
+                @ViewBag.Exito
+            </div>
+        }
 
-                    <form asp-action="RecuperarContrasena" method="post" class="mt-3">
-                        @Html.AntiForgeryToken()
+        @if (ViewBag.Error != null)
+        {
+            <div class="auth-alert auth-alert-danger" role="alert">
+                @ViewBag.Error
+            </div>
+        }
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Correo electrónico</label>
-                            <input type="email"
-                                   class="form-control form-control-lg"
-                                   name="correo"
-                                   placeholder="ej: usuario@correo.com"
-                                   required />
-                            <div class="form-text">
-                                Si el correo existe, se enviará un enlace para restablecer la contraseña.
-                            </div>
-                        </div>
+        <form asp-action="RecuperarContrasena" method="post" class="auth-form" id="frmRecuperar">
+            @Html.AntiForgeryToken()
 
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
-                            Enviar enlace
-                        </button>
-
-                        <div class="text-center mt-3">
-                            <a asp-controller="Auth" asp-action="Login" class="text-decoration-none">
-                                ← Volver a iniciar sesión
-                            </a>
-                        </div>
-                    </form>
-
+            <div class="auth-field">
+                <label for="correo">Correo electrónico</label>
+                <input type="email"
+                       id="correo"
+                       name="correo"
+                       class="auth-input"
+                       placeholder="usuario@correo.com"
+                       autocomplete="email"
+                       required />
+                <div class="auth-hint">
+                    Por seguridad, verás el mismo mensaje aunque el correo no exista.
                 </div>
             </div>
 
-            <div class="text-center mt-3 text-muted small">
-                © @DateTime.Now.Year ONTHERUSH
-            </div>
+            <button type="submit" class="auth-btn" id="btnEnviar">
+                Enviar enlace
+            </button>
+        </form>
 
+        <div class="auth-divider"></div>
+
+        <div class="auth-footer">
+            <a asp-controller="Auth" asp-action="Login" class="auth-link">
+                Volver a iniciar sesión
+            </a>
         </div>
+
+        <div class="auth-copy">
+            © @DateTime.Now.Year ONTHERUSH
+        </div>
+
     </div>
 </div>
+
+@section Scripts {
+<script>
+    (function () {
+        const form = document.getElementById('frmRecuperar');
+        const btn = document.getElementById('btnEnviar');
+
+        if (!form || !btn) return;
+
+        form.addEventListener('submit', function () {
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+        });
+    })();
+</script>
+}
