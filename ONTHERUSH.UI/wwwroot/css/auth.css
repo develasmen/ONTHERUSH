@@ -71,6 +71,7 @@ body {
     border-radius: 8px;
     font-size: 15px;
     transition: all 0.3s;
+    box-sizing: border-box;
 }
 
 .form-input:focus {
