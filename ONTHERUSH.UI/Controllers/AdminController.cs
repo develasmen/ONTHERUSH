@@ -1,27 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ONTHERUSH.AccesoADatos.Data;
+using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Models;
-using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace ONTHERUSH.UI.Controllers
 {
     [Authorize(Roles = "Administrador")]
     public class AdminController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly ApplicationDbContext _context;
+        private readonly IAdminService _adminService;
 
-        public AdminController(
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            ApplicationDbContext context)
+        public AdminController(IAdminService adminService)
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _context = context;
+            _adminService = adminService;
         }
 
         public IActionResult PanelAdministrador()
@@ -31,18 +23,12 @@ namespace ONTHERUSH.UI.Controllers
 
         public async Task<IActionResult> GestionarUsuarios()
         {
-            var todosLosUsuarios = await _userManager.Users.ToListAsync();
-            var usuariosSinRol = new List<ApplicationUser>();
+            var usuariosSinRolObj = await _adminService.ObtenerUsuariosSinRol();
             
-            foreach (var user in todosLosUsuarios)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-                if (!roles.Any())
-                {
-                    usuariosSinRol.Add(user);
-                }
-            }
-
+            var usuariosSinRol = usuariosSinRolObj
+                .Cast<ApplicationUser>()
+                .ToList();
+            
             return View(usuariosSinRol);
         }
 
@@ -50,57 +36,15 @@ namespace ONTHERUSH.UI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AsignarRol(string userId, string rol)
         {
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(rol))
+            var resultado = await _adminService.AsignarRol(userId, rol);
+
+            if (resultado.Exito)
             {
-                TempData["Error"] = "Datos inválidos.";
-                return RedirectToAction("GestionarUsuarios");
-            }
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                TempData["Error"] = "Usuario no encontrado.";
-                return RedirectToAction("GestionarUsuarios");
-            }
-
-            if (!await _roleManager.RoleExistsAsync(rol))
-            {
-                TempData["Error"] = "Rol no válido.";
-                return RedirectToAction("GestionarUsuarios");
-            }
-
-            var result = await _userManager.AddToRoleAsync(user, rol);
-
-            if (result.Succeeded)
-            {
-                if (rol == "Conductor")
-                {
-                    var conductor = new Conductor
-                    {
-                        UserId = user.Id,
-                        Estado = true,
-                        FechaContratacion = DateTime.Now
-                    };
-                    _context.Conductores.Add(conductor);
-                    await _context.SaveChangesAsync();
-                }
-                else if (rol == "Administrador")
-                {
-                    var administrador = new Administrador
-                    {
-                        UserId = user.Id,
-                        Cargo = "Administrador General",
-                        FechaContratacion = DateTime.Now
-                    };
-                    _context.Administradores.Add(administrador);
-                    await _context.SaveChangesAsync();
-                }
-
-                TempData["Exito"] = $"Rol '{rol}' asignado exitosamente a {user.Nombre} {user.Apellido}.";
+                TempData["Exito"] = resultado.Mensaje;
             }
             else
             {
-                TempData["Error"] = "Error al asignar el rol.";
+                TempData["Error"] = resultado.Mensaje;
             }
 
             return RedirectToAction("GestionarUsuarios");
