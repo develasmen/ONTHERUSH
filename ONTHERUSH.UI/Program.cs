@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ONTHERUSH.AccesoADatos.Data;
 using ONTHERUSH.AccesoADatos.Models;
-using ONTHERUSH.UI.Services;
+using ONTHERUSH.AccesoADatos.Repositories;
+using ONTHERUSH.Abstracciones.Interfaces;
+using ONTHERUSH.LogicaDeNegocio.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// EmailService (DI)
+// Registrar Repositorios
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+
+// Registrar Servicios
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<EmailService>();
 
 // Identity

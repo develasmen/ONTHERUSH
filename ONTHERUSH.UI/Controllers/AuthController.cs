@@ -1,24 +1,37 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ONTHERUSH.Abstracciones.DTOs;
+using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Models;
 
 namespace ONTHERUSH.UI.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthService _authService;
         private readonly SignInManager<ApplicationUser> _signInManager;
+<<<<<<< HEAD
         private readonly RoleManager<IdentityRole> _roleManager;
+=======
+        private readonly UserManager<ApplicationUser> _userManager;
+>>>>>>> Daniel
 
         public AuthController(
-            UserManager<ApplicationUser> userManager,
+            IAuthService authService,
             SignInManager<ApplicationUser> signInManager,
+<<<<<<< HEAD
             RoleManager<IdentityRole> roleManager)
+=======
+            UserManager<ApplicationUser> userManager)
+>>>>>>> Daniel
         {
-            _userManager = userManager;
+            _authService = authService;
             _signInManager = signInManager;
+<<<<<<< HEAD
             _roleManager = roleManager;
+=======
+            _userManager = userManager;
+>>>>>>> Daniel
         }
 
         // GET: Registro
@@ -26,7 +39,6 @@ namespace ONTHERUSH.UI.Controllers
         {
             return View();
         }
-
 
         // POST: Registro
         [HttpPost]
@@ -40,53 +52,37 @@ namespace ONTHERUSH.UI.Controllers
             string contrasena,
             string confirmarContrasena)
         {
-            if (string.IsNullOrWhiteSpace(cedula) ||
-                string.IsNullOrWhiteSpace(nombre) ||
-                string.IsNullOrWhiteSpace(apellido) ||
-                string.IsNullOrWhiteSpace(correo) ||
-                string.IsNullOrWhiteSpace(contrasena) ||
-                string.IsNullOrWhiteSpace(confirmarContrasena))
+            var dto = new RegistroUsuarioDto
             {
-                ViewBag.Error = "Por favor completa los campos requeridos.";
-                return View();
-            }
-
-            if (contrasena != confirmarContrasena)
-            {
-                ViewBag.Error = "Las contraseña no es correcta.";
-                return View();
-            }
-
-            // Registro de Usuario
-            var user = new ApplicationUser
-            {
-                UserName = correo,
-                Email = correo,
+                Cedula = cedula,
                 Nombre = nombre,
                 Apellido = apellido,
-                Cedula = cedula,
-                Direccion = ubicacion,
-                EmailConfirmed = true,
-                Estado = true
+                Correo = correo,
+                Ubicacion = ubicacion,
+                Contrasena = contrasena,
+                ConfirmarContrasena = confirmarContrasena
             };
 
-            var result = await _userManager.CreateAsync(user, contrasena);
+            var resultado = await _authService.RegistrarUsuario(dto);
 
+<<<<<<< HEAD
             if (result.Succeeded)
                 {
                     ViewBag.Exito = "Registro exitoso. Su cuenta está pendiente de aprobación por un administrador.";
                     return View();
                 }
+=======
+            if (resultado.Exito)
+            {
+                ViewBag.Exito = resultado.Mensaje;
+            }
+>>>>>>> Daniel
             else
             {
-                // log de errores del Identity
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-                ViewBag.Error = "Error al crear la cuenta.";
-                return View();
+                ViewBag.Error = resultado.Mensaje;
             }
+
+            return View();
         }
 
 
@@ -110,20 +106,45 @@ namespace ONTHERUSH.UI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string correo, string contrasena)
         {
-            if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasena))
+            var dto = new LoginDto
             {
-                ViewBag.Error = "Por favor ingrese su correo y contraseña.";
+                Correo = correo,
+                Contrasena = contrasena
+            };
+
+            var resultado = await _authService.IniciarSesion(dto);
+
+            if (!resultado.Exito)
+            {
+                ViewBag.Error = resultado.Mensaje;
                 return View();
             }
 
+<<<<<<< HEAD
             var user = await _userManager.FindByEmailAsync(correo);
             
             if (user == null)
+=======
+            // Obtener roles del usuario
+            var usuario = await _userManager.FindByEmailAsync(correo);
+            var roles = await _userManager.GetRolesAsync(usuario);
+
+            // Redirigir según rol
+            if (roles.Contains("Administrador"))
+>>>>>>> Daniel
             {
-                ViewBag.Error = "Credenciales incorrectas.";
-                return View();
+                return RedirectToAction("PanelAdministrador", "Admin");
+            }
+            else if (roles.Contains("Conductor"))
+            {
+                return RedirectToAction("PanelConductor", "Conductor");
+            }
+            else if (roles.Contains("Pasajero"))
+            {
+                return RedirectToAction("ReservaTransporte", "Usuario");
             }
 
+<<<<<<< HEAD
             // Verificar aprobacion de Administrador
             var roles = await _userManager.GetRolesAsync(user);
             if (!roles.Any())
@@ -159,6 +180,78 @@ namespace ONTHERUSH.UI.Controllers
         }
 
         // GET: Logout
+=======
+            return RedirectToAction("Index", "Home");
+        }
+
+        // GET: RecuperarContrasena
+        [HttpGet]
+        public IActionResult RecuperarContrasena()
+        {
+            return View();
+        }
+
+        // POST: RecuperarContrasena
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecuperarContrasena(string correo)
+        {
+            var resultado = await _authService.RecuperarContrasena(correo);
+
+            if (resultado.Exito)
+            {
+                ViewBag.Exito = resultado.Mensaje;
+            }
+            else
+            {
+                ViewBag.Error = resultado.Mensaje;
+            }
+
+            return View();
+        }
+
+        // GET: RestablecerContrasena
+        [HttpGet]
+        public IActionResult RestablecerContrasena(string email, string token)
+        {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
+            {
+                ViewBag.Error = "Enlace inválido.";
+                return View();
+            }
+
+            ViewBag.Email = email;
+            ViewBag.Token = token;
+            return View();
+        }
+
+        // POST: RestablecerContrasena
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RestablecerContrasena(
+            string email, 
+            string token, 
+            string nuevaContrasena, 
+            string confirmarContrasena)
+        {
+            var resultado = await _authService.RestablecerContrasena(email, token, nuevaContrasena, confirmarContrasena);
+
+            if (resultado.Exito)
+            {
+                ViewBag.Exito = resultado.Mensaje;
+            }
+            else
+            {
+                ViewBag.Error = resultado.Mensaje;
+                ViewBag.Email = email;
+                ViewBag.Token = token;
+            }
+
+            return View();
+        }
+
+        // POST: Logout
+>>>>>>> Daniel
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
