@@ -20,6 +20,7 @@ builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddSingleton<RutaAsignacionService>();
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

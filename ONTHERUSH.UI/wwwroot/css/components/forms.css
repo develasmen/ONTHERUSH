@@ -25,3 +25,19 @@
     outline: none;
     border-color: var(--primary-green);
 }
+
+.password-hint {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+.password-hint ul {
+    margin: 5px 0 0 18px;
+    padding: 0;
+}
+
+.password-hint li {
+    margin-bottom: 3px;
+}

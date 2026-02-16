@@ -1,0 +1,179 @@
+:root{
+  --bg:#f4f5fb;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --shadow: 0 10px 24px rgba(17,24,39,.08);
+  --radius:16px;
+}
+
+body{
+  background: var(--bg);
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color: var(--text);
+}
+
+.dashboard-wrapper{
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+.dashboard-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  margin-bottom: 18px;
+}
+
+.header-left h1{
+  font-size: 28px;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.2px;
+}
+
+.header-left p{
+  margin: 0;
+  color: var(--muted);
+}
+
+.role-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #c8e6c9;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.alert-soft{
+  background: #ecfeff;
+  border: 1px solid #cffafe;
+  color: #155e75;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin: 16px 0 22px 0;
+}
+
+.card-grid{
+  display:grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+
+.dash-card{
+  grid-column: span 6;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dash-card.full{
+  grid-column: span 12;
+}
+
+.card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.card-icon{
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 18px;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #e0e7ff;
+}
+
+.card-title{
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.card-desc{
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.35rem;
+}
+
+.card-actions{
+  margin-top: 6px;
+  display:flex;
+  gap:10px;
+  flex-wrap: wrap;
+}
+
+.btn-soft{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  text-decoration:none;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.btn-soft:hover{
+  border-color:#cbd5e1;
+}
+
+.btn-primary-soft{
+  border: 1px solid #bfdbfe;
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+
+.btn-secondary-soft{
+  border: 1px solid #e5e7eb;
+  background:#f9fafb;
+  color:#374151;
+}
+
+.btn-danger-soft{
+  border: 1px solid #fecaca;
+  background:#fef2f2;
+  color:#b91c1c;
+  cursor:pointer;
+}
+
+.footer{
+  margin-top: 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 860px){
+  .dash-card{ grid-column: span 12; }
+  .dashboard-header{ flex-direction:column; align-items:flex-start; }
+}

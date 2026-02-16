@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="~/css/components/forms.css" />
     <link rel="stylesheet" href="~/css/auth.css" />
 </head>
+
 <body>
     <div class="auth-container">
         <div class="auth-card">
@@ -58,26 +59,38 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="ubicacion">Ubicación (opcional)</label>
-                    <input type="text" id="ubicacion" name="ubicacion" class="form-input" />
+                    <label>Ubicación (Latitud, Longitud)</label>
+                    <small class="form-hint">
+                        Ejemplo: 9.998514, -84.205716
+                    </small>
+                    <input type="text" name="ubicacion" class="form-control" placeholder="Ej: 9.998514, -84.205716" pattern="^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$" />
                 </div>
 
                 <div class="form-group">
                     <label for="contrasena">Contraseña</label>
                     <input type="password" id="contrasena" name="contrasena" class="form-input" required />
+                    <small class="password-hint">
+                        La contraseña debe contener:
+                        <ul>
+                            <li>Al menos 6 caracteres</li>
+                            <li>Al menos una letra mayúscula</li>
+                            <li>Al menos una letra minúscula</li>
+                            <li>Al menos un número</li>
+                        </ul>
+                    </small>
                 </div>
 
                 <div class="form-group">
                     <label for="confirmarContrasena">Confirmar contraseña</label>
-                    <input type="password" id="confirmarContrasena" name="confirmarContrasena" class="form-input" required />
+                    <input type="password" id="confirmarContrasena" name="confirmarContrasena" class="form-input"
+                           required />
                 </div>
 
                 <button type="submit" class="btn btn-primary">
                     Registrar
                 </button>
 
-                <button type="button"
-                        class="btn btn-secondary"
+                <button type="button" class="btn btn-secondary"
                         onclick="window.location.href='@Url.Action("Login", "Auth")'">
                     Volver al inicio de sesión
                 </button>
@@ -85,4 +98,5 @@
         </div>
     </div>
 </body>
+
 </html>
