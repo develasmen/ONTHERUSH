@@ -1,6 +1,13 @@
+@model List<ONTHERUSH.Abstracciones.DTOs.ParadaAsignadaDto>
+
 @{
     Layout = null;
-    var pasajeros = ViewBag.Pasajeros as string[];
+
+    var hayParadas = Model != null && Model.Any();
+    var todosRecogidos = hayParadas && Model.All(x => x.Estado == "Recogido");
+
+    var destinoAeropuerto = Uri.EscapeDataString("Aeropuerto Internacional Juan Santamaría");
+    var urlAeropuerto = $"https://www.google.com/maps/dir/?api=1&destination={destinoAeropuerto}";
 }
 
 <!DOCTYPE html>
@@ -8,81 +15,107 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ver pasajeros de la ruta - ON THE RUSH</title>
+    <title>Lista de pasajeros - ON THE RUSH</title>
 
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/components/buttons.css" />
-    <link rel="stylesheet" href="~/css/components/forms.css" />
-    <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="stylesheet" href="~/css/pages/conductor-pasajeros.css" />
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>Ver pasajeros</h1>
-                <p>Ingrese la ruta para ver la lista de pasajeros agendados.</p>
+    <div class="page-wrap">
+
+        <div class="page-header">
+            <div>
+                <h1>Lista de pasajeros</h1>
+                <p>Paradas asignadas en orden. Abre Google Maps para ir a recoger a cada cliente.</p>
             </div>
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger">
-                    @ViewBag.Error
-                </div>
-            }
-
-            @if (ViewBag.Info != null)
-            {
-                <div class="alert alert-warning">
-                    @ViewBag.Info
-                </div>
-            }
-
-            @if (ViewBag.Exito != null)
-            {
-                <div class="alert alert-success">
-                    @ViewBag.Exito
-                </div>
-            }
-
-            <form asp-action="VerPasajeros" asp-controller="Conductor" method="post" class="auth-form">
-                <div class="form-group">
-                    <label for="idRuta">ID de la ruta</label>
-                    <input type="text" id="idRuta" name="idRuta" class="form-input" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="estadoLista">Estado (simulación)</label>
-                    <select id="estadoLista" name="estadoLista" class="form-input">
-                        <option value="ok">Lista disponible</option>
-                        <option value="error">Error al cargar</option>
-                        <option value="vacia">Sin pasajeros</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    Ver pasajeros
-                </button>
-
-                <button type="button"
-                        class="btn btn-secondary"
-                        onclick="window.location.href='@Url.Action("PanelConductor", "Conductor")'">
-                    Volver al panel de conductor
-                </button>
-            </form>
-
-            @if (pasajeros != null)
-            {
-                <h3 style="margin-top:20px;">Pasajeros en la ruta:</h3>
-                <ul>
-                    @foreach (var p in pasajeros)
-                    {
-                        <li>@p</li>
-                    }
-                </ul>
-            }
+            <a class="btn-link btn-secondary" href="@Url.Action("PanelConductor","Conductor")">
+                ← Volver al panel
+            </a>
         </div>
+
+        @if (TempData["Mensaje"] != null)
+        {
+            <div class="alert alert-success" style="margin-bottom:12px;">
+                @TempData["Mensaje"]
+            </div>
+        }
+
+        @if (!hayParadas)
+        {
+            <div class="card" style="padding:16px;">
+                <b>No tienes ruta asignada.</b>
+                <div style="color:#666; margin-top:6px;">
+                    Cuando el administrador te asigne una ruta, te aparecerá aquí.
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Orden</th>
+                            <th>Cliente</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.OrderBy(x => x.Orden))
+                        {
+                            var destino = Uri.EscapeDataString(p.Direccion ?? "");
+                            var googleMapsUrl = $"https://www.google.com/maps/dir/?api=1&destination={destino}";
+                            var claseBadge = (p.Estado == "Recogido") ? "badge badge-recogido" : "badge badge-pendiente";
+
+                            <tr>
+                                <td>@p.Orden</td>
+                                <td>@p.NombreCliente</td>
+                                <td>@p.Direccion</td>
+                                <td><span class="@claseBadge">@p.Estado</span></td>
+                                <td>
+                                    <div class="actions" style="display:flex; gap:10px; flex-wrap:wrap;">
+                                        <a class="btn-link btn-primary" href="@googleMapsUrl" target="_blank" rel="noopener">
+                                            Ir a recoger →
+                                        </a>
+
+                                        @if (p.Estado != "Recogido")
+                                        {
+                                            <form asp-action="MarcarRecogido" asp-controller="Conductor" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@p.Id" />
+                                                <button type="submit" class="btn-link btn-secondary">
+                                                    Marcar recogido
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @* Cuando todos están recogidos: Aeropuerto + Finalizar *@
+            @if (todosRecogidos)
+            {
+                <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <a class="btn-link btn-primary" href="@urlAeropuerto" target="_blank" rel="noopener">
+                        Ir al Aeropuerto Juan Santamaría →
+                    </a>
+
+                    <form asp-action="FinalizarViaje" asp-controller="Conductor" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-link btn-secondary">
+                            Finalizar viaje
+                        </button>
+                    </form>
+                </div>
+            }
+        }
     </div>
 </body>
 </html>
-
-
