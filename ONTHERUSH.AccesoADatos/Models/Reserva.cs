@@ -9,27 +9,32 @@ namespace ONTHERUSH.AccesoADatos.Models
         public int ReservaId { get; set; }
 
         [Required]
-        public int ViajeId { get; set; }
+        public TimeSpan HoraDestino { get; set; }
 
         [Required]
-        public string UserId { get; set; } = string.Empty;
-
-        [StringLength(300)]
-        public string? ParadaDestino { get; set; }
+        [MaxLength(50)]
+        public string Provincia { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(50)]
-        public string Estado { get; set; } = "Activa";
+        [MaxLength(100)]
+        public string Canton { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(100)]
+        public string Distrito { get; set; } = string.Empty;
 
         public DateTime FechaReserva { get; set; } = DateTime.Now;
 
-        public DateTime? FechaCancelacion { get; set; }
+        [Required]
+        [MaxLength(20)]
+        public string Estado { get; set; } = "Pendiente";
 
+        [Required]
+        public string UserId { get; set; } = string.Empty;
+        public virtual ApplicationUser? Usuario { get; set; }
 
-        [ForeignKey("ViajeId")]
-        public Viaje Viaje { get; set; } = null!;
-
-        [ForeignKey("UserId")]
-        public ApplicationUser Usuario { get; set; } = null!;
+        // Por si Heiner lo ocupa para mostrar el viaje en la reserva
+        public int? ViajeId { get; set; }
+        public virtual Viaje? Viaje { get; set; }
     }
 }

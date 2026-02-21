@@ -9,6 +9,7 @@ namespace ONTHERUSH.Abstracciones.Interfaces
         Task<bool> RolExiste(string rol);
         Task<ResultadoOperacion> CrearAdministrador(string userId);
         Task<ResultadoOperacion> CrearConductor(string userId);
+        Task<ResultadoOperacion> EliminarUsuario(object usuario);
     }
 }
 

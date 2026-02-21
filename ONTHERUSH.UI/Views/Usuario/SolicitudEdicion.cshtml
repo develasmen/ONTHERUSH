@@ -7,87 +7,192 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Solicitud de edición de datos - ON THE RUSH</title>
+    <title>Solicitar Cambios - ON THE RUSH</title>
 
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/components/buttons.css" />
     <link rel="stylesheet" href="~/css/components/forms.css" />
-    <link rel="stylesheet" href="~/css/auth.css" />
+
+    <style>
+        .dashboard-wrapper {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .dashboard-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-subtitle {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .form-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .form-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .form-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 4px;
+            display: block;
+        }
+
+        body {
+            background: #f4f5fb;
+        }
+
+        .dash-footer {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .button-group .btn {
+            flex: 1;
+        }
+    </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>Solicitud de edición de información</h1>
-                <p>Complete los datos que desea actualizar y envíe la solicitud.</p>
+    <div class="dashboard-wrapper">
+        <div class="dashboard-title">Solicitar Cambios</div>
+        <div class="dashboard-subtitle">
+            Solicite cambios en su correo electrónico o dirección.
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">
+                @ViewBag.Error
             </div>
+        }
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger">
-                    @ViewBag.Error
-                </div>
-            }
+        <div class="alert alert-info">
+            <strong>Importante:</strong> Los cambios deben ser aprobados por un administrador antes de aplicarse.
+        </div>
 
-            @if (ViewBag.Info != null)
-            {
-                <div class="alert alert-warning">
-                    @ViewBag.Info
-                </div>
-            }
-
-            @if (ViewBag.Exito != null)
-            {
-                <div class="alert alert-success">
-                    @ViewBag.Exito
-                </div>
-            }
-
-            <form asp-action="SolicitudEdicion" asp-controller="Usuario" method="post" class="auth-form">
+        <!-- Formulario Cambio de Email -->
+        <div class="form-card">
+            <h4>Cambiar Correo Electrónico</h4>
+            <form asp-action="SolicitarCambioEmail" method="post">
                 <div class="form-group">
-                    <label for="nombre">Nombre completo</label>
-                    <input type="text" id="nombre" name="nombre" class="form-input" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="correo">Correo electrónico</label>
-                    <input type="email" id="correo" name="correo" class="form-input" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="ubicacion">Ubicación</label>
-                    <input type="text" id="ubicacion" name="ubicacion" class="form-input" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="detalleCambios">Detalle de los cambios solicitados</label>
-                    <textarea id="detalleCambios"
-                              name="detalleCambios"
-                              class="form-input"
-                              rows="3"
-                              placeholder="Describa los cambios que desea realizar (teléfono, dirección, etc.)"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <input type="checkbox" id="huboCambios" name="huboCambios" value="true" />
-                    <label for="huboCambios">
-                        He modificado mis datos en esta solicitud
+                    <label for="nuevoEmail" class="form-label">
+                        Nuevo correo electrónico
                     </label>
+                    <input type="email"
+                           class="form-control"
+                           id="nuevoEmail"
+                           name="nuevoEmail"
+                           placeholder="nuevo-email@ejemplo.com"
+                           required />
+                    <small class="form-text">
+                        Este será tu nuevo correo para iniciar sesión.
+                    </small>
                 </div>
-
-                <button type="submit" class="btn btn-primary">
-                    Enviar solicitud
-                </button>
-
-                <button type="button"
-                        class="btn btn-secondary"
-                        onclick="window.location.href='@Url.Action("PanelUsuario", "Auth")'">
-                    Volver al panel de usuario
-                </button>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        Solicitar Cambio
+                    </button>
+                </div>
             </form>
+        </div>
+
+        <!-- Formulario Cambio de Dirección -->
+        <div class="form-card">
+            <h4>Cambiar Dirección</h4>
+            <form asp-action="SolicitarCambioDireccion" method="post">
+                <div class="form-group">
+                    <label for="nuevaDireccion" class="form-label">
+                        Nueva dirección (coordenadas de Google Maps)
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           id="nuevaDireccion"
+                           name="nuevaDireccion"
+                           placeholder="Ingrese las coordenadas de su nueva dirección"
+                           required />
+                    <small class="form-text">
+                        Puede pegar las coordenadas de Google Maps (ej. -12.043333, -77.028333).
+                    </small>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        Solicitar Cambio
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <a href="@Url.Action("PanelPasajero", "Usuario")" class="btn btn-secondary" style="width:100%;">
+            Volver al Panel
+        </a>
+
+        <div class="dash-footer">
+            <small>ON THE RUSH · Pasajero</small>
         </div>
     </div>
 </body>
 </html>
-
-

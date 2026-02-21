@@ -92,5 +92,27 @@ namespace ONTHERUSH.AccesoADatos.Repositories
                 Mensaje = "Registro de conductor creado"
             };
         }
+
+        public async Task<ResultadoOperacion> EliminarUsuario(object usuario)
+        {
+            var user = (ApplicationUser)usuario;
+            var result = await _userManager.DeleteAsync(user);
+
+            if (result.Succeeded)
+            {
+                return new ResultadoOperacion
+                {
+                    Exito = true,
+                    Mensaje = "Usuario eliminado exitosamente"
+                };
+            }
+
+            var errores = string.Join(", ", result.Errors.Select(e => e.Description));
+            return new ResultadoOperacion
+            {
+                Exito = false,
+                Mensaje = $"Error al eliminar usuario: {errores}"
+            };
+        }
     }
 }

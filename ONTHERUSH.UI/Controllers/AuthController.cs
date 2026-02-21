@@ -99,7 +99,7 @@ namespace ONTHERUSH.UI.Controllers
             }
             else if (roles.Contains("Pasajero"))
             {
-                return RedirectToAction("ReservaTransporte", "Usuario");
+                return RedirectToAction("PanelPasajero", "Usuario"); 
             }
 
             return RedirectToAction("Index", "Home");

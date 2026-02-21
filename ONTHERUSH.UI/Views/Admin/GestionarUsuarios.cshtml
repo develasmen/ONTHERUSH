@@ -58,6 +58,11 @@
                                 </select>
                                 <button type="submit" class="btn btn-sm btn-primary">Asignar</button>
                             </form>
+
+                            <form asp-action="RechazarUsuario" method="post" class="d-inline" onsubmit="return confirm('¿Estás seguro de rechazar a @usuario.Nombre @usuario.Apellido? Esta acción eliminará la solicitud del usuario.');">
+                                <input type="hidden" name="userId" value="@usuario.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger">Rechazar</button>
+                            </form>
                         </td>
                     </tr>
                 }
