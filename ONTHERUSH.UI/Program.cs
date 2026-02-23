@@ -15,12 +15,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Registrar Repositorios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
+builder.Services.AddScoped<ISolicitudCambioRepository, SolicitudCambioRepository>();
 
 // Registrar Servicios
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddSingleton<RutaAsignacionService>();
+builder.Services.AddScoped<IReservaService, ReservaService>();
+builder.Services.AddScoped<ISolicitudCambioService, SolicitudCambioService>();
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

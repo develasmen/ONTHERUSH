@@ -15,15 +15,18 @@ namespace ONTHERUSH.UI.Controllers
         private readonly IAdminService _adminService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RutaAsignacionService _rutaAsignacionService;
+        private readonly ISolicitudCambioService _solicitudCambioService;
 
         public AdminController(
             IAdminService adminService,
             UserManager<ApplicationUser> userManager,
-            RutaAsignacionService rutaAsignacionService)
+            RutaAsignacionService rutaAsignacionService,
+            ISolicitudCambioService solicitudCambioService)
         {
             _adminService = adminService;
             _userManager = userManager;
             _rutaAsignacionService = rutaAsignacionService;
+            _solicitudCambioService = solicitudCambioService;
         }
 
         public IActionResult PanelAdministrador()
@@ -56,19 +59,71 @@ namespace ONTHERUSH.UI.Controllers
             return RedirectToAction("GestionarUsuarios");
         }
 
-        public IActionResult Login()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RechazarUsuario(string userId)
         {
-            return View();
+            var resultado = await _adminService.RechazarUsuario(userId);
+
+            if (resultado.Exito)
+            {
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
+            }
+
+            return RedirectToAction("GestionarUsuarios");
         }
 
-        public IActionResult DescargarReportes()
+        // GESTIONAR SOLICITUDES DE CAMBIO
+
+        public async Task<IActionResult> GestionarSolicitudes()
         {
-            return View();
+            var solicitudesObj = await _solicitudCambioService.ObtenerSolicitudesPendientes();
+
+            var solicitudes = solicitudesObj
+                .Cast<SolicitudCambio>()
+                .ToList();
+
+            return View(solicitudes);
         }
 
-        public IActionResult ActualizarSolicitud()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AprobarSolicitud(int solicitudId)
         {
-            return View();
+            var resultado = await _solicitudCambioService.AprobarSolicitud(solicitudId);
+
+            if (resultado.Exito)
+            {
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
+            }
+
+            return RedirectToAction("GestionarSolicitudes");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RechazarSolicitudCambio(int solicitudId, string motivoRechazo)
+        {
+            var resultado = await _solicitudCambioService.RechazarSolicitud(solicitudId, motivoRechazo);
+
+            if (resultado.Exito)
+            {
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
+            }
+
+            return RedirectToAction("GestionarSolicitudes");
         }
 
         // ASIGNAR RUTAS
@@ -132,8 +187,26 @@ namespace ONTHERUSH.UI.Controllers
 
             _rutaAsignacionService.AsignarRuta(conductorId, paradas);
 
-            TempData["Exito"] = " Ruta asignada correctamente al conductor.";
+            TempData["Exito"] = "Ruta asignada correctamente al conductor.";
+
             return RedirectToAction(nameof(AsignarRutas));
+        }
+
+        // OTRAS VISTAS
+
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        public IActionResult DescargarReportes()
+        {
+            return View();
+        }
+
+        public IActionResult ActualizarSolicitud()
+        {
+            return View();
         }
     }
 }

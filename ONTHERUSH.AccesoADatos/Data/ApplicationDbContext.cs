@@ -18,6 +18,12 @@ namespace ONTHERUSH.AccesoADatos.Data
         public DbSet<Reserva> Reservas { get; set; }
         public DbSet<Auditoria> Auditorias { get; set; }
 
+
+
+        //Tal vez esto se tenga que cambiar 
+        public DbSet<SolicitudCambio> SolicitudesCambio { get; set; }
+        //
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

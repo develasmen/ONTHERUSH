@@ -6,5 +6,6 @@ namespace ONTHERUSH.Abstracciones.Interfaces
     {
         Task<List<object>> ObtenerUsuariosSinRol();
         Task<ResultadoOperacion> AsignarRol(string userId, string rol);
+        Task<ResultadoOperacion> RechazarUsuario(string userId);
     }
 }

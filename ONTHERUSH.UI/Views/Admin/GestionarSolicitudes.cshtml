@@ -1,0 +1,129 @@
+@model IEnumerable<ONTHERUSH.AccesoADatos.Models.SolicitudCambio>
+
+@{
+    ViewData["Title"] = "Gestionar Solicitudes";
+}
+
+<div class="container mt-4">
+    <h2>Solicitudes de Cambio Pendientes</h2>
+
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Exito"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Tipo de Cambio</th>
+                    <th>Valor Actual</th>
+                    <th>Valor Nuevo</th>
+                    <th>Fecha Solicitud</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var solicitud in Model)
+                {
+                    <tr>
+                        <td>@solicitud.Usuario?.Nombre @solicitud.Usuario?.Apellido</td>
+                        <td>@solicitud.Usuario?.Email</td>
+                        <td>
+                            @if (solicitud.TipoCambio == "Email")
+                            {
+                                <span class="badge bg-primary">Correo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-info">Dirección</span>
+                            }
+                        </td>
+                        <td>
+                            <small class="text-muted">@solicitud.ValorActual</small>
+                        </td>
+                        <td>
+                            <strong>@solicitud.ValorNuevo</strong>
+                        </td>
+                        <td>@solicitud.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <!-- Botón Aprobar -->
+                            <form asp-action="AprobarSolicitud" method="post" class="d-inline">
+                                <input type="hidden" name="solicitudId" value="@solicitud.SolicitudCambioId" />
+                                <button type="submit" 
+                                        class="btn btn-sm btn-success"
+                                        onclick="return confirm('¿Aprobar este cambio?')">
+                                    Aprobar
+                                </button>
+                            </form>
+
+                            <!-- Botón Rechazar con Modal -->
+                            <button type="button" 
+                                    class="btn btn-sm btn-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#modalRechazo@(solicitud.SolicitudCambioId)">
+                                Rechazar
+                            </button>
+
+                            <!-- Modal para Motivo de Rechazo -->
+                            <div class="modal fade" id="modalRechazo@(solicitud.SolicitudCambioId)" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Rechazar Solicitud</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form asp-action="RechazarSolicitudCambio" method="post">
+                                            <div class="modal-body">
+                                                <input type="hidden" name="solicitudId" value="@solicitud.SolicitudCambioId" />
+                                                <div class="mb-3">
+                                                    <label for="motivoRechazo" class="form-label">Motivo del rechazo:</label>
+                                                    <textarea class="form-control" 
+                                                              id="motivoRechazo" 
+                                                              name="motivoRechazo" 
+                                                              rows="3" 
+                                                              required
+                                                              placeholder="Explique por qué se rechaza esta solicitud..."></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-danger">Rechazar Solicitud</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No hay solicitudes pendientes.
+        </div>
+    }
+
+    <a asp-action="PanelAdministrador" class="btn btn-secondary mt-3">Volver al Panel</a>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+}

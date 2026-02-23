@@ -84,5 +84,37 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
             resultado.Mensaje = $"Rol '{rol}' asignado exitosamente a {usuario.Nombre} {usuario.Apellido}.";
             return resultado;
         }
+
+        public async Task<ResultadoOperacion> RechazarUsuario(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return new ResultadoOperacion
+                {
+                    Exito = false,
+                    Mensaje = "ID de usuario inválido."
+                };
+            }
+
+            var usuarioObj = await _usuarioRepository.ObtenerPorId(userId);
+            if (usuarioObj == null)
+            {
+                return new ResultadoOperacion
+                {
+                    Exito = false,
+                    Mensaje = "Usuario no encontrado."
+                };
+            }
+
+            var usuario = (ApplicationUser)usuarioObj;
+            var resultado = await _adminRepository.EliminarUsuario(usuarioObj);
+
+            if (resultado.Exito)
+            {
+                resultado.Mensaje = $"Usuario {usuario.Nombre} {usuario.Apellido} rechazado y eliminado exitosamente.";
+            }
+
+            return resultado;
+        }
     }
 }
