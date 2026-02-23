@@ -132,7 +132,7 @@ namespace ONTHERUSH.UI.Controllers
 
             _rutaAsignacionService.AsignarRuta(conductorId, paradas);
 
-            TempData["Exito"] = "✅ Ruta asignada correctamente al conductor.";
+            TempData["Exito"] = " Ruta asignada correctamente al conductor.";
             return RedirectToAction(nameof(AsignarRutas));
         }
     }
