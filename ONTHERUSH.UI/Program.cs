@@ -1,16 +1,20 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ONTHERUSH.Abstracciones.Interfaces;
+using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Data;
 using ONTHERUSH.AccesoADatos.Models;
 using ONTHERUSH.AccesoADatos.Repositories;
-using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.LogicaDeNegocio.Services;
+using QuestPDF.Infrastructure;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
+QuestPDF.Settings.License = LicenseType.Community;
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -28,6 +32,7 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddSingleton<RutaAsignacionService>();
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<ISolicitudCambioService, SolicitudCambioService>();
+builder.Services.AddScoped<ReporteViajesService>();
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
