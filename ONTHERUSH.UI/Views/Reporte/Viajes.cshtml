@@ -1,0 +1,122 @@
+﻿@model ReporteViajesVM
+
+@{
+    ViewData["Title"] = "Reporte de Viajes";
+}
+
+<div class="container mt-4">
+
+    <!-- TÍTULO -->
+    <div class="row mb-3">
+        <div class="col">
+            <h2 class="fw-bold text-primary">
+                <i class="bi bi-truck"></i> Reporte de Viajes
+            </h2>
+            <hr />
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+    <form method="get" asp-action="Viajes">
+        <div class="row align-items-end g-3">
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Fecha inicio</label>
+                <input type="date"
+                       class="form-control"
+                       name="fechaInicio"
+                       value="@Model.FechaInicio?.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Fecha fin</label>
+                <input type="date"
+                       class="form-control"
+                       name="fechaFin"
+                       value="@Model.FechaFin?.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-6 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Consultar
+                </button>
+
+                @if (Model.Viajes.Any())
+                {
+                    <a asp-action="ExportarPdf"
+                       asp-route-fechaInicio="@Model.FechaInicio?.ToString("yyyy-MM-dd")"
+                       asp-route-fechaFin="@Model.FechaFin?.ToString("yyyy-MM-dd")"
+                       class="btn btn-danger">
+                        <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                    </a>
+                }
+            </div>
+
+        </div>
+    </form>
+
+    <!-- TABLA -->
+    <div class="row mt-4">
+        <div class="col">
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-light fw-semibold">
+                    Resultados
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+
+                        <table class="table table-striped table-hover mb-0 align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Ruta</th>
+                                    <th>Salida</th>
+                                    <th>Llegada</th>
+                                    <th>Conductor</th>
+                                    <th>Vehículo</th>
+                                    <th>Pasajeros</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @if (!Model.Viajes.Any())
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            No hay datos para el rango seleccionado
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var v in Model.Viajes)
+                                    {
+                                        <tr>
+                                            <td>@v.Ruta</td>
+                                            <td>@v.Salida.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>@v.Llegada.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>@v.Conductor</td>
+                                            <td>@v.Vehiculo</td>
+                                            <td class="text-center">@v.Pasajeros</td>
+                                            <td>
+                                                <span class="badge bg-success">
+                                                    @v.Estado
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
