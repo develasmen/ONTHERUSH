@@ -1,0 +1,42 @@
+body {
+    background: #f4f5fb;
+}
+
+.conductor-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.conductor-container h2 {
+    margin-bottom: 20px;
+}
+
+.conductor-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.conductor-table th,
+.conductor-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.conductor-table th {
+    background: #f3f3f3;
+}
+
+.estado-pendiente {
+    color: #e65100;
+    font-weight: bold;
+}
+
+.estado-recogido {
+    color: #2e7d32;
+    font-weight: bold;
+}

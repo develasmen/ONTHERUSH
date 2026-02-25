@@ -1,37 +1,25 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
+using ONTHERUSH.Abstracciones.DTOs;
+using ONTHERUSH.Abstracciones.Interfaces;
+using ONTHERUSH.AccesoADatos.Models;
 
 namespace ONTHERUSH.UI.Controllers
 {
     public class AuthController : Controller
     {
-        public IActionResult Login()
+        private readonly IAuthService _authService;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public AuthController(
+            IAuthService authService,
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager)
         {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Login(string correo, string contrasena)
-        {
-            if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasena))
-            {
-                ViewBag.Error = "Por favor llenar todos los campos requeridos.";
-                return View();
-            }
-
-            var correoDemo = "usuario@demo.com";
-            var contrasenaDemo = "1234";
-
-            if (correo == correoDemo && contrasena == contrasenaDemo)
-            {
-                TempData["MensajeBienvenida"] = "Inicio de sesión exitoso. ¡Bienvenido al panel de usuario!";
-                return RedirectToAction("PanelUsuario");
-            }
-            else
-            {
-                ViewBag.Error = "Las credenciales son incorrectas, por favor intentar de nuevo.";
-                return View();
-            }
+            _authService = authService;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         public IActionResult Registro()
@@ -40,100 +28,151 @@ namespace ONTHERUSH.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Registro(
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Registro(
             string cedula,
             string nombre,
+            string apellido,
             string correo,
             string ubicacion,
             string contrasena,
             string confirmarContrasena)
         {
-            if (string.IsNullOrWhiteSpace(cedula) ||
-                string.IsNullOrWhiteSpace(nombre) ||
-                string.IsNullOrWhiteSpace(correo) ||
-                string.IsNullOrWhiteSpace(ubicacion) ||
-                string.IsNullOrWhiteSpace(contrasena) ||
-                string.IsNullOrWhiteSpace(confirmarContrasena))
+            var dto = new RegistroUsuarioDto
             {
-                ViewBag.Error = "Por favor llenar todos los campos requeridos.";
-                return View();
-            }
+                Cedula = cedula,
+                Nombre = nombre,
+                Apellido = apellido,
+                Correo = correo,
+                Ubicacion = ubicacion,
+                Contrasena = contrasena,
+                ConfirmarContrasena = confirmarContrasena
+            };
 
-            if (contrasena != confirmarContrasena)
+            var resultado = await _authService.RegistrarUsuario(dto);
+
+            if (resultado.Exito)
             {
-                ViewBag.Error = "Las contraseñas no coinciden.";
-                return View();
+                ViewBag.Exito = resultado.Mensaje;
             }
-
-            ViewBag.Exito = "Registro exitoso. ¡Su cuenta ha sido creada!";
+            else
+            {
+                ViewBag.Error = resultado.Mensaje;
+            }
 
             return View();
         }
-        public IActionResult OlvidoContrasena()
+
+        public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult OlvidoContrasena(string correo)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(string correo, string contrasena)
         {
-            if (string.IsNullOrWhiteSpace(correo))
+            var dto = new LoginDto
             {
-                ViewBag.Error = "Por favor ingresar un correo electrónico.";
+                Correo = correo,
+                Contrasena = contrasena
+            };
+
+            var resultado = await _authService.IniciarSesion(dto);
+
+            if (!resultado.Exito)
+            {
+                ViewBag.Error = resultado.Mensaje;
                 return View();
             }
 
-            if (!EsCorreoValido(correo))
+            var usuario = await _userManager.FindByEmailAsync(correo);
+            var roles = await _userManager.GetRolesAsync(usuario);
+
+            if (roles.Contains("Administrador"))
             {
-                ViewBag.Error = "Formato de correo inválido.";
-                return View();
+                return RedirectToAction("PanelAdministrador", "Admin");
+            }
+            else if (roles.Contains("Conductor"))
+            {
+                return RedirectToAction("PanelConductor", "Conductor");
+            }
+            else if (roles.Contains("Pasajero"))
+            {
+                return RedirectToAction("PanelPasajero", "Usuario"); 
             }
 
-            var correoDemoRegistrado = "usuario@demo.com";
+            return RedirectToAction("Index", "Home");
+        }
 
-            if (!string.Equals(correo, correoDemoRegistrado, System.StringComparison.OrdinalIgnoreCase))
+        [HttpGet]
+        public IActionResult RecuperarContrasena()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecuperarContrasena(string correo)
+        {
+            var resultado = await _authService.RecuperarContrasena(correo);
+
+            if (resultado.Exito)
             {
-                ViewBag.Error = "Correo no encontrado.";
-                return View();
+                ViewBag.Exito = resultado.Mensaje;
             }
-
-            ViewBag.Exito = "Se ha enviado un correo con el enlace para restablecer su contraseña.";
+            else
+            {
+                ViewBag.Error = resultado.Mensaje;
+            }
 
             return View();
         }
 
-        private bool EsCorreoValido(string correo)
+        [HttpGet]
+        public IActionResult RestablecerContrasena(string email, string token)
         {
-            var regex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-            return regex.IsMatch(correo);
-        }
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
+            {
+                ViewBag.Error = "Enlace invÃ¡lido.";
+                return View();
+            }
 
-      
-        public IActionResult PanelUsuario()
-        {
+            ViewBag.Email = email;
+            ViewBag.Token = token;
             return View();
         }
 
-      
-        public IActionResult CerrarSesionUsuario(string estado)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RestablecerContrasena(
+            string email,
+            string token,
+            string nuevaContrasena,
+            string confirmarContrasena)
         {
-            switch (estado)
+            var resultado = await _authService.RestablecerContrasena(email, token, nuevaContrasena, confirmarContrasena);
+
+            if (resultado.Exito)
             {
-                case "activa":
-                    TempData["MensajeSesion"] = "Sesión cerrada correctamente.";
-                    break;
-
-                case "expirada":
-                    TempData["MensajeSesion"] = "Sesión expirada";
-                    break;
-
-                case "inactiva":
-                default:
-                    TempData["MensajeSesion"] = "Sesión no activa";
-                    break;
+                ViewBag.Exito = resultado.Mensaje;
+            }
+            else
+            {
+                ViewBag.Error = resultado.Mensaje;
+                ViewBag.Email = email;
+                ViewBag.Token = token;
             }
 
-            return RedirectToAction("Login");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Login", "Auth");
         }
     }
 }

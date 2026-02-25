@@ -155,6 +155,33 @@ namespace ONTHERUSH.AccesoADatos.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Administrador", b =>
+                {
+                    b.Property<int>("AdministradorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AdministradorId"));
+
+                    b.Property<string>("Cargo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("FechaContratacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AdministradorId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Administradores");
+                });
+
             modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -244,6 +271,277 @@ namespace ONTHERUSH.AccesoADatos.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Auditoria", b =>
+                {
+                    b.Property<int>("AuditoriaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuditoriaId"));
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("FechaHora")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RegistroId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tabla")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AuditoriaId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Auditorias");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Conductor", b =>
+                {
+                    b.Property<int>("ConductorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConductorId"));
+
+                    b.Property<bool>("Estado")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("FechaContratacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaUltimaModificacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ConductorId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Conductores");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Reserva", b =>
+                {
+                    b.Property<int>("ReservaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservaId"));
+
+                    b.Property<string>("Canton")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Distrito")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("FechaReserva")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("HoraDestino")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Provincia")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("ViajeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReservaId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ViajeId");
+
+                    b.ToTable("Reservas");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.SolicitudCambio", b =>
+                {
+                    b.Property<int>("SolicitudCambioId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SolicitudCambioId"));
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("FechaRespuesta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaSolicitud")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MotivoRechazo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("TipoCambio")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ValorActual")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ValorNuevo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("SolicitudCambioId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("SolicitudesCambio");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Vehiculo", b =>
+                {
+                    b.Property<int>("VehiculoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehiculoId"));
+
+                    b.Property<int>("Año")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CapacidadPasajeros")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Marca")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Modelo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Placa")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("VehiculoId");
+
+                    b.ToTable("Vehiculos");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Viaje", b =>
+                {
+                    b.Property<int>("ViajeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ViajeId"));
+
+                    b.Property<int>("AsignadoPorAdminId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CantidadPasajeros")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ConductorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("FechaAsignacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaHoraSalida")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("HoraEstimadaLlegada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NombreRuta")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Paradas")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PuntoPartida")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("VehiculoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ViajeId");
+
+                    b.HasIndex("AsignadoPorAdminId");
+
+                    b.HasIndex("ConductorId");
+
+                    b.HasIndex("VehiculoId");
+
+                    b.ToTable("Viajes");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -293,6 +591,107 @@ namespace ONTHERUSH.AccesoADatos.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Administrador", b =>
+                {
+                    b.HasOne("ONTHERUSH.AccesoADatos.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Auditoria", b =>
+                {
+                    b.HasOne("ONTHERUSH.AccesoADatos.Models.ApplicationUser", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Conductor", b =>
+                {
+                    b.HasOne("ONTHERUSH.AccesoADatos.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Reserva", b =>
+                {
+                    b.HasOne("ONTHERUSH.AccesoADatos.Models.ApplicationUser", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ONTHERUSH.AccesoADatos.Models.Viaje", "Viaje")
+                        .WithMany("Reservas")
+                        .HasForeignKey("ViajeId");
+
+                    b.Navigation("Usuario");
+
+                    b.Navigation("Viaje");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.SolicitudCambio", b =>
+                {
+                    b.HasOne("ONTHERUSH.AccesoADatos.Models.ApplicationUser", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Viaje", b =>
+                {
+                    b.HasOne("ONTHERUSH.AccesoADatos.Models.Administrador", "AsignadoPor")
+                        .WithMany()
+                        .HasForeignKey("AsignadoPorAdminId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ONTHERUSH.AccesoADatos.Models.Conductor", "Conductor")
+                        .WithMany("Viajes")
+                        .HasForeignKey("ConductorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ONTHERUSH.AccesoADatos.Models.Vehiculo", "Vehiculo")
+                        .WithMany("Viajes")
+                        .HasForeignKey("VehiculoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AsignadoPor");
+
+                    b.Navigation("Conductor");
+
+                    b.Navigation("Vehiculo");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Conductor", b =>
+                {
+                    b.Navigation("Viajes");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Vehiculo", b =>
+                {
+                    b.Navigation("Viajes");
+                });
+
+            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Viaje", b =>
+                {
+                    b.Navigation("Reservas");
                 });
 #pragma warning restore 612, 618
         }

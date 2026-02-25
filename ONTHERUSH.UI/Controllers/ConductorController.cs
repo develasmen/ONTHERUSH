@@ -1,199 +1,134 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ONTHERUSH.Abstracciones.DTOs;
+using ONTHERUSH.AccesoADatos.Models;
+using ONTHERUSH.LogicaDeNegocio.Services;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ONTHERUSH.UI.Controllers
 {
+    [Authorize(Roles = "Conductor")]
     public class ConductorController : Controller
     {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RutaAsignacionService _rutaAsignacionService;
 
-        public IActionResult Login()
+        public ConductorController(
+            UserManager<ApplicationUser> userManager,
+            RutaAsignacionService rutaAsignacionService)
         {
-            return View();
+            _userManager = userManager;
+            _rutaAsignacionService = rutaAsignacionService;
         }
 
-
-        [HttpPost]
-        public IActionResult Login(string correo, string contrasena)
-        {
- 
-            if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasena))
-            {
-                ViewBag.Error = "Por favor rellenar todos los campos necesarios.";
-                return View();
-            }
-
-         
-            var correoDemo = "conductor@demo.com";
-            var passDemo = "cond123";
-
-            if (correo == correoDemo && contrasena == passDemo)
-            {
-         
-                TempData["MensajeBienvenidaConductor"] = "Inicio de sesiÛn exitoso. Bienvenido al panel de conductores.";
-                return RedirectToAction("PanelConductor");
-            }
-            else
-            {
-                ViewBag.Error = "Las credenciales son incorrectas, por favor intente de nuevo.";
-                return View();
-            }
-        }
-
-        public IActionResult Registro()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Registro(
-            string cedula,
-            string nombre,
-            string numero,
-            string correo,
-            string direccion)
-        {
-            if (string.IsNullOrWhiteSpace(cedula) ||
-                string.IsNullOrWhiteSpace(nombre) ||
-                string.IsNullOrWhiteSpace(numero) ||
-                string.IsNullOrWhiteSpace(correo) ||
-                string.IsNullOrWhiteSpace(direccion))
-            {
-                ViewBag.Error = "Los campos estan vacios o incorrectos, por favor revisar.";
-                return View();
-            }
-
-            var correoDemo = "conductor@demo.com";
-            if (correo == correoDemo)
-            {
-                ViewBag.Error = "Sus credenciales han sido registradas exitosamente.";
-                return View();
-            }
-
-            ViewBag.Exito = "Informacion guardada con exito";
-
-            return View();
-        }
+        [HttpGet]
         public IActionResult PanelConductor()
         {
             return View();
         }
+
+        [HttpGet]
         public IActionResult ActualizarEstadoViaje()
         {
             return View();
         }
 
-        [HttpPost]
-        public IActionResult ActualizarEstadoViaje(string idViaje, string accion)
-        {
-
-            if (string.IsNullOrWhiteSpace(idViaje))
-            {
-                ViewBag.Error = "Por favor ingrese el identificador del viaje.";
-                return View();
-            }
-
-            if (accion == "error")
-            {
-                ViewBag.Error = "No es posible actualizar el viaje";
-            }
-            else if (accion == "yaActualizada")
-            {
-                ViewBag.Info = "La ruta ya ha sido actualizada";
-            }
-            else
-            {
-                ViewBag.Exito = "El estado del viaje se ha actualizado correctamente.";
-            }
-
-            return View();
-        }
-
+        [HttpGet]
         public IActionResult SolicitarActualizacionRuta()
         {
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> VerPasajeros()
+        {
+            var conductor = await _userManager.GetUserAsync(User);
+            if (conductor == null)
+                return RedirectToAction("Login", "Auth");
+
+            // Trae la ruta asignada por el Admin (en memoria)
+            var paradas = _rutaAsignacionService.ObtenerRuta(conductor.Id);
+
+            // Si no hay ruta asignada, mandamos lista vac√≠a con mensajito
+            if (paradas == null || paradas.Count == 0)
+            {
+                TempData["Mensaje"] = "‚ö†Ô∏è No tienes una ruta asignada todav√≠a.";
+                return View(new List<ParadaAsignadaDto>());
+            }
+
+            // Recogidos por conductor (TempData separado por conductor)
+            var key = $"Recogidos_{conductor.Id}";
+            var recogidos = TempData[key] as string;
+            var idsRecogidos = new HashSet<int>();
+
+            if (!string.IsNullOrWhiteSpace(recogidos))
+            {
+                idsRecogidos = recogidos.Split(',')
+                    .Select(x => int.TryParse(x, out var id) ? id : 0)
+                    .Where(id => id > 0)
+                    .ToHashSet();
+            }
+
+            foreach (var p in paradas)
+            {
+                if (idsRecogidos.Contains(p.Id))
+                    p.Estado = "Recogido";
+            }
+
+            TempData.Keep(key);
+
+            return View(paradas.OrderBy(x => x.Orden).ToList());
+        }
+
         [HttpPost]
-        public IActionResult SolicitarActualizacionRuta(
-            string idRuta,
-            string motivo,
-            bool hayCambios)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarcarRecogido(int id)
         {
-            if (string.IsNullOrWhiteSpace(idRuta) || string.IsNullOrWhiteSpace(motivo))
+            var conductor = await _userManager.GetUserAsync(User);
+            if (conductor == null)
+                return RedirectToAction("Login", "Auth");
+
+            var key = $"Recogidos_{conductor.Id}";
+            var recogidos = TempData[key] as string;
+            var set = new HashSet<int>();
+
+            if (!string.IsNullOrWhiteSpace(recogidos))
             {
-                ViewBag.Error = "Ha ocurrido un error , intente nuevamente";
-                return View();
+                set = recogidos.Split(',')
+                    .Select(x => int.TryParse(x, out var n) ? n : 0)
+                    .Where(n => n > 0)
+                    .ToHashSet();
             }
 
-            if (!hayCambios)
-            {
-                ViewBag.Info = "No hay nigun cambio por realizar";
-                return View();
-            }
+            set.Add(id);
 
-            ViewBag.Exito = "Su solicitud ha sido enviada exitosamente.";
+            TempData[key] = string.Join(",", set);
+            TempData["Mensaje"] = "‚úÖ Pasajero marcado como recogido.";
+            TempData.Keep(key);
 
-            return View();
-        }
-
-        public IActionResult VerPasajeros()
-        {
-            return View();
+            return RedirectToAction("VerPasajeros");
         }
 
         [HttpPost]
-        public IActionResult VerPasajeros(string idRuta, string estadoLista)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FinalizarViaje()
         {
+            var conductor = await _userManager.GetUserAsync(User);
+            if (conductor == null)
+                return RedirectToAction("Login", "Auth");
 
-            if (string.IsNullOrWhiteSpace(idRuta))
-            {
-                ViewBag.Error = "Por favor ingrese la ruta.";
-                return View();
-            }
+            // Borra ruta asignada
+            _rutaAsignacionService.LimpiarRuta(conductor.Id);
 
-            if (estadoLista == "error")
-            {
-                ViewBag.Error = "Ha ocurrido un error";
-                return View();
-            }
-            else if (estadoLista == "vacia")
-            {
-                ViewBag.Info = "No hay pasajeros en su ruta";
-                return View();
-            }
-            else
-            {
-                ViewBag.Exito = "Lista de pasajeros cargada correctamente (simulada).";
+            // Limpia recogidos del conductor
+            var key = $"Recogidos_{conductor.Id}";
+            TempData.Remove(key);
 
-                ViewBag.Pasajeros = new[]
-                {
-                    "Juan PÈrez",
-                    "MarÌa LÛpez",
-                    "Carlos RodrÌguez"
-                };
-
-                return View();
-            }
-        }
-
-        public IActionResult CerrarSesion(string estado)
-        {
-            switch (estado)
-            {
-                case "activa":
-                    TempData["MensajeSesionConductor"] = "SesiÛn cerrada correctamente.";
-                    break;
-
-                case "inactiva":
-                    TempData["MensajeSesionConductor"] = "SesiÛn no activa";
-                    break;
-
-                case "sinSesion":
-                default:
-                    TempData["MensajeSesionConductor"] = "No hay ninguna sesiÛn activa.";
-                    break;
-            }
-
-            return RedirectToAction("Login");
+            TempData["Mensaje"] = "‚úÖ Viaje finalizado. Ruta completada.";
+            return RedirectToAction("VerPasajeros");
         }
     }
 }

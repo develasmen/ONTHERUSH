@@ -4,14 +4,12 @@ using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Data;
 using ONTHERUSH.AccesoADatos.Models;
 using ONTHERUSH.AccesoADatos.Repositories;
+using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.LogicaDeNegocio.Services;
-using QuestPDF.Infrastructure;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-QuestPDF.Settings.License = LicenseType.Community;
 
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -31,29 +29,24 @@ builder.Services.AddSingleton<RutaAsignacionService>();
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<ISolicitudCambioService, SolicitudCambioService>();
 
-builder.Services.AddScoped<ReporteViajesService>();
-
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    // Configuraci�n de contrase�as
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
-    
-    // Configuraci�n de usuario
+
     options.User.RequireUniqueEmail = true;
-    
-    // Configuraci�n de lockout
+
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.MaxFailedAccessAttempts = 5;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Configurar cookies de autenticaci�n
+// Cookies
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Auth/Login";
@@ -67,6 +60,16 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+// Inicializador (roles admin etc.)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await DbInitializer.Initialize(services, userManager, roleManager);
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -77,7 +80,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// IMPORTANTE: Authentication debe ir antes de Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 

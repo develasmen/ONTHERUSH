@@ -1,82 +1,199 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ONTHERUSH.Abstracciones.DTOs;
+using ONTHERUSH.Abstracciones.Interfaces;
+using ONTHERUSH.AccesoADatos.Models;
+using ONTHERUSH.LogicaDeNegocio.Services;
+using System.Linq;
 
 namespace ONTHERUSH.UI.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class AdminController : Controller
     {
-        public IActionResult Login()
+        private readonly IAdminService _adminService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RutaAsignacionService _rutaAsignacionService;
+        private readonly ISolicitudCambioService _solicitudCambioService;
+
+        public AdminController(
+            IAdminService adminService,
+            UserManager<ApplicationUser> userManager,
+            RutaAsignacionService rutaAsignacionService,
+            ISolicitudCambioService solicitudCambioService)
+        {
+            _adminService = adminService;
+            _userManager = userManager;
+            _rutaAsignacionService = rutaAsignacionService;
+            _solicitudCambioService = solicitudCambioService;
+        }
+
+        public IActionResult PanelAdministrador()
         {
             return View();
         }
 
-        [HttpPost]
-        public IActionResult Login(string correo, string contrasena)
+        public async Task<IActionResult> GestionarUsuarios()
         {
+            var usuariosSinRolObj = await _adminService.ObtenerUsuariosSinRol();
 
-            if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasena))
+            var usuariosSinRol = usuariosSinRolObj
+                .Cast<ApplicationUser>()
+                .ToList();
+
+            return View(usuariosSinRol);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AsignarRol(string userId, string rol)
+        {
+            var resultado = await _adminService.AsignarRol(userId, rol);
+
+            if (resultado.Exito)
+                TempData["Exito"] = resultado.Mensaje;
+            else
+                TempData["Error"] = resultado.Mensaje;
+
+            return RedirectToAction("GestionarUsuarios");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RechazarUsuario(string userId)
+        {
+            var resultado = await _adminService.RechazarUsuario(userId);
+
+            if (resultado.Exito)
             {
-                ViewBag.Error = "Por favor llene todos los campos.";
-                return View();
-            }
-
-            var adminDemoCorreo = "admin@demo.com";
-            var adminDemoPass = "admin123";
-
-            if (correo == adminDemoCorreo && contrasena == adminDemoPass)
-            {
-                TempData["MensajeBienvenidaAdmin"] = "Inicio de sesión exitoso. Bienvenido al panel de administradores.";
-                return RedirectToAction("PanelAdministrador");
+                TempData["Exito"] = resultado.Mensaje;
             }
             else
             {
-                ViewBag.Error = "Las credenciales estan incorrectas.";
-                return View();
+                TempData["Error"] = resultado.Mensaje;
             }
+
+            return RedirectToAction("GestionarUsuarios");
         }
 
-        public IActionResult Registro()
+        // GESTIONAR SOLICITUDES DE CAMBIO
+
+        public async Task<IActionResult> GestionarSolicitudes()
         {
+            var solicitudesObj = await _solicitudCambioService.ObtenerSolicitudesPendientes();
+
+            var solicitudes = solicitudesObj
+                .Cast<SolicitudCambio>()
+                .ToList();
+
+            return View(solicitudes);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AprobarSolicitud(int solicitudId)
+        {
+            var resultado = await _solicitudCambioService.AprobarSolicitud(solicitudId);
+
+            if (resultado.Exito)
+            {
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
+            }
+
+            return RedirectToAction("GestionarSolicitudes");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RechazarSolicitudCambio(int solicitudId, string motivoRechazo)
+        {
+            var resultado = await _solicitudCambioService.RechazarSolicitud(solicitudId, motivoRechazo);
+
+            if (resultado.Exito)
+            {
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
+            }
+
+            return RedirectToAction("GestionarSolicitudes");
+        }
+
+        // ASIGNAR RUTAS
+
+        [HttpGet]
+        public async Task<IActionResult> AsignarRutas()
+        {
+            var conductores = await _userManager.GetUsersInRoleAsync("Conductor");
+            var pasajeros = await _userManager.GetUsersInRoleAsync("Pasajero");
+
+            ViewBag.Conductores = conductores;
+            ViewBag.Pasajeros = pasajeros;
+
             return View();
         }
 
         [HttpPost]
-        public IActionResult Registro(
-            string nombre,
-            string correo,
-            string contrasena,
-            string confirmarContrasena)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AsignarRutas(string conductorId, string[] pasajeroIds, int[] ordenes)
         {
-
-            if (string.IsNullOrWhiteSpace(nombre) ||
-                string.IsNullOrWhiteSpace(correo) ||
-                string.IsNullOrWhiteSpace(contrasena) ||
-                string.IsNullOrWhiteSpace(confirmarContrasena))
+            if (string.IsNullOrWhiteSpace(conductorId))
             {
-                ViewBag.Error = "Por favor llene todos los campos.";
-                return View();
+                TempData["Error"] = "Debe seleccionar un conductor.";
+                return RedirectToAction(nameof(AsignarRutas));
             }
 
-            if (contrasena != confirmarContrasena)
+            if (pasajeroIds == null || pasajeroIds.Length == 0)
             {
-                ViewBag.Error = "Las contraseñas no coinciden.";
-                return View();
+                TempData["Error"] = "Debe seleccionar al menos un pasajero.";
+                return RedirectToAction(nameof(AsignarRutas));
             }
 
-            var adminDemoCorreo = "admin@demo.com";
-            if (correo == adminDemoCorreo)
+            if (ordenes == null || ordenes.Length == 0)
             {
-                ViewBag.Error = "Las credenciales ya están registradas.";
-                return View();
+                TempData["Error"] = "Debe indicar el orden de la ruta.";
+                return RedirectToAction(nameof(AsignarRutas));
             }
 
+            if (pasajeroIds.Length != ordenes.Length)
+            {
+                TempData["Error"] = "El orden no coincide con los pasajeros seleccionados. Revise los datos.";
+                return RedirectToAction(nameof(AsignarRutas));
+            }
 
-            ViewBag.Exito = "Registro exitoso. El administrador ha sido registrado.";
+            var paradas = new List<ParadaAsignadaDto>();
 
-            return View();
+            for (int i = 0; i < pasajeroIds.Length; i++)
+            {
+                var pasajero = await _userManager.FindByIdAsync(pasajeroIds[i]);
+                if (pasajero == null) continue;
+
+                paradas.Add(new ParadaAsignadaDto
+                {
+                    Id = i + 1,
+                    Orden = ordenes[i],
+                    NombreCliente = $"{pasajero.Nombre} {pasajero.Apellido}",
+                    Direccion = pasajero.Direccion ?? "",
+                    Estado = "Pendiente"
+                });
+            }
+
+            _rutaAsignacionService.AsignarRuta(conductorId, paradas);
+
+            TempData["Exito"] = "Ruta asignada correctamente al conductor.";
+            return RedirectToAction(nameof(AsignarRutas));
         }
 
+        // OTRAS VISTAS
 
-        public IActionResult PanelAdministrador()
+        public IActionResult Login()
         {
             return View();
         }
@@ -86,125 +203,9 @@ namespace ONTHERUSH.UI.Controllers
             return View();
         }
 
-
-        [HttpPost]
-        public IActionResult DescargarReportes(string idConductor, string estadoReporte)
-        {
-
-
-            if (string.IsNullOrWhiteSpace(idConductor))
-            {
-                ViewBag.Error = "Por favor ingrese un identificador de conductor.";
-                return View();
-            }
-
-            if (estadoReporte == "error")
-            {
-
-                ViewBag.Error = "Hubo un error al descargar el reporte, porfavor volver a intentar.";
-                return View();
-            }
-            else if (estadoReporte == "nodisponible")
-            {
-          
-                ViewBag.Error = "El reporte seleccionado no se encuentra disponible.";
-                return View();
-            }
-            else
-            {
-       
-                ViewBag.Exito = "El reporte se ha descargado en formato xls (simulado).";
-                return View();
-            }
-        }
-
         public IActionResult ActualizarSolicitud()
         {
             return View();
-        }
-
-
-        [HttpPost]
-        public IActionResult ActualizarSolicitud(
-            string nombreUsuario,
-            string nuevoCorreo,
-            string nuevaUbicacion,
-            bool datosValidos,
-            bool autorizar)
-        {
-       
-            if (!datosValidos)
-            {
-                ViewBag.Error = "Los datos son invalidos, por favor revisar.";
-                return View();
-            }
-
-            if (autorizar)
-            {
-                ViewBag.Exito = "La informacion ha sido actualizada exitosamente.";
-            }
-            else
-            {
-                ViewBag.Info = "La autorizacion ha sido rechazada.";
-            }
-
-            return View();
-        }
-
-        public IActionResult AsignarRutas()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult AsignarRutas(
-            string idConductor,
-            string ruta,
-            bool conductorDisponible,
-            bool esActualizacionRuta)
-        {
-            if (string.IsNullOrWhiteSpace(idConductor) || string.IsNullOrWhiteSpace(ruta))
-            {
-                ViewBag.Error = "Por favor complete todos los datos de la ruta y del conductor.";
-                return View();
-            }
-
-            if (!conductorDisponible)
-            {
-                ViewBag.Error = "El conductor no esta disponible";
-                return View();
-            }
-
-            if (esActualizacionRuta)
-            {
-                ViewBag.Info = "Sesión no activa";
-                return View();
-            }
-
-            ViewBag.Exito = "La ruta ha sido asignada exitosamente al conductor.";
-
-            return View();
-        }
-
-        public IActionResult CerrarSesion(string estado)
-        {
-            switch (estado)
-            {
-                case "activa":
-                    TempData["MensajeSesionAdmin"] = "Sesión cerrada correctamente.";
-                    break;
-
-                case "inactiva":
-                    TempData["MensajeSesionAdmin"] = "Sesión no activa";
-                    break;
-
-                case "sinSesion":
-                default:
-                    TempData["MensajeSesionAdmin"] = "No hay ninguna sesión activa.";
-                    break;
-            }
-
-            return RedirectToAction("Login");
         }
     }
 }

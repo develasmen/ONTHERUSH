@@ -1,82 +1,102 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ONTHERUSH.Abstracciones.Interfaces;
 
 namespace ONTHERUSH.UI.Controllers
 {
+    [Authorize(Roles = "Pasajero")]
     public class UsuarioController : Controller
     {
-        public IActionResult SolicitudEdicion()
+        private readonly IReservaService _reservaService;
+        private readonly ISolicitudCambioService _solicitudCambioService;
+
+        public UsuarioController(
+            IReservaService reservaService,
+            ISolicitudCambioService solicitudCambioService)
+        {
+            _reservaService = reservaService;
+            _solicitudCambioService = solicitudCambioService;
+        }
+
+        // Panel Principal del Pasajero
+        public IActionResult PanelPasajero()
         {
             return View();
         }
 
-        [HttpPost]
-        public IActionResult SolicitudEdicion(
-            string nombre,
-            string correo,
-            string ubicacion,
-            bool huboCambios,
-            string detalleCambios)
-        {
-            if (string.IsNullOrWhiteSpace(nombre) ||
-                string.IsNullOrWhiteSpace(correo) ||
-                string.IsNullOrWhiteSpace(ubicacion))
-            {
-                ViewBag.Error = "Por favor llenar todos los campos necesarios.";
-                return View();
-            }
-
-            if (!huboCambios)
-            {
-                ViewBag.Info = "No se realizaran cambios";
-                return View();
-            }
-
-            ViewBag.Exito = "Su solicitud de actualización ha sido enviada a los administradores.";
-
-
-            return View();
-        }
-
+        // GET: Hacer Reserva
         public IActionResult ReservaTransporte()
         {
             return View();
         }
 
+        // POST: Hacer Reserva
         [HttpPost]
-        public IActionResult ReservaTransporte(
-            string nombre,
-            string cedula,
-            string correo,
-            string telefono,
-            string origen,
-            string destino,
-            string fecha,
-            string horario,
-            int cantidadPasajeros)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReservaTransporte(TimeSpan horaDestino, string provincia, string canton, string distrito)
         {
-            if (string.IsNullOrWhiteSpace(nombre) ||
-                string.IsNullOrWhiteSpace(cedula) ||
-                string.IsNullOrWhiteSpace(correo) ||
-                string.IsNullOrWhiteSpace(telefono) ||
-                string.IsNullOrWhiteSpace(origen) ||
-                string.IsNullOrWhiteSpace(destino) ||
-                string.IsNullOrWhiteSpace(fecha) ||
-                string.IsNullOrWhiteSpace(horario) ||
-                cantidadPasajeros <= 0)
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var resultado = await _reservaService.CrearReserva(userId, horaDestino, provincia, canton, distrito);
+
+            if (resultado.Exito)
             {
-                ViewBag.Error = "Necesitar llenar todos los datos personales para realizar la reserva";
+                TempData["Exito"] = resultado.Mensaje;
+                return RedirectToAction("PanelPasajero");
+            }
+            else
+            {
+                ViewBag.Error = resultado.Mensaje;
                 return View();
             }
-            if (cantidadPasajeros > 40)
-            {
-                ViewBag.Error = "Ha ocurrido un error";
-                return View();
-            }
+        }
 
-            ViewBag.Exito = "Reserva Exitosa";
-
-
+        // GET: Solicitar Cambios
+        public IActionResult SolicitudEdicion()
+        {
             return View();
+        }
+
+        // POST: Solicitar Cambio Email
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SolicitarCambioEmail(string nuevoEmail)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var resultado = await _solicitudCambioService.SolicitarCambioEmail(userId, nuevoEmail);
+
+            if (resultado.Exito)
+            {
+                TempData["Exito"] = resultado.Mensaje;
+                return RedirectToAction("PanelPasajero");
+            }
+            else
+            {
+                ViewBag.Error = resultado.Mensaje;
+                return View("SolicitudEdicion");
+            }
+        }
+
+        // POST: Solicitar Cambio DirecciÃ³n
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SolicitarCambioDireccion(string nuevaDireccion)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var resultado = await _solicitudCambioService.SolicitarCambioDireccion(userId, nuevaDireccion);
+
+            if (resultado.Exito)
+            {
+                TempData["Exito"] = resultado.Mensaje;
+                return RedirectToAction("PanelPasajero");
+            }
+            else
+            {
+                ViewBag.Error = resultado.Mensaje;
+                return View("SolicitudEdicion");
+            }
         }
     }
 }

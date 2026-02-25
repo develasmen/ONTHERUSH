@@ -1,5 +1,9 @@
+@using ONTHERUSH.AccesoADatos.Models
 @{
     Layout = null;
+
+    var conductores = ViewBag.Conductores as IList<ApplicationUser>;
+    var pasajeros = ViewBag.Pasajeros as IList<ApplicationUser>;
 }
 
 <!DOCTYPE html>
@@ -7,74 +11,159 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Asignar rutas a conductores - ON THE RUSH</title>
+    <title>Asignar rutas - ON THE RUSH</title>
 
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/components/buttons.css" />
-    <link rel="stylesheet" href="~/css/components/forms.css" />
-    <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="stylesheet" href="~/css/pages/admin-asignar-rutas.css" />
 </head>
+
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>Asignar rutas a conductores</h1>
-                <p>Seleccione el conductor y la ruta.</p>
-            </div>
+    <div class="wrap">
+        <h2>Asignar rutas</h2>
+        <div class="hint">Selecciona un conductor, marca pasajeros y define el orden de recogida.</div>
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger">
-                    @ViewBag.Error
-                </div>
-            }
+        @if (TempData["Exito"] != null)
+        {
+            <div class="ok">@TempData["Exito"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="err">@TempData["Error"]</div>
+        }
 
-            @if (ViewBag.Info != null)
-            {
-                <div class="alert alert-warning">
-                    @ViewBag.Info
-                </div>
-            }
+        <div class="card">
+            <form asp-action="AsignarRutas" asp-controller="Admin" method="post" id="formAsignar">
+                @Html.AntiForgeryToken()
 
-            @if (ViewBag.Exito != null)
-            {
-                <div class="alert alert-success">
-                    @ViewBag.Exito
-                </div>
-            }
+                <div class="row">
+                    <div>
+                        <label><b>Conductor</b></label><br />
+                        <select name="conductorId" style="min-width:340px;">
+                            @foreach (var c in conductores)
+                            {
+                                <option value="@c.Id">@c.Email</option>
+                            }
+                        </select>
+                        <div class="hint">Se asignará la lista al conductor seleccionado.</div>
+                    </div>
 
-            <form asp-action="AsignarRutas" asp-controller="Admin" method="post" class="auth-form">
-                <div class="form-group">
-                    <label for="idConductor">ID Conductor</label>
-                    <input type="text" id="idConductor" name="idConductor" class="form-input" required />
+                    <button type="submit" class="btn">Asignar ruta</button>
                 </div>
 
-                <div class="form-group">
-                    <label for="ruta">Ruta</label>
-                    <input type="text" id="ruta" name="ruta" class="form-input" required />
+                <div class="small">
+                    Tip: Orden = 1,2,3... según el recorrido que quieres. La ubicación son coordenadas.
                 </div>
 
-                <div class="form-group">
-                    <input type="checkbox" id="conductorDisponible" name="conductorDisponible" value="true" />
-                    <label for="conductorDisponible">Conductor disponible</label>
+                <div style="margin-top:12px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Seleccionar</th>
+                                <th>Pasajero</th>
+                                <th>Ubicación</th>
+                                <th>Orden</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < pasajeros.Count; i++)
+                            {
+                                var p = pasajeros[i];
+                                var sinUbicacion = string.IsNullOrWhiteSpace(p.Direccion);
+
+                                <tr>
+                                    <td>
+                                        <input type="checkbox"
+                                               class="chkPasajero"
+                                               data-index="@i"
+                                               @(sinUbicacion ? "disabled" : "") />
+
+                                        @if (sinUbicacion)
+                                        {
+                                            <div style="color:#991b1b; font-size:12px; margin-top:4px;">
+                                                Sin ubicación
+                                            </div>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div><b>@p.Nombre @p.Apellido</b></div>
+                                        <div class="pill">@p.Email</div>
+                                    </td>
+
+                                    <td>
+                                        <div>@(sinUbicacion ? "—" : p.Direccion)</div>
+                                    </td>
+
+                                    <td>
+                                        <input type="number"
+                                               class="txtOrden"
+                                               data-index="@i"
+                                               value="@(i + 1)"
+                                               min="1"
+                                               style="width:90px;"
+                                               @(sinUbicacion ? "disabled" : "") />
+                                    </td>
+
+                                    <td style="display:none;">
+                                        <!-- NO tienen name, no se envían por defecto -->
+                                        <input type="hidden" id="pid_@i" value="" />
+                                        <input type="hidden" id="ord_@i" value="" />
+                                        <input type="hidden" id="realid_@i" value="@p.Id" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="form-group">
-                    <input type="checkbox" id="esActualizacionRuta" name="esActualizacionRuta" value="true" />
-                    <label for="esActualizacionRuta">Es una actualización de ruta</label>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    Asignar al conductor
-                </button>
-
-                <button type="button"
-                        class="btn btn-secondary"
-                        onclick="window.location.href='@Url.Action("PanelAdministrador", "Admin")'">
-                    Volver al panel de administrador
-                </button>
             </form>
         </div>
     </div>
+
+    <script>
+        const form = document.getElementById("formAsignar");
+
+        form.addEventListener("submit", function (e) {
+
+            // Borra inputs dinámicos previos (si intenta 2 veces)
+            document.querySelectorAll(".dyn-input").forEach(x => x.remove());
+
+            const checks = document.querySelectorAll(".chkPasajero");
+            let seleccionados = 0;
+
+            checks.forEach(chk => {
+                const i = chk.getAttribute("data-index");
+
+                if (chk.disabled) return;
+
+                const realId = document.getElementById("realid_" + i).value;
+                const orden = document.querySelector(".txtOrden[data-index='" + i + "']").value;
+
+                if (chk.checked) {
+                    seleccionados++;
+
+                    // pasajeroIds[]
+                    const pid = document.createElement("input");
+                    pid.type = "hidden";
+                    pid.name = "pasajeroIds";
+                    pid.value = realId;
+                    pid.classList.add("dyn-input");
+                    form.appendChild(pid);
+
+                    // ordenes[]
+                    const ord = document.createElement("input");
+                    ord.type = "hidden";
+                    ord.name = "ordenes";
+                    ord.value = orden;
+                    ord.classList.add("dyn-input");
+                    form.appendChild(ord);
+                }
+            });
+
+            if (seleccionados === 0) {
+                e.preventDefault();
+                alert("Debes seleccionar al menos un pasajero.");
+            }
+        });
+    </script>
 </body>
 </html>

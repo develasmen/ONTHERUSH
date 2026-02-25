@@ -1,0 +1,80 @@
+@model IEnumerable<ONTHERUSH.AccesoADatos.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Gestionar Usuarios";
+}
+
+<div class="container mt-4">
+    <h2>Usuarios Pendientes de Aprobación</h2>
+
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Exito"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Cédula</th>
+                    <th>Email</th>
+                    <th>Dirección</th>
+                    <th>Fecha Registro</th>
+                    <th>Asignar Rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var usuario in Model)
+                {
+                    <tr>
+                        <td>@usuario.Nombre</td>
+                        <td>@usuario.Apellido</td>
+                        <td>@usuario.Cedula</td>
+                        <td>@usuario.Email</td>
+                        <td>@(usuario.Direccion ?? "No especificada")</td>
+                        <td>@usuario.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <form asp-action="AsignarRol" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@usuario.Id" />
+                                <select name="rol" class="form-select form-select-sm d-inline w-auto me-2" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Pasajero">Pasajero</option>
+                                    <option value="Conductor">Conductor</option>
+                                    <option value="Administrador">Administrador</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Asignar</button>
+                            </form>
+
+                            <form asp-action="RechazarUsuario" method="post" class="d-inline" onsubmit="return confirm('¿Estás seguro de rechazar a @usuario.Nombre @usuario.Apellido? Esta acción eliminará la solicitud del usuario.');">
+                                <input type="hidden" name="userId" value="@usuario.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger">Rechazar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No hay usuarios pendientes de aprobación.
+        </div>
+    }
+
+    <a asp-action="PanelAdministrador" class="btn btn-secondary mt-3">Volver al Panel</a>
+</div>

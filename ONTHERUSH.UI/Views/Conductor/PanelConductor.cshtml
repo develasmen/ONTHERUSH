@@ -7,142 +7,92 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Panel de conductor - ON THE RUSH</title>
+    <title>Panel de Conductor - ON THE RUSH</title>
 
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/components/buttons.css" />
-    <link rel="stylesheet" href="~/css/components/forms.css" />
-
-    <style>
-        .dashboard-wrapper {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .dashboard-title {
-            font-size: 26px;
-            font-weight: 700;
-        }
-
-        .role-badge {
-            background: #e8f5e9;
-            color: #1b5e20;
-            padding: 6px 14px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .dashboard-subtitle {
-            color: #555;
-            margin-bottom: 25px;
-        }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 18px;
-        }
-
-        .dash-card {
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            padding: 18px 18px 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-            .dash-card h3 {
-                font-size: 18px;
-                margin-bottom: 6px;
-            }
-
-            .dash-card p {
-                font-size: 14px;
-                color: #666;
-                margin-bottom: 14px;
-            }
-
-        .dash-footer {
-            margin-top: 30px;
-            text-align: right;
-        }
-
-        body {
-            background: #f4f5fb;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/pages/conductor-dashboard.css" />
 </head>
 <body>
     <div class="dashboard-wrapper">
 
         <div class="dashboard-header">
-            <div>
-                <div class="dashboard-title">Panel de Conductor</div>
-                <div class="dashboard-subtitle">
-                    Gestione el estado de sus viajes, rutas y lista de pasajeros.
-                </div>
+            <div class="header-left">
+                <h1>Panel de Conductor</h1>
+                <p>Gestiona tu ruta asignada, actualiza estados y solicita cambios.</p>
             </div>
-            <span class="role-badge">Rol: Conductor</span>
+            <span class="role-badge">🚗 Rol: Conductor</span>
         </div>
 
         @if (TempData["MensajeBienvenidaConductor"] != null)
         {
-            <div class="alert alert-success" style="margin-bottom:20px;">
+            <div class="alert-soft">
                 @TempData["MensajeBienvenidaConductor"]
             </div>
         }
 
         <div class="card-grid">
+
             <div class="dash-card">
-                <h3>Estado de viaje</h3>
-                <p>Actualice el estado de los viajes asignados en la ruta actual.</p>
-                <a href="@Url.Action("ActualizarEstadoViaje", "Conductor")" class="btn btn-primary">
-                    Actualizar estado
-                </a>
+                <div class="card-top">
+                    <div>
+                        <h3 class="card-title">Estado de viaje</h3>
+                        <p class="card-desc">Actualiza el estado de los viajes asignados en tu ruta actual.</p>
+                    </div>
+                    <div class="card-icon">🟢</div>
+                </div>
+
+                <div class="card-actions">
+                    <a class="btn-soft btn-primary-soft" href="@Url.Action("ActualizarEstadoViaje","Conductor")">
+                        Actualizar estado →
+                    </a>
+                </div>
             </div>
 
             <div class="dash-card">
-                <h3>Solicitud de cambio de ruta</h3>
-                <p>Envíe una solicitud para modificar la ruta asignada por administración.</p>
-                <a href="@Url.Action("SolicitarActualizacionRuta", "Conductor")" class="btn btn-secondary">
-                    Solicitar actualización
-                </a>
+                <div class="card-top">
+                    <div>
+                        <h3 class="card-title">Solicitud de cambio de ruta</h3>
+                        <p class="card-desc">Envía una solicitud para modificar el orden o paradas de la ruta.</p>
+                    </div>
+                    <div class="card-icon">🔁</div>
+                </div>
+
+                <div class="card-actions">
+                    <a class="btn-soft btn-secondary-soft" href="@Url.Action("SolicitarActualizacionRuta","Conductor")">
+                        Solicitar actualización →
+                    </a>
+                </div>
             </div>
 
-            <div class="dash-card">
-                <h3>Lista de pasajeros</h3>
-                <p>Consulte los pasajeros que tienen reserva en su ruta.</p>
-                <a href="@Url.Action("VerPasajeros", "Conductor")" class="btn btn-secondary">
-                    Ver pasajeros
-                </a>
+            <div class="dash-card full">
+                <div class="card-top">
+                    <div>
+                        <h3 class="card-title">Lista de pasajeros</h3>
+                        <p class="card-desc">Visualiza las paradas asignadas y abre la dirección en Google Maps.</p>
+                    </div>
+                    <div class="card-icon">📍</div>
+                </div>
+
+                <div class="card-actions">
+                    <a class="btn-soft btn-primary-soft" href="@Url.Action("VerPasajeros","Conductor")">
+                        Ver pasajeros y direcciones →
+                    </a>
+
+                    <form asp-action="Logout" asp-controller="Auth" method="post" style="margin:0;">
+                        <button type="submit" class="btn-soft btn-danger-soft">
+                            Cerrar sesión
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            <div class="dash-card">
-                <h3>Cerrar sesión</h3>
-                <p>Finalice su sesión como conductor y vuelva al inicio.</p>
-                <a href="@Url.Action("CerrarSesion", "Conductor", new { estado = "activa" })"
-                   class="btn btn-outline-danger">
-                    Cerrar sesión
-                </a>
-            </div>
         </div>
 
-        <div class="dash-footer">
-            <small>ON THE RUSH · Conductor</small>
+        <div class="footer">
+            <span>ON THE RUSH</span>
+            <span>Conductor · Panel</span>
         </div>
+
     </div>
 </body>
 </html>
