@@ -4,7 +4,11 @@
     Layout = null;
 
     var hayParadas = Model != null && Model.Any();
-    var todosRecogidos = hayParadas && Model.All(x => x.Estado == "Recogido");
+
+    bool EsRecogido(string? s) =>
+        string.Equals((s ?? "").Trim(), "Recogido", StringComparison.OrdinalIgnoreCase);
+
+    var todosRecogidos = hayParadas && Model.All(x => EsRecogido(x.Estado));
 
     var destinoAeropuerto = Uri.EscapeDataString("Aeropuerto Internacional Juan Santamaría");
     var urlAeropuerto = $"https://www.google.com/maps/dir/?api=1&destination={destinoAeropuerto}";
@@ -15,7 +19,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lista de pasajeros - ON THE RUSH</title>
+    <title>Ver viaje - ON THE RUSH</title>
 
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/pages/conductor-pasajeros.css" />
@@ -25,8 +29,8 @@
 
         <div class="page-header">
             <div>
-                <h1>Lista de pasajeros</h1>
-                <p>Paradas asignadas en orden. Abre Google Maps para ir a recoger a cada cliente.</p>
+                <h1>Ver viaje</h1>
+                <p>Reservas asignadas en orden. Abre Google Maps para ir a recoger a cada cliente.</p>
             </div>
 
             <a class="btn-link btn-secondary" href="@Url.Action("PanelConductor","Conductor")">
@@ -44,9 +48,9 @@
         @if (!hayParadas)
         {
             <div class="card" style="padding:16px;">
-                <b>No tienes ruta asignada.</b>
+                <b>No tienes un viaje activo.</b>
                 <div style="color:#666; margin-top:6px;">
-                    Cuando el administrador te asigne una ruta, te aparecerá aquí.
+                    Cuando el administrador te asigne reservas, te aparecerán aquí.
                 </div>
             </div>
         }
@@ -68,20 +72,24 @@
                         {
                             var destino = Uri.EscapeDataString(p.Direccion ?? "");
                             var googleMapsUrl = $"https://www.google.com/maps/dir/?api=1&destination={destino}";
-                            var claseBadge = (p.Estado == "Recogido") ? "badge badge-recogido" : "badge badge-pendiente";
+
+                            var estadoTxt = (p.Estado ?? "").Trim();
+                            var recogido = string.Equals(estadoTxt, "Recogido", StringComparison.OrdinalIgnoreCase);
+
+                            var claseBadge = recogido ? "badge badge-recogido" : "badge badge-pendiente";
 
                             <tr>
                                 <td>@p.Orden</td>
                                 <td>@p.NombreCliente</td>
                                 <td>@p.Direccion</td>
-                                <td><span class="@claseBadge">@p.Estado</span></td>
+                                <td><span class="@claseBadge">@estadoTxt</span></td>
                                 <td>
                                     <div class="actions" style="display:flex; gap:10px; flex-wrap:wrap;">
                                         <a class="btn-link btn-primary" href="@googleMapsUrl" target="_blank" rel="noopener">
                                             Ir a recoger →
                                         </a>
 
-                                        @if (p.Estado != "Recogido")
+                                        @if (!recogido)
                                         {
                                             <form asp-action="MarcarRecogido" asp-controller="Conductor" method="post">
                                                 @Html.AntiForgeryToken()
@@ -99,7 +107,6 @@
                 </table>
             </div>
 
-            @* Cuando todos están recogidos: Aeropuerto + Finalizar *@
             @if (todosRecogidos)
             {
                 <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">

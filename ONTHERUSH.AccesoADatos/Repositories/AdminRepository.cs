@@ -114,5 +114,17 @@ namespace ONTHERUSH.AccesoADatos.Repositories
                 Mensaje = $"Error al eliminar usuario: {errores}"
             };
         }
+
+        public async Task<object?> ObtenerConductorPorUserId(string userId)
+        {
+            return await _context.Conductores
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+        }
+
+        public async Task<object?> ObtenerAdministradorPorUserId(string userId)
+        {
+            return await _context.Administradores
+                .FirstOrDefaultAsync(a => a.UserId == userId);
+        }
     }
 }

@@ -10,6 +10,8 @@ namespace ONTHERUSH.Abstracciones.Interfaces
         Task<ResultadoOperacion> CrearAdministrador(string userId);
         Task<ResultadoOperacion> CrearConductor(string userId);
         Task<ResultadoOperacion> EliminarUsuario(object usuario);
+        Task<object?> ObtenerConductorPorUserId(string userId);
+        Task<object?> ObtenerAdministradorPorUserId(string userId);
     }
 }
 
