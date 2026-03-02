@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ONTHERUSH.Abstracciones.DTOs;
+using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Models;
 using ONTHERUSH.LogicaDeNegocio.Services;
 using System.Collections.Generic;
@@ -15,13 +16,22 @@ namespace ONTHERUSH.UI.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RutaAsignacionService _rutaAsignacionService;
+        private readonly IAdminService _adminService;
+        private readonly IReservaService _reservaService;
+        private readonly IViajeService _viajeService;
 
         public ConductorController(
             UserManager<ApplicationUser> userManager,
-            RutaAsignacionService rutaAsignacionService)
+            RutaAsignacionService rutaAsignacionService,
+            IAdminService adminService,
+            IReservaService reservaService,
+            IViajeService viajeService)
         {
             _userManager = userManager;
             _rutaAsignacionService = rutaAsignacionService;
+            _adminService = adminService;
+            _reservaService = reservaService;
+            _viajeService = viajeService;
         }
 
         [HttpGet]
@@ -43,92 +53,124 @@ namespace ONTHERUSH.UI.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> VerViaje()
+        {
+            return await VerPasajeros();
+        }
+
+        [HttpGet]
         public async Task<IActionResult> VerPasajeros()
         {
-            var conductor = await _userManager.GetUserAsync(User);
-            if (conductor == null)
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
                 return RedirectToAction("Login", "Auth");
 
-            // Trae la ruta asignada por el Admin (en memoria)
-            var paradas = _rutaAsignacionService.ObtenerRuta(conductor.Id);
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
 
-            // Si no hay ruta asignada, mandamos lista vacía con mensajito
-            if (paradas == null || paradas.Count == 0)
+            if (conductor == null)
             {
-                TempData["Mensaje"] = "⚠️ No tienes una ruta asignada todavía.";
-                return View(new List<ParadaAsignadaDto>());
+                TempData["Mensaje"] = " No se encontró el registro del conductor.";
+                return View("VerViaje", new List<ParadaAsignadaDto>());
             }
 
-            // Recogidos por conductor (TempData separado por conductor)
-            var key = $"Recogidos_{conductor.Id}";
-            var recogidos = TempData[key] as string;
-            var idsRecogidos = new HashSet<int>();
+            var reservasObj = await _reservaService.ObtenerReservasAsignadasPorConductor(conductor.ConductorId);
+            var reservas = reservasObj.Cast<Reserva>().ToList();
 
-            if (!string.IsNullOrWhiteSpace(recogidos))
+            if (reservas.Count == 0)
             {
-                idsRecogidos = recogidos.Split(',')
-                    .Select(x => int.TryParse(x, out var id) ? id : 0)
-                    .Where(id => id > 0)
-                    .ToHashSet();
+                TempData["Mensaje"] = " No tienes reservas asignadas todavía.";
+                return View("VerViaje", new List<ParadaAsignadaDto>());
             }
 
-            foreach (var p in paradas)
+            var paradas = new List<ParadaAsignadaDto>();
+            int orden = 1;
+
+            foreach (var r in reservas)
             {
-                if (idsRecogidos.Contains(p.Id))
-                    p.Estado = "Recogido";
+                paradas.Add(new ParadaAsignadaDto
+                {
+                    Id = r.ReservaId,
+                    Orden = orden++,
+                    NombreCliente = r.Usuario != null
+                        ? $"{r.Usuario.Nombre} {r.Usuario.Apellido}"
+                        : $"Usuario {r.UserId}",
+                    Direccion = $"{r.Provincia}, {r.Canton}, {r.Distrito}",
+                    Estado = r.Estado
+                });
             }
 
-            TempData.Keep(key);
-
-            return View(paradas.OrderBy(x => x.Orden).ToList());
+            return View("VerViaje", paradas.OrderBy(x => x.Orden).ToList());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarcarRecogido(int id)
         {
-            var conductor = await _userManager.GetUserAsync(User);
-            if (conductor == null)
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
                 return RedirectToAction("Login", "Auth");
 
-            var key = $"Recogidos_{conductor.Id}";
-            var recogidos = TempData[key] as string;
-            var set = new HashSet<int>();
+            var reservaObj = await _reservaService.ObtenerReservaPorId(id);
+            var reserva = reservaObj as Reserva;
 
-            if (!string.IsNullOrWhiteSpace(recogidos))
+            if (reserva == null)
             {
-                set = recogidos.Split(',')
-                    .Select(x => int.TryParse(x, out var n) ? n : 0)
-                    .Where(n => n > 0)
-                    .ToHashSet();
+                TempData["Mensaje"] = " No se encontró la reserva.";
+                return RedirectToAction("VerViaje");
             }
 
-            set.Add(id);
+            reserva.Estado = "Recogido";
+            var resultado = await _reservaService.ActualizarReserva(reserva);
 
-            TempData[key] = string.Join(",", set);
-            TempData["Mensaje"] = "✅ Pasajero marcado como recogido.";
-            TempData.Keep(key);
+            TempData["Mensaje"] = resultado.Exito
+                ? " Reserva marcada como recogida."
+                : $" {resultado.Mensaje}";
 
-            return RedirectToAction("VerPasajeros");
+            return RedirectToAction("VerViaje");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FinalizarViaje()
         {
-            var conductor = await _userManager.GetUserAsync(User);
-            if (conductor == null)
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
                 return RedirectToAction("Login", "Auth");
 
-            // Borra ruta asignada
-            _rutaAsignacionService.LimpiarRuta(conductor.Id);
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
 
-            // Limpia recogidos del conductor
-            var key = $"Recogidos_{conductor.Id}";
-            TempData.Remove(key);
+            if (conductor == null)
+            {
+                TempData["Mensaje"] = " Conductor no encontrado.";
+                return RedirectToAction("VerViaje");
+            }
 
-            TempData["Mensaje"] = "✅ Viaje finalizado. Ruta completada.";
-            return RedirectToAction("VerPasajeros");
+            var reservasObj = await _reservaService.ObtenerReservasAsignadasPorConductor(conductor.ConductorId);
+            var reservas = reservasObj.Cast<Reserva>().ToList();
+
+            if (reservas.Count == 0)
+            {
+                TempData["Mensaje"] = " No hay viaje activo.";
+                return RedirectToAction("VerViaje");
+            }
+
+            var viajeId = reservas.First().ViajeId;
+
+            if (viajeId == null)
+            {
+                TempData["Mensaje"] = " No se encontró el viaje.";
+                return RedirectToAction("VerViaje");
+            }
+
+            var resultado = await _viajeService.FinalizarViaje(viajeId.Value);
+
+            TempData["Mensaje"] = resultado.Exito
+                ? " Viaje finalizado correctamente."
+                : $" {resultado.Mensaje}";
+
+            return RedirectToAction("VerViaje");
         }
     }
 }

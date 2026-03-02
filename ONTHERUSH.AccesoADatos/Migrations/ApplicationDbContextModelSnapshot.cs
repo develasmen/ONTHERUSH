@@ -179,7 +179,7 @@ namespace ONTHERUSH.AccesoADatos.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Administradores");
+                    b.ToTable("Administradores", (string)null);
                 });
 
             modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.ApplicationUser", b =>
@@ -306,7 +306,7 @@ namespace ONTHERUSH.AccesoADatos.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Auditorias");
+                    b.ToTable("Auditorias", (string)null);
                 });
 
             modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Conductor", b =>
@@ -334,7 +334,7 @@ namespace ONTHERUSH.AccesoADatos.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Conductores");
+                    b.ToTable("Conductores", (string)null);
                 });
 
             modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Reserva", b =>
@@ -384,7 +384,7 @@ namespace ONTHERUSH.AccesoADatos.Migrations
 
                     b.HasIndex("ViajeId");
 
-                    b.ToTable("Reservas");
+                    b.ToTable("Reservas", (string)null);
                 });
 
             modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.SolicitudCambio", b =>
@@ -433,7 +433,7 @@ namespace ONTHERUSH.AccesoADatos.Migrations
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("SolicitudesCambio");
+                    b.ToTable("SolicitudesCambio", (string)null);
                 });
 
             modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Vehiculo", b =>
@@ -475,7 +475,7 @@ namespace ONTHERUSH.AccesoADatos.Migrations
 
                     b.HasKey("VehiculoId");
 
-                    b.ToTable("Vehiculos");
+                    b.ToTable("Vehiculos", (string)null);
                 });
 
             modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Viaje", b =>
@@ -539,7 +539,7 @@ namespace ONTHERUSH.AccesoADatos.Migrations
 
                     b.HasIndex("VehiculoId");
 
-                    b.ToTable("Viajes");
+                    b.ToTable("Viajes", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

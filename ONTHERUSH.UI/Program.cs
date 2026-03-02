@@ -17,6 +17,7 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
 builder.Services.AddScoped<ISolicitudCambioRepository, SolicitudCambioRepository>();
+builder.Services.AddScoped<IViajeRepository, ViajeRepository>();
 
 // Registrar Servicios
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -25,6 +26,7 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddSingleton<RutaAsignacionService>();
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<ISolicitudCambioService, SolicitudCambioService>();
+builder.Services.AddScoped<IViajeService, ViajeService>();
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

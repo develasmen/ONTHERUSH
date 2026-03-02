@@ -116,5 +116,21 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
 
             return resultado;
         }
+
+        public async Task<object?> ObtenerConductorPorUserId(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                return null;
+
+            return await _adminRepository.ObtenerConductorPorUserId(userId);
+        }
+
+        public async Task<object?> ObtenerAdministradorPorUserId(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                return null;
+
+            return await _adminRepository.ObtenerAdministradorPorUserId(userId);
+        }
     }
 }

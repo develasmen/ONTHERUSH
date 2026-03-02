@@ -8,7 +8,7 @@ namespace ONTHERUSH.AccesoADatos.Models
         [Key]
         public int ViajeId { get; set; }
 
-        [Required]
+        [Required] 
         public int ConductorId { get; set; }
 
         [Required]

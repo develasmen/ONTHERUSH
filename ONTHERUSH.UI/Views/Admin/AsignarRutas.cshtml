@@ -3,7 +3,7 @@
     Layout = null;
 
     var conductores = ViewBag.Conductores as IList<ApplicationUser>;
-    var pasajeros = ViewBag.Pasajeros as IList<ApplicationUser>;
+    var reservas = ViewBag.Reservas as List<Reserva>;
 }
 
 <!DOCTYPE html>
@@ -20,7 +20,12 @@
 <body>
     <div class="wrap">
         <h2>Asignar rutas</h2>
-        <div class="hint">Selecciona un conductor, marca pasajeros y define el orden de recogida.</div>
+        <div style="margin-bottom:15px;">
+            <a asp-controller="Admin"asp-action="PanelAdministrador"class="btn-link btn-secondary">
+                ← Volver al panel
+            </a>
+        </div>
+        <div class="hint">Selecciona un conductor, marca reservas y define el orden de recogida.</div>
 
         @if (TempData["Exito"] != null)
         {
@@ -51,7 +56,7 @@
                 </div>
 
                 <div class="small">
-                    Tip: Orden = 1,2,3... según el recorrido que quieres. La ubicación son coordenadas.
+                    Tip: Orden = 1,2,3... según el recorrido. Ubicación = Provincia / Cantón / Distrito.
                 </div>
 
                 <div style="margin-top:12px;">
@@ -59,56 +64,38 @@
                         <thead>
                             <tr>
                                 <th>Seleccionar</th>
-                                <th>Pasajero</th>
+                                <th>Reserva</th>
                                 <th>Ubicación</th>
                                 <th>Orden</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @for (int i = 0; i < pasajeros.Count; i++)
+                            @for (int i = 0; i < reservas.Count; i++)
                             {
-                                var p = pasajeros[i];
-                                var sinUbicacion = string.IsNullOrWhiteSpace(p.Direccion);
+                                var r = reservas[i];
 
                                 <tr>
                                     <td>
-                                        <input type="checkbox"
-                                               class="chkPasajero"
-                                               data-index="@i"
-                                               @(sinUbicacion ? "disabled" : "") />
-
-                                        @if (sinUbicacion)
-                                        {
-                                            <div style="color:#991b1b; font-size:12px; margin-top:4px;">
-                                                Sin ubicación
-                                            </div>
-                                        }
+                                        <input type="checkbox"                          class="chkReserva"                 data-index="@i" />
                                     </td>
 
                                     <td>
-                                        <div><b>@p.Nombre @p.Apellido</b></div>
-                                        <div class="pill">@p.Email</div>
+                                        <div><b>Reserva #@r.ReservaId</b></div>
+                                        <div class="pill">@r.FechaReserva.ToString("dd/MM/yyyy HH:mm")</div>
+                                        <div class="pill">@r.Estado</div>
                                     </td>
 
                                     <td>
-                                        <div>@(sinUbicacion ? "—" : p.Direccion)</div>
+                                        <div>@r.Provincia, @r.Canton, @r.Distrito</div>
                                     </td>
 
                                     <td>
-                                        <input type="number"
-                                               class="txtOrden"
-                                               data-index="@i"
-                                               value="@(i + 1)"
-                                               min="1"
-                                               style="width:90px;"
-                                               @(sinUbicacion ? "disabled" : "") />
+                                        <input type="number"                        class="txtOrden"                                            data-index="@i"                                    value="@(i + 1)"                            min="1"
+                                               style="width:90px;" />
                                     </td>
 
                                     <td style="display:none;">
-                                        <!-- NO tienen name, no se envían por defecto -->
-                                        <input type="hidden" id="pid_@i" value="" />
-                                        <input type="hidden" id="ord_@i" value="" />
-                                        <input type="hidden" id="realid_@i" value="@p.Id" />
+                                        <input type="hidden" id="realid_@i" value="@r.ReservaId" />
                                     </td>
                                 </tr>
                             }
@@ -120,50 +107,49 @@
     </div>
 
     <script>
-        const form = document.getElementById("formAsignar");
+            const form = document.getElementById("formAsignar");
 
-        form.addEventListener("submit", function (e) {
+            form.addEventListener("submit", function (e) {
 
-            // Borra inputs dinámicos previos (si intenta 2 veces)
-            document.querySelectorAll(".dyn-input").forEach(x => x.remove());
+                // Borra inputs dinámicos previos (si intenta 2 veces)
+                document.querySelectorAll(".dyn-input").forEach(x => x.remove());
 
-            const checks = document.querySelectorAll(".chkPasajero");
-            let seleccionados = 0;
+                const checks = document.querySelectorAll(".chkReserva");
+                let seleccionados = 0;
 
-            checks.forEach(chk => {
-                const i = chk.getAttribute("data-index");
+                checks.forEach(chk => {
+                    const i = chk.getAttribute("data-index");
 
-                if (chk.disabled) return;
+                    const realId = document.getElementById("realid_" + i).value;
+                    const orden = document.querySelector(".txtOrden[data-index='" + i + "']").value;
 
-                const realId = document.getElementById("realid_" + i).value;
-                const orden = document.querySelector(".txtOrden[data-index='" + i + "']").value;
+                    if (chk.checked) {
+                        seleccionados++;
 
-                if (chk.checked) {
-                    seleccionados++;
+                        // reservaIds[]
+                        const rid = document.createElement("input");
+                        rid.type = "hidden";
+                        rid.name = "reservaIds";
+                        rid.value = realId;
+                        rid.classList.add("dyn-input");
+                        form.appendChild(rid);
 
-                    // pasajeroIds[]
-                    const pid = document.createElement("input");
-                    pid.type = "hidden";
-                    pid.name = "pasajeroIds";
-                    pid.value = realId;
-                    pid.classList.add("dyn-input");
-                    form.appendChild(pid);
+                        // ordenes[]
+                        const ord = document.createElement("input");
+                        ord.type = "hidden";
+                        ord.name = "ordenes";
+                        ord.value = orden;
+                        ord.classList.add("dyn-input");
+                        form.appendChild(ord);
+                    }
+                });
 
-                    // ordenes[]
-                    const ord = document.createElement("input");
-                    ord.type = "hidden";
-                    ord.name = "ordenes";
-                    ord.value = orden;
-                    ord.classList.add("dyn-input");
-                    form.appendChild(ord);
+                if (seleccionados === 0) {
+                    e.preventDefault();
+                    alert("Debes seleccionar al menos una reserva.");
                 }
             });
-
-            if (seleccionados === 0) {
-                e.preventDefault();
-                alert("Debes seleccionar al menos un pasajero.");
-            }
-        });
     </script>
 </body>
+
 </html>

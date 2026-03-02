@@ -14,10 +14,10 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
         }
 
         public async Task<ResultadoOperacion> CrearReserva(
-            string userId, 
-            TimeSpan horaDestino, 
-            string provincia, 
-            string canton, 
+            string userId,
+            TimeSpan horaDestino,
+            string provincia,
+            string canton,
             string distrito)
         {
             // Validaciones
@@ -63,6 +63,26 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
             };
 
             return await _reservaRepository.CrearReserva(reserva);
+        }
+
+        public async Task<List<object>> ObtenerReservasPendientes()
+        {
+            return await _reservaRepository.ObtenerReservasPendientes();
+        }
+
+        public async Task<object?> ObtenerReservaPorId(int reservaId)
+        {
+            return await _reservaRepository.ObtenerReservaPorId(reservaId);
+        }
+
+        public async Task<ResultadoOperacion> ActualizarReserva(object reserva)
+        {
+            return await _reservaRepository.ActualizarReserva(reserva);
+        }
+
+        public async Task<List<object>> ObtenerReservasAsignadasPorConductor(int conductorId)
+        {
+            return await _reservaRepository.ObtenerReservasAsignadasPorConductor(conductorId);
         }
     }
 }
