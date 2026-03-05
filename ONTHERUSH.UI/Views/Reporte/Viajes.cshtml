@@ -100,19 +100,34 @@
                                             <td>@v.Conductor</td>
                                             <td>@v.Vehiculo</td>
                                             <td class="text-center">@v.Pasajeros</td>
-                                            <td>
-                                                <span class="badge bg-success">
-                                                    @v.Estado
-                                                </span>
-                                            </td>
+                                            @if(v.Estado == "Programado")
+                                            {
+                                                <td>
+                                                    <span class="badge bg-warning">
+                                                        @v.Estado
+                                                    </span>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        @v.Estado
+                                                    </span>
+                                                </td>
+                                            }
+
                                         </tr>
                                     }
                                 }
 
                             </tbody>
                         </table>
-
+                        
                     </div>
+                    <a asp-controller="Admin" asp-action="PanelAdministrador" class="btn btn-secondary">
+                        Volver
+                    </a>
                 </div>
 
             </div>

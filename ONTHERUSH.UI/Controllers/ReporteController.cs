@@ -7,6 +7,7 @@ using ONTHERUSH.UI.Models;
 
 namespace ONTHERUSH.UI.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class ReporteController : Controller
     {
         // GET: ReporteController
@@ -18,7 +19,7 @@ namespace ONTHERUSH.UI.Controllers
             _service = service;
         }
 
-        [AllowAnonymous]
+  
         [HttpGet]
         public IActionResult Viajes(DateTime? fechaInicio, DateTime? fechaFin)
         {
@@ -36,7 +37,6 @@ namespace ONTHERUSH.UI.Controllers
             return View(vm);
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public IActionResult ExportarPdf(DateTime fechaInicio, DateTime fechaFin)
         {
