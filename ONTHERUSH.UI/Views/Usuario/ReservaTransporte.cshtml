@@ -8,225 +8,162 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hacer Reserva - ON THE RUSH</title>
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/components/buttons.css" />
-    <link rel="stylesheet" href="~/css/components/forms.css" />
-
-    <style>
-        .dashboard-wrapper {
-            max-width: 700px;
-            margin: 40px auto;
-            padding: 20px;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        .dashboard-title {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .dashboard-subtitle {
-            color: #555;
-            margin-bottom: 25px;
-        }
-
-        .form-card {
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
-            padding: 24px;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .alert h5 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 14px;
-        }
-
-        .form-control, .form-select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .form-control:focus, .form-select:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-        .form-text {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 4px;
-            display: block;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .button-group .btn {
-            flex: 1;
-        }
-
-        body {
-            background: #f4f5fb;
-        }
-
-        .dash-footer {
-            margin-top: 30px;
-            text-align: right;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/pages/form-base.css" />
 </head>
 <body>
-    <div class="dashboard-wrapper">
-        <div class="dashboard-title">Hacer Reserva de Transporte</div>
-        <div class="dashboard-subtitle">
-            Complete el formulario para reservar su transporte.
-        </div>
-
-        <div class="form-card">
-            <!-- Alerta de advertencia sobre horarios -->
-            <div class="alert alert-warning">
-                <h5>Nota sobre horarios</h5>
-                <p style="margin:0;">
-                    La hora en que se le recogería/dejaría en su casa podría ser de <strong>1 hora a 1 hora y media antes</strong> de la hora indicada, dependiendo del tráfico. <strong>Por favor sea puntual.</strong>
-                </p>
+    <div class="form-page-container">
+        <!-- Header -->
+        <header class="form-header">
+            <div class="form-header-content">
+                <a href="@Url.Action("PanelPasajero", "Usuario")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al panel</span>
+                </a>
+                <div class="form-header-info">
+                    <h1 class="form-title">Hacer Reserva de Transporte</h1>
+                    <p class="form-subtitle">Complete el formulario para reservar su transporte</p>
+                </div>
             </div>
+        </header>
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger">
-                    @ViewBag.Error
-                </div>
-            }
-
-            <form asp-action="ReservaTransporte" method="post">
-                <!-- Hora Destino -->
-                <div class="form-group">
-                    <label for="horaDestino" class="form-label">
-                        Hora en que necesita llegar a su destino
-                    </label>
-                    <input type="time"
-                           class="form-control"
-                           id="horaDestino"
-                           name="horaDestino"
-                           required />
-                    <small class="form-text">
-                        Especifica la hora a la que debes estar en tu destino.
-                    </small>
+        <!-- Contenido principal -->
+        <main class="form-main">
+            <div class="form-container">
+                
+                <!-- Alerta de advertencia sobre horarios -->
+                <div class="alert alert-warning">
+                    <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <div class="alert-content">
+                        <h5 class="alert-title">Nota sobre horarios</h5>
+                        <p>La hora en que se le recogería/dejaría en su casa podría ser de <strong>1 hora a 1 hora y media antes</strong> de la hora indicada, dependiendo del tráfico. <strong>Por favor sea puntual.</strong></p>
+                    </div>
                 </div>
 
-                <!-- Provincia -->
-                <div class="form-group">
-                    <label for="provincia" class="form-label">
-                        Provincia
-                    </label>
-                    <select class="form-select"
-                            id="provincia"
-                            name="provincia"
-                            required>
-                        <option value="">Seleccionar provincia...</option>
-                        <option value="San José">San José</option>
-                        <option value="Heredia">Heredia</option>
-                        <option value="Alajuela">Alajuela</option>
-                    </select>
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        <div class="alert-content">
+                            <p>@ViewBag.Error</p>
+                        </div>
+                    </div>
+                }
+
+                <!-- Formulario -->
+                <form asp-action="ReservaTransporte" asp-controller="Usuario" method="post" class="form">
+                    
+                    <!-- Hora Destino -->
+                    <div class="form-group">
+                        <label for="horaDestino" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                            </svg>
+                            Hora en que necesita llegar a su destino
+                        </label>
+                        <input type="time"
+                               class="form-input"
+                               id="horaDestino"
+                               name="horaDestino"
+                               required />
+                        <small class="form-hint">Especifique la hora a la que debe estar en su destino</small>
+                    </div>
+
+                    <!-- Provincia -->
+                    <div class="form-group">
+                        <label for="provincia" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                            </svg>
+                            Provincia
+                        </label>
+                        <select class="form-input"
+                                id="provincia"
+                                name="provincia"
+                                required>
+                            <option value="">Seleccionar provincia...</option>
+                            <option value="San José">San José</option>
+                            <option value="Heredia">Heredia</option>
+                            <option value="Alajuela">Alajuela</option>
+                        </select>
+                    </div>
+
+                    <!-- Cantón -->
+                    <div class="form-group">
+                        <label for="canton" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd" />
+                            </svg>
+                            Cantón
+                        </label>
+                        <input type="text"
+                               class="form-input"
+                               id="canton"
+                               name="canton"
+                               placeholder="Ej: Escazú, San Rafael, Atenas"
+                               required />
+                    </div>
+
+                    <!-- Distrito -->
+                    <div class="form-group">
+                        <label for="distrito" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                            </svg>
+                            Distrito
+                        </label>
+                        <input type="text"
+                               class="form-input"
+                               id="distrito"
+                               name="distrito"
+                               placeholder="Ej: San Rafael Arriba, Centro, San Antonio"
+                               required />
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Crear Reserva</span>
+                        </button>
+                        <a href="@Url.Action("PanelPasajero", "Usuario")" class="btn btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Cancelar</span>
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Información adicional -->
+                <div class="info-box">
+                    <div class="info-box-header">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <h5>Información importante</h5>
+                    </div>
+                    <ul class="info-box-list">
+                        <li>Actualmente solo operamos en San José, Heredia y Alajuela</li>
+                        <li>La reserva quedará en estado "Pendiente" hasta que sea asignada a una ruta</li>
+                        <li>Recibirá confirmación una vez que su reserva sea procesada</li>
+                    </ul>
                 </div>
 
-                <!-- Cantón -->
-                <div class="form-group">
-                    <label for="canton" class="form-label">
-                        Cantón
-                    </label>
-                    <input type="text"
-                           class="form-control"
-                           id="canton"
-                           name="canton"
-                           placeholder="Ej: Escazú, San Rafael, Atenas"
-                           required />
-                </div>
+            </div>
+        </main>
 
-                <!-- Distrito -->
-                <div class="form-group">
-                    <label for="distrito" class="form-label">
-                        Distrito
-                    </label>
-                    <input type="text"
-                           class="form-control"
-                           id="distrito"
-                           name="distrito"
-                           placeholder="Ej: San Rafael Arriba, Centro, San Antonio"
-                           required />
-                </div>
-
-                <!-- Botones -->
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">
-                        Crear Reserva
-                    </button>
-                    <a href="@Url.Action("PanelPasajero", "Usuario")" class="btn btn-secondary">
-                        Cancelar
-                    </a>
-                </div>
-            </form>
-        </div>
-
-        <!-- Información adicional -->
-        <div class="alert alert-info" style="margin-top:20px;">
-            <h5>Información importante</h5>
-            <ul style="margin:0; padding-left:20px;">
-                <li>Actualmente solo operamos en San José, Heredia y Alajuela.</li>
-                <li>La reserva quedará en estado "Pendiente" hasta que sea asignada a una ruta.</li>
-                <li>Recibirás confirmación una vez que tu reserva sea procesada.</li>
-            </ul>
-        </div>
-
-        <div class="dash-footer">
-            <small>ON THE RUSH · Pasajero</small>
-        </div>
+        <!-- Footer -->
+        <footer class="form-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Pasajero</p>
+        </footer>
     </div>
 </body>
 </html>

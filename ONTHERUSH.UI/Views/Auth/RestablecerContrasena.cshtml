@@ -1,145 +1,211 @@
 @{
-    ViewData["Title"] = "Restablecer contraseña";
+    Layout = null;
     var email = ViewBag.Email as string ?? "";
     var token = ViewBag.Token as string ?? "";
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-5">
-
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-body p-4 p-md-5">
-
-                    <div class="text-center mb-4">
-                        <h2 class="mb-1 fw-bold">Restablecer contraseña</h2>
-                        <p class="text-muted mb-0">
-                            Ingresá una contraseña nueva para tu cuenta.
-                        </p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restablecer contraseña - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/auth-restablecer.css" />
+</head>
+<body>
+    <div class="restablecer-wrapper">
+        <!-- Panel izquierdo - Branding -->
+        <div class="restablecer-brand-panel">
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <img src="~/images/OnTheRush-removebg-preview.png" alt="On The Rush" />
+                </div>
+                <h1 class="brand-title">Nueva contraseña</h1>
+                <p class="brand-subtitle">Crea una contraseña segura para proteger tu cuenta</p>
+                
+                <!-- Footer del panel izquierdo -->
+                <div class="brand-footer">
+                    <p class="copyright">© @DateTime.Now.Year ON THE RUSH. Todos los derechos reservados.</p>
+                    <div class="brand-links">
+                        <a href="#" class="brand-link">Términos y condiciones</a>
+                        <span class="separator">·</span>
+                        <a href="#" class="brand-link">Política de privacidad</a>
                     </div>
-
-                    @* Mensajes *@
-                    @if (ViewBag.Exito != null)
-                    {
-                        <div class="alert alert-success" role="alert">
-                            @ViewBag.Exito
-                        </div>
-                    }
-
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger" role="alert">
-                            @ViewBag.Error
-                        </div>
-                    }
-
-                    <form asp-action="RestablecerContrasena" method="post" class="mt-3">
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden" name="email" value="@email" />
-                        <input type="hidden" name="token" value="@token" />
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Correo</label>
-                            <input type="email" class="form-control" value="@email" disabled />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Nueva contraseña</label>
-                            <div class="input-group">
-                                <input type="password"
-                                       class="form-control"
-                                       id="nuevaContrasena"
-                                       name="nuevaContrasena"
-                                       placeholder="Ingrese la nueva contraseña"
-                                       required />
-                                <button class="btn btn-outline-secondary" type="button" id="btnVer1">
-                                    Ver
-                                </button>
-                            </div>
-                            <div class="form-text">
-                                Debe cumplir las reglas de seguridad del sistema.
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Confirmar contraseña</label>
-                            <div class="input-group">
-                                <input type="password"
-                                       class="form-control"
-                                       id="confirmarContrasena"
-                                       name="confirmarContrasena"
-                                       placeholder="Repita la nueva contraseña"
-                                       required />
-                                <button class="btn btn-outline-secondary" type="button" id="btnVer2">
-                                    Ver
-                                </button>
-                            </div>
-                            <div class="invalid-feedback d-block" id="msgNoCoinciden" style="display:none;">
-                                Las contraseñas no coinciden.
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-lg w-100" id="btnSubmit">
-                            Guardar contraseña
-                        </button>
-
-                        <div class="text-center mt-3">
-                            <a asp-controller="Auth" asp-action="Login" class="text-decoration-none">
-                                Volver a iniciar sesión
-                            </a>
-                        </div>
-                    </form>
-
                 </div>
             </div>
+        </div>
 
-            <div class="text-center mt-3 text-muted small">
-                © @DateTime.Now.Year ONTHERUSH
+        <!-- Panel derecho - Formulario -->
+        <div class="restablecer-form-panel">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Restablecer contraseña</h2>
+                    <p>Ingresa tu nueva contraseña para completar la recuperación de tu cuenta</p>
+                </div>
+
+                @if (ViewBag.Exito != null)
+                {
+                    <div class="alert alert-success">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        @ViewBag.Exito
+                    </div>
+                }
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        @ViewBag.Error
+                    </div>
+                }
+
+                <form asp-action="RestablecerContrasena" asp-controller="Auth" method="post" class="restablecer-form">
+                    @Html.AntiForgeryToken()
+                    
+                    <input type="hidden" name="email" value="@email" />
+                    <input type="hidden" name="token" value="@token" />
+
+                    <!-- Correo (disabled) -->
+                    <div class="form-group">
+                        <label for="emailDisplay" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                            Correo electrónico
+                        </label>
+                        <input type="email" 
+                               id="emailDisplay" 
+                               class="form-input" 
+                               value="@email" 
+                               disabled />
+                    </div>
+
+                    <!-- Nueva contraseña -->
+                    <div class="form-group">
+                        <label for="nuevaContrasena" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                            Nueva contraseña
+                        </label>
+                        <div class="input-with-button">
+                            <input type="password" 
+                                   id="nuevaContrasena" 
+                                   name="nuevaContrasena" 
+                                   class="form-input" 
+                                   placeholder="••••••••"
+                                   required 
+                                   autocomplete="new-password" />
+                            <button type="button" class="toggle-password" id="btnVer1">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="password-requirements">
+                            <p class="requirements-title">La contraseña debe contener:</p>
+                            <ul class="requirements-list">
+                                <li>Al menos 6 caracteres</li>
+                                <li>Una letra mayúscula</li>
+                                <li>Una letra minúscula</li>
+                                <li>Un número</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Confirmar contraseña -->
+                    <div class="form-group">
+                        <label for="confirmarContrasena" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                            Confirmar contraseña
+                        </label>
+                        <div class="input-with-button">
+                            <input type="password" 
+                                   id="confirmarContrasena" 
+                                   name="confirmarContrasena" 
+                                   class="form-input" 
+                                   placeholder="••••••••"
+                                   required 
+                                   autocomplete="new-password" />
+                            <button type="button" class="toggle-password" id="btnVer2">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="password-match-error" id="msgNoCoinciden" style="display:none;">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                            Las contraseñas no coinciden
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-restablecer" id="btnSubmit">
+                        <span>Guardar nueva contraseña</span>
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="form-footer">
+                    <a href="@Url.Action("Login", "Auth")" class="login-link">
+                        Volver a iniciar sesión
+                    </a>
+                </div>
             </div>
-
         </div>
     </div>
-</div>
 
-@section Scripts {
-<script>
-    (function () {
-        const pass1 = document.getElementById('nuevaContrasena');
-        const pass2 = document.getElementById('confirmarContrasena');
-        const msg = document.getElementById('msgNoCoinciden');
-        const btn = document.getElementById('btnSubmit');
+    <script>
+        (function () {
+            const pass1 = document.getElementById('nuevaContrasena');
+            const pass2 = document.getElementById('confirmarContrasena');
+            const msg = document.getElementById('msgNoCoinciden');
+            const btn = document.getElementById('btnSubmit');
 
-        function toggle(input, btnId) {
-            const btnEl = document.getElementById(btnId);
-            btnEl.addEventListener('click', function () {
-                const isPassword = input.type === 'password';
-                input.type = isPassword ? 'text' : 'password';
-                btnEl.textContent = isPassword ? 'Ocultar' : 'Ver';
-            });
-        }
-
-        function validarCoincidencia() {
-            if (!pass1.value || !pass2.value) {
-                msg.style.display = 'none';
-                btn.disabled = false;
-                return;
+            // Toggle password visibility
+            function toggle(input, btnId) {
+                const btnEl = document.getElementById(btnId);
+                btnEl.addEventListener('click', function () {
+                    const isPassword = input.type === 'password';
+                    input.type = isPassword ? 'text' : 'password';
+                });
             }
 
-            if (pass1.value !== pass2.value) {
-                msg.style.display = 'block';
-                btn.disabled = true;
-            } else {
-                msg.style.display = 'none';
-                btn.disabled = false;
+            // Validar coincidencia
+            function validarCoincidencia() {
+                if (!pass1.value || !pass2.value) {
+                    msg.style.display = 'none';
+                    btn.disabled = false;
+                    return;
+                }
+
+                if (pass1.value !== pass2.value) {
+                    msg.style.display = 'flex';
+                    btn.disabled = true;
+                } else {
+                    msg.style.display = 'none';
+                    btn.disabled = false;
+                }
             }
-        }
 
-        toggle(pass1, 'btnVer1');
-        toggle(pass2, 'btnVer2');
+            toggle(pass1, 'btnVer1');
+            toggle(pass2, 'btnVer2');
 
-        pass1.addEventListener('input', validarCoincidencia);
-        pass2.addEventListener('input', validarCoincidencia);
-    })();
-</script>
-}
+            pass1.addEventListener('input', validarCoincidencia);
+            pass2.addEventListener('input', validarCoincidencia);
+        })();
+    </script>
+</body>
+</html>

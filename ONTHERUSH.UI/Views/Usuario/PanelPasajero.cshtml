@@ -8,160 +8,131 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Panel de Pasajero - ON THE RUSH</title>
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/components/buttons.css" />
-    <link rel="stylesheet" href="~/css/components/forms.css" />
-
-    <style>
-        .dashboard-wrapper {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 20px;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .dashboard-title {
-            font-size: 26px;
-            font-weight: 700;
-        }
-
-        .role-badge {
-            background: #d1ecf1;
-            color: #0c5460;
-            padding: 6px 14px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .dashboard-subtitle {
-            color: #555;
-            margin-bottom: 25px;
-        }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-        }
-
-        .dash-card {
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
-            padding: 18px 18px 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .dash-card h3 {
-            font-size: 18px;
-            margin-bottom: 6px;
-        }
-
-        .dash-card p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 14px;
-        }
-
-        .dash-footer {
-            margin-top: 30px;
-            text-align: right;
-        }
-
-        body {
-            background: #f4f5fb;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/pages/dashboard-base.css" />
 </head>
 <body>
-    <div class="dashboard-wrapper">
-
-        <div class="dashboard-header">
-            <div>
-                <div class="dashboard-title">Panel de Pasajero</div>
-                <div class="dashboard-subtitle">
-                    Reserve su transporte y gestione su información personal.
+    <div class="dashboard-container">
+        <!-- Header del dashboard -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo-section">
+                        <img src="~/images/OnTheRush-removebg-preview.png" alt="ON THE RUSH" class="dashboard-logo" />
+                    </div>
+                    <div class="header-info">
+                        <h1 class="dashboard-title">Panel de Pasajero</h1>
+                        <p class="dashboard-subtitle">Reserve su transporte y gestione su información personal</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <span class="role-badge">
+                        <svg class="badge-icon" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                        Pasajero
+                    </span>
                 </div>
             </div>
-            <span class="role-badge">Rol: Pasajero</span>
-        </div>
+        </header>
 
-        @if (TempData["Exito"] != null)
-        {
-            <div class="alert alert-success">
-                @TempData["Exito"]
+        <!-- Contenido principal -->
+        <main class="dashboard-main">
+            @if (TempData["Exito"] != null)
+            {
+                <div class="alert alert-success">
+                    <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>@TempData["Exito"]</span>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    <span>@TempData["Error"]</span>
+                </div>
+            }
+
+            <!-- Grid de tarjetas -->
+            <div class="dashboard-grid">
+                
+                <!-- Tarjeta: Hacer Reserva -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Hacer Reserva</h3>
+                        <p class="card-description">Reserve su transporte especificando hora y destino</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("ReservaTransporte", "Usuario")" class="btn btn-primary">
+                            <span>Ir a Reservas</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Solicitar Cambios -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Solicitar Cambios</h3>
+                        <p class="card-description">Solicite cambios en su correo electrónico o dirección</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("SolicitudEdicion", "Usuario")" class="btn btn-primary">
+                            <span>Solicitar Cambios</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Cerrar sesión -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Cerrar sesión</h3>
+                        <p class="card-description">Cierre su sesión de pasajero de forma segura</p>
+                    </div>
+                    <div class="card-footer">
+                        <form asp-action="Logout" asp-controller="Auth" method="post">
+                            <button type="submit" class="btn btn-danger">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                                </svg>
+                                <span>Cerrar sesión</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
             </div>
-        }
+        </main>
 
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger">
-                @TempData["Error"]
-            </div>
-        }
-
-        <div class="card-grid">
-            <div class="dash-card">
-                <h3>Hacer Reserva</h3>
-                <p>Reserve su transporte especificando hora y destino.</p>
-                <a href="@Url.Action("ReservaTransporte", "Usuario")" class="btn btn-primary">
-                    Ir a Reservas
-                </a>
-            </div>
-
-            <div class="dash-card">
-                <h3>Solicitar Cambios</h3>
-                <p>Solicite cambios en su correo electrónico o dirección.</p>
-                <a href="@Url.Action("SolicitudEdicion", "Usuario")" class="btn btn-secondary">
-                    Solicitar Cambios
-                </a>
-            </div>
-
-            <div class="dash-card">
-                <h3>Cerrar sesión</h3>
-                <p>Cierre su sesión y regrese a la pantalla de inicio.</p>
-                <form asp-action="Logout" asp-controller="Auth" method="post">
-                    <button type="submit" class="btn btn-outline-danger">
-                        Cerrar sesión
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <div class="dash-footer">
-            <small>ON THE RUSH · Pasajero</small>
-        </div>
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Panel de Pasajero</p>
+        </footer>
     </div>
 </body>
 </html>

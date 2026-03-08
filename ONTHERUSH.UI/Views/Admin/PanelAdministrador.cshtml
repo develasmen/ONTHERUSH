@@ -7,153 +7,164 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Panel de administrador - ON THE RUSH</title>
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/components/buttons.css" />
-    <link rel="stylesheet" href="~/css/components/forms.css" />
-
-    <style>
-        .dashboard-wrapper {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 20px;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .dashboard-title {
-            font-size: 26px;
-            font-weight: 700;
-        }
-
-        .role-badge {
-            background: #fff3cd;
-            color: #8a6d1d;
-            padding: 6px 14px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .dashboard-subtitle {
-            color: #555;
-            margin-bottom: 25px;
-        }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-        }
-
-        .dash-card {
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
-            padding: 18px 18px 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-            .dash-card h3 {
-                font-size: 18px;
-                margin-bottom: 6px;
-            }
-
-            .dash-card p {
-                font-size: 14px;
-                color: #666;
-                margin-bottom: 14px;
-            }
-
-        .dash-footer {
-            margin-top: 30px;
-            text-align: right;
-        }
-
-        body {
-            background: #f4f5fb;
-        }
-    </style>
+    <title>Panel de Administrador - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/dashboard-base.css" />
 </head>
 <body>
-    <div class="dashboard-wrapper">
-
-        <div class="dashboard-header">
-            <div>
-                <div class="dashboard-title">Panel de Administrador</div>
-                <div class="dashboard-subtitle">
-                    Administre rutas, solicitudes de usuarios y reportes de conductores.
+    <div class="dashboard-container">
+        <!-- Header del dashboard -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo-section">
+                        <img src="~/images/OnTheRush-removebg-preview.png" alt="ON THE RUSH" class="dashboard-logo" />
+                    </div>
+                    <div class="header-info">
+                        <h1 class="dashboard-title">Panel de Administrador</h1>
+                        <p class="dashboard-subtitle">Gestione usuarios, rutas y solicitudes del sistema</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <span class="role-badge">
+                        <svg class="badge-icon" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                        Administrador
+                    </span>
                 </div>
             </div>
-            <span class="role-badge">Rol: Administrador</span>
-        </div>
+        </header>
 
-        @if (TempData["MensajeBienvenidaAdmin"] != null)
-        {
-            <div class="alert alert-success" style="margin-bottom:20px;">
-                @TempData["MensajeBienvenidaAdmin"]
+        <!-- Contenido principal -->
+        <main class="dashboard-main">
+            @if (TempData["MensajeBienvenidaAdmin"] != null)
+            {
+                <div class="alert alert-success">
+                    <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>@TempData["MensajeBienvenidaAdmin"]</span>
+                    </div>
+            }
+
+            <!-- Grid de tarjetas -->
+            <div class="dashboard-grid">
+                
+                <!-- Tarjeta: Reportes de viajes -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Reportes de viajes</h3>
+                        <p class="card-description">Descargue los reportes generados por los viajes en formato PDF</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("Viajes", "Reporte")" class="btn btn-primary">
+                            <span>Descargar reportes</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Gestionar usuarios -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Gestionar usuarios</h3>
+                        <p class="card-description">Apruebe usuarios pendientes y asigne roles al sistema</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("GestionarUsuarios", "Admin")" class="btn btn-primary">
+                            <span>Gestionar usuarios</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Solicitudes de usuarios -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Solicitudes de usuarios</h3>
+                        <p class="card-description">Revise y gestione solicitudes de actualización de datos</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("GestionarSolicitudes", "Admin")" class="btn btn-primary">
+                            <span>Ver solicitudes</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Asignar rutas -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Asignar rutas</h3>
+                        <p class="card-description">Asigne rutas a conductores y gestione cambios de recorrido</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("AsignarRutas", "Admin")" class="btn btn-primary">
+                            <span>Asignar rutas</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Cerrar sesión -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Cerrar sesión</h3>
+                        <p class="card-description">Cierre su sesión de administrador de forma segura</p>
+                    </div>
+                    <div class="card-footer">
+                        <form asp-action="Logout" asp-controller="Auth" method="post">
+                            <button type="submit" class="btn btn-danger">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                                </svg>
+                                <span>Cerrar sesión</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
             </div>
-        }
+        </main>
 
-        <div class="card-grid">
-
-            <div class="dash-card">
-                <h3>Reportes de viajes</h3>
-                <p>Descargue los reportes generados por los viajes en formato pdf</p>
-                <a href="@Url.Action("Viajes", "Reporte")" class="btn btn-primary">
-                    Descargar reportes
-                </a>
-            </div>
-
-            <div class="dash-card">
-                <h3>Gestionar usuarios</h3>
-                <p>Apruebe usuarios pendientes y asigne roles al sistema.</p>
-                <a href="@Url.Action("GestionarUsuarios", "Admin")" class="btn btn-primary">
-                    Gestionar usuarios
-                </a>
-            </div>
-
-            <div class="dash-card">
-                <h3>Solicitudes de usuarios</h3>
-                <p>Revise y apruebe o rechace las solicitudes de actualización de datos.</p>
-                <a href="@Url.Action("GestionarSolicitudes", "Admin")" class="btn btn-secondary">
-                    Gestionar solicitudes
-                </a>
-            </div>
-
-            <div class="dash-card">
-                <h3>Asignar rutas</h3>
-                <p>Asigne rutas a los conductores y gestione cambios de recorrido.</p>
-                <a href="@Url.Action("AsignarRutas", "Admin")" class="btn btn-secondary">
-                    Asignar rutas
-                </a>
-            </div>
-
-            <div class="dash-card">
-                <h3>Cerrar sesión</h3>
-                <p>Cierre la sesión de administrador y regrese a la pantalla de inicio.</p>
-                <form asp-action="Logout" asp-controller="Auth" method="post">
-                    <button type="submit" class="btn btn-outline-danger">
-                        Cerrar sesión
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <div class="dash-footer">
-            <small>ON THE RUSH · Administrador</small>
-        </div>
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Panel de Administrador</p>
+        </footer>
     </div>
 </body>
 </html>
-

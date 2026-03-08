@@ -8,91 +8,141 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Panel de Conductor - ON THE RUSH</title>
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/pages/conductor-dashboard.css" />
+    <link rel="stylesheet" href="~/css/pages/dashboard-base.css" />
 </head>
 <body>
-    <div class="dashboard-wrapper">
-
-        <div class="dashboard-header">
-            <div class="header-left">
-                <h1>Panel de Conductor</h1>
-                <p>Gestiona tu ruta asignada, actualiza estados y solicita cambios.</p>
-            </div>
-            <span class="role-badge">🚗 Rol: Conductor</span>
-        </div>
-
-        @if (TempData["MensajeBienvenidaConductor"] != null)
-        {
-            <div class="alert-soft">
-                @TempData["MensajeBienvenidaConductor"]
-            </div>
-        }
-
-        <div class="card-grid">
-
-            <div class="dash-card">
-                <div class="card-top">
-                    <div>
-                        <h3 class="card-title">Estado de viaje</h3>
-                        <p class="card-desc">Actualiza el estado de los viajes asignados en tu ruta actual.</p>
+    <div class="dashboard-container">
+        <!-- Header del dashboard -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo-section">
+                        <img src="~/images/OnTheRush-removebg-preview.png" alt="ON THE RUSH" class="dashboard-logo" />
                     </div>
-                    <div class="card-icon">🟢</div>
-                </div>
-
-                <div class="card-actions">
-                    <a class="btn-soft btn-primary-soft" href="@Url.Action("ActualizarEstadoViaje","Conductor")">
-                        Actualizar estado →
-                    </a>
-                </div>
-            </div>
-
-            <div class="dash-card">
-                <div class="card-top">
-                    <div>
-                        <h3 class="card-title">Solicitud de cambio de ruta</h3>
-                        <p class="card-desc">Envía una solicitud para modificar el orden o paradas de la ruta.</p>
+                    <div class="header-info">
+                        <h1 class="dashboard-title">Panel de Conductor</h1>
+                        <p class="dashboard-subtitle">Gestione su ruta asignada, actualice estados y solicite cambios</p>
                     </div>
-                    <div class="card-icon">🔁</div>
                 </div>
-
-                <div class="card-actions">
-                    <a class="btn-soft btn-secondary-soft" href="@Url.Action("SolicitarActualizacionRuta","Conductor")">
-                        Solicitar actualización →
-                    </a>
+                <div class="header-right">
+                    <span class="role-badge">
+                        <svg class="badge-icon" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                        </svg>
+                        Conductor
+                    </span>
                 </div>
             </div>
+        </header>
 
-            <div class="dash-card full">
-                <div class="card-top">
-                    <div>
+        <!-- Contenido principal -->
+        <main class="dashboard-main">
+            @if (TempData["MensajeBienvenidaConductor"] != null)
+            {
+                <div class="alert alert-success">
+                    <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>@TempData["MensajeBienvenidaConductor"]</span>
+                </div>
+            }
+
+            <!-- Grid de tarjetas -->
+            <div class="dashboard-grid">
+                
+                <!-- Tarjeta: Ver viaje -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
                         <h3 class="card-title">Ver viaje</h3>
-                        <p class="card-desc">Visualiza las paradas asignadas y abre la dirección en Google Maps.</p>
+                        <p class="card-description">Visualice las paradas asignadas y ábralas en Google Maps</p>
                     </div>
-                    <div class="card-icon">📍</div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("VerViaje", "Conductor")" class="btn btn-primary">
+                            <span>Ver pasajeros y rutas</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
                 </div>
 
-                <div class="card-actions">
-                    <a class="btn-soft btn-primary-soft" href="@Url.Action("VerViaje","Conductor")">
-                        Ver pasajeros y direcciones →
-                    </a>
-
-                    <form asp-action="Logout" asp-controller="Auth" method="post" style="margin:0;">
-                        <button type="submit" class="btn-soft btn-danger-soft">
-                            Cerrar sesión
-                        </button>
-                    </form>
+                <!-- Tarjeta: Estado de viaje -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Estado de viaje</h3>
+                        <p class="card-description">Actualice el estado de los viajes asignados en su ruta actual</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("ActualizarEstadoViaje", "Conductor")" class="btn btn-primary">
+                            <span>Actualizar estado</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
                 </div>
+
+                <!-- Tarjeta: Solicitud de cambio de ruta -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Solicitud de cambio de ruta</h3>
+                        <p class="card-description">Envíe una solicitud para modificar el orden o paradas de la ruta</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("SolicitarActualizacionRuta", "Conductor")" class="btn btn-primary">
+                            <span>Solicitar actualización</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Cerrar sesión -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Cerrar sesión</h3>
+                        <p class="card-description">Cierre su sesión de conductor de forma segura</p>
+                    </div>
+                    <div class="card-footer">
+                        <form asp-action="Logout" asp-controller="Auth" method="post">
+                            <button type="submit" class="btn btn-danger">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                                </svg>
+                                <span>Cerrar sesión</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
             </div>
+        </main>
 
-        </div>
-
-        <div class="footer">
-            <span>ON THE RUSH</span>
-            <span>Conductor · Panel</span>
-        </div>
-
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Panel de Conductor</p>
+        </footer>
     </div>
 </body>
 </html>

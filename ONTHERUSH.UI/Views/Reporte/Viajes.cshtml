@@ -1,137 +1,211 @@
 ﻿@model ReporteViajesVM
 
 @{
-    ViewData["Title"] = "Reporte de Viajes";
+    Layout = null;
 }
 
-<div class="container mt-4">
-
-    <!-- TÍTULO -->
-    <div class="row mb-3">
-        <div class="col">
-            <h2 class="fw-bold text-primary">
-                <i class="bi bi-truck"></i> Reporte de Viajes
-            </h2>
-            <hr />
-        </div>
-    </div>
-
-    <!-- FILTROS -->
-    <form method="get" asp-action="Viajes">
-        <div class="row align-items-end g-3">
-
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Fecha inicio</label>
-                <input type="date"
-                       class="form-control"
-                       name="fechaInicio"
-                       value="@Model.FechaInicio?.ToString("yyyy-MM-dd")" />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Fecha fin</label>
-                <input type="date"
-                       class="form-control"
-                       name="fechaFin"
-                       value="@Model.FechaFin?.ToString("yyyy-MM-dd")" />
-            </div>
-
-            <div class="col-md-6 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search"></i> Consultar
-                </button>
-
-                @if (Model.Viajes.Any())
-                {
-                    <a asp-action="ExportarPdf"
-                       asp-route-fechaInicio="@Model.FechaInicio?.ToString("yyyy-MM-dd")"
-                       asp-route-fechaFin="@Model.FechaFin?.ToString("yyyy-MM-dd")"
-                       class="btn btn-danger">
-                        <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-                    </a>
-                }
-            </div>
-
-        </div>
-    </form>
-
-    <!-- TABLA -->
-    <div class="row mt-4">
-        <div class="col">
-            <div class="card shadow-sm">
-
-                <div class="card-header bg-light fw-semibold">
-                    Resultados
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reporte de Viajes - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
+    <link rel="stylesheet" href="~/css/pages/reports.css" />
+</head>
+<body>
+    <div class="table-page-container">
+        <!-- Header -->
+        <header class="table-header">
+            <div class="table-header-content">
+                <a href="@Url.Action("PanelAdministrador", "Admin")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al panel</span>
+                </a>
+                <div class="table-header-info">
+                    <h1 class="table-title">Reporte de Viajes</h1>
+                    <p class="table-subtitle">Consulte y exporte reportes de viajes por rango de fechas</p>
                 </div>
+            </div>
+        </header>
 
-                <div class="card-body p-0">
-                    <div class="table-responsive">
+        <!-- Contenido principal -->
+        <main class="table-main">
+            <div class="table-container">
+                
+                <!-- Filtros -->
+                <form method="get" asp-action="Viajes" asp-controller="Reporte" class="filters-section">
+                    <div class="filters-grid">
+                        <!-- Fecha Inicio -->
+                        <div class="form-group">
+                            <label for="fechaInicio" class="form-label">
+                                <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                </svg>
+                                Fecha inicio
+                            </label>
+                            <input type="date" 
+                                   class="form-input" 
+                                   id="fechaInicio"
+                                   name="fechaInicio" 
+                                   value="@Model.FechaInicio?.ToString("yyyy-MM-dd")" />
+                        </div>
 
-                        <table class="table table-striped table-hover mb-0 align-middle">
-                            <thead class="table-dark">
+                        <!-- Fecha Fin -->
+                        <div class="form-group">
+                            <label for="fechaFin" class="form-label">
+                                <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                </svg>
+                                Fecha fin
+                            </label>
+                            <input type="date" 
+                                   class="form-input" 
+                                   id="fechaFin"
+                                   name="fechaFin" 
+                                   value="@Model.FechaFin?.ToString("yyyy-MM-dd")" />
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="form-actions-inline">
+                            <button type="submit" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                </svg>
+                                <span>Consultar</span>
+                            </button>
+
+                            @if (Model.Viajes != null && Model.Viajes.Any())
+                            {
+                                <a asp-action="ExportarPdf" 
+                                   asp-controller="Reporte"
+                                   asp-route-fechaInicio="@Model.FechaInicio?.ToString("yyyy-MM-dd")"
+                                   asp-route-fechaFin="@Model.FechaFin?.ToString("yyyy-MM-dd")"
+                                   class="btn btn-danger">
+                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span>Exportar PDF</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Resultados -->
+                @if (Model.Viajes != null && Model.Viajes.Any())
+                {
+                    <!-- Tabla de viajes -->
+                    <div class="results-header">
+                        <h3 class="results-title">Resultados</h3>
+                        <span class="results-count">@Model.Viajes.Count() @(Model.Viajes.Count() == 1 ? "viaje encontrado" : "viajes encontrados")</span>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
                                     <th>Ruta</th>
                                     <th>Salida</th>
                                     <th>Llegada</th>
                                     <th>Conductor</th>
                                     <th>Vehículo</th>
-                                    <th>Pasajeros</th>
-                                    <th>Estado</th>
+                                    <th class="text-center">Pasajeros</th>
+                                    <th class="text-center">Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
-
-                                @if (!Model.Viajes.Any())
+                                @foreach (var v in Model.Viajes)
                                 {
                                     <tr>
-                                        <td colspan="7" class="text-center text-muted py-4">
-                                            No hay datos para el rango seleccionado
+                                        <td>
+                                            <div class="route-info">
+                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                                </svg>
+                                                <span>@v.Ruta</span>
+                                            </div>
                                         </td>
-                                    </tr>
-                                }
-                                else
-                                {
-                                    foreach (var v in Model.Viajes)
-                                    {
-                                        <tr>
-                                            <td>@v.Ruta</td>
-                                            <td>@v.Salida.ToString("dd/MM/yyyy HH:mm")</td>
-                                            <td>@v.Llegada.ToString("dd/MM/yyyy HH:mm")</td>
-                                            <td>@v.Conductor</td>
-                                            <td>@v.Vehiculo</td>
-                                            <td class="text-center">@v.Pasajeros</td>
-                                            @if(v.Estado == "Programado")
+                                        <td>
+                                            <div class="datetime-info">
+                                                <span class="date">@v.Salida.ToString("dd/MM/yyyy")</span>
+                                                <span class="time">@v.Salida.ToString("HH:mm")</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="datetime-info">
+                                                <span class="date">@v.Llegada.ToString("dd/MM/yyyy")</span>
+                                                <span class="time">@v.Llegada.ToString("HH:mm")</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="driver-info">
+                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                                </svg>
+                                                <span>@v.Conductor</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="vehicle-info">
+                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                                                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                                                </svg>
+                                                <span>@v.Vehiculo</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="passenger-badge">@v.Pasajeros</span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (v.Estado == "Programado")
                                             {
-                                                <td>
-                                                    <span class="badge bg-warning">
-                                                        @v.Estado
-                                                    </span>
-                                                </td>
+                                                <span class="status-badge status-programado">
+                                                    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    @v.Estado
+                                                </span>
                                             }
                                             else
                                             {
-                                                <td>
-                                                    <span class="badge bg-success">
-                                                        @v.Estado
-                                                    </span>
-                                                </td>
+                                                <span class="status-badge status-completado">
+                                                    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    @v.Estado
+                                                </span>
                                             }
-
-                                        </tr>
-                                    }
+                                        </td>
+                                    </tr>
                                 }
-
                             </tbody>
                         </table>
-                        
                     </div>
-                    <a asp-controller="Admin" asp-action="PanelAdministrador" class="btn btn-secondary">
-                        Volver
-                    </a>
-                </div>
+                }
+                else
+                {
+                    <!-- Estado vacío -->
+                    <div class="empty-state">
+                        <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                        </svg>
+                        <h3>No hay datos para mostrar</h3>
+                        <p>Seleccione un rango de fechas y presione "Consultar" para ver los viajes</p>
+                    </div>
+                }
 
             </div>
-        </div>
-    </div>
+        </main>
 
-</div>
+        <!-- Footer -->
+        <footer class="table-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Administrador</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -8,95 +8,209 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registro de usuario - ON THE RUSH</title>
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/components/buttons.css" />
-    <link rel="stylesheet" href="~/css/components/forms.css" />
-    <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="stylesheet" href="~/css/pages/auth-registro.css" />
 </head>
-
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>Registro de usuario</h1>
-                <p>Cree su cuenta para utilizar el sistema de transporte ON THE RUSH.</p>
+    <div class="registro-wrapper">
+        <!-- Panel izquierdo - Branding -->
+        <div class="registro-brand-panel">
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <img src="~/images/OnTheRush-removebg-preview.png" alt="On The Rush" />
+                </div>
+                <h1 class="brand-title">Únete a ON THE RUSH</h1>
+                <p class="brand-subtitle">Crea tu cuenta y comienza a disfrutar de nuestro sistema de transporte inteligente</p>
+                
+                <!-- Footer del panel izquierdo -->
+                <div class="brand-footer">
+                    <p class="copyright">© @DateTime.Now.Year ON THE RUSH. Todos los derechos reservados.</p>
+                    <div class="brand-links">
+                        <a href="#" class="brand-link">Términos y condiciones</a>
+                        <span class="separator">·</span>
+                        <a href="#" class="brand-link">Política de privacidad</a>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger">
-                    @ViewBag.Error
-                </div>
-            }
-
-            @if (ViewBag.Exito != null)
-            {
-                <div class="alert alert-success">
-                    @ViewBag.Exito
-                </div>
-            }
-
-            <form asp-action="Registro" asp-controller="Auth" method="post" class="auth-form">
-                <div class="form-group">
-                    <label for="cedula">Cédula</label>
-                    <input type="text" id="cedula" name="cedula" class="form-input" required />
+        <!-- Panel derecho - Formulario -->
+        <div class="registro-form-panel">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Crear cuenta</h2>
+                    <p>Completa el formulario para registrarte en el sistema</p>
                 </div>
 
-                <div class="form-group">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" class="form-input" required />
-                </div>
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        @ViewBag.Error
+                    </div>
+                }
 
-                <div class="form-group">
-                    <label for="apellido">Apellido</label>
-                    <input type="text" id="apellido" name="apellido" class="form-input" required />
-                </div>
+                @if (ViewBag.Exito != null)
+                {
+                    <div class="alert alert-success">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        @ViewBag.Exito
+                    </div>
+                }
 
-                <div class="form-group">
-                    <label for="correo">Correo electrónico</label>
-                    <input type="email" id="correo" name="correo" class="form-input" required />
-                </div>
+                <form asp-action="Registro" asp-controller="Auth" method="post" class="registro-form">
+                    
+                    <!-- Fila de 2 columnas: Nombre y Apellido -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombre" class="form-label">
+                                <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                                Nombre
+                            </label>
+                            <input type="text" 
+                                   id="nombre" 
+                                   name="nombre" 
+                                   class="form-input" 
+                                   placeholder="Tu nombre"
+                                   required 
+                                   autocomplete="given-name" />
+                        </div>
 
-                <div class="form-group">
-                    <label>Ubicación (Latitud, Longitud)</label>
-                    <small class="form-hint">
-                        Ejemplo: 9.998514, -84.205716
-                    </small>
-                    <input type="text" name="ubicacion" class="form-control" placeholder="Ej: 9.998514, -84.205716" pattern="^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$" />
-                </div>
+                        <div class="form-group">
+                            <label for="apellido" class="form-label">
+                                <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                                Apellido
+                            </label>
+                            <input type="text" 
+                                   id="apellido" 
+                                   name="apellido" 
+                                   class="form-input" 
+                                   placeholder="Tu apellido"
+                                   required 
+                                   autocomplete="family-name" />
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="contrasena">Contraseña</label>
-                    <input type="password" id="contrasena" name="contrasena" class="form-input" required />
-                    <small class="password-hint">
-                        La contraseña debe contener:
-                        <ul>
-                            <li>Al menos 6 caracteres</li>
-                            <li>Al menos una letra mayúscula</li>
-                            <li>Al menos una letra minúscula</li>
-                            <li>Al menos un número</li>
-                        </ul>
-                    </small>
-                </div>
+                    <!-- Cédula -->
+                    <div class="form-group">
+                        <label for="cedula" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                            </svg>
+                            Cédula
+                        </label>
+                        <input type="text" 
+                               id="cedula" 
+                               name="cedula" 
+                               class="form-input" 
+                               placeholder="Número de cédula"
+                               required />
+                    </div>
 
-                <div class="form-group">
-                    <label for="confirmarContrasena">Confirmar contraseña</label>
-                    <input type="password" id="confirmarContrasena" name="confirmarContrasena" class="form-input"
-                           required />
-                </div>
+                    <!-- Correo -->
+                    <div class="form-group">
+                        <label for="correo" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                            Correo electrónico
+                        </label>
+                        <input type="email" 
+                               id="correo" 
+                               name="correo" 
+                               class="form-input" 
+                               placeholder="tucorreo@ejemplo.com"
+                               required 
+                               autocomplete="email" />
+                    </div>
 
-                <button type="submit" class="btn btn-primary">
-                    Registrar
-                </button>
+                    <!-- Ubicación -->
+                    <div class="form-group">
+                        <label for="ubicacion" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                            </svg>
+                            Ubicación
+                        </label>
+                        <input type="text" 
+                               id="ubicacion" 
+                               name="ubicacion" 
+                               class="form-input" 
+                               placeholder="Ej: 9.998514, -84.205716"
+                               pattern="^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$" />
+                        <small class="form-hint">Formato: Latitud, Longitud (opcional)</small>
+                    </div>
 
-                <button type="button" class="btn btn-secondary"
-                        onclick="window.location.href='@Url.Action("Login", "Auth")'">
-                    Volver al inicio de sesión
-                </button>
-            </form>
+                    <!-- Contraseña -->
+                    <div class="form-group">
+                        <label for="contrasena" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                            Contraseña
+                        </label>
+                        <input type="password" 
+                               id="contrasena" 
+                               name="contrasena" 
+                               class="form-input" 
+                               placeholder="••••••••"
+                               required 
+                               autocomplete="new-password" />
+                        <div class="password-requirements">
+                            <p class="requirements-title">La contraseña debe contener:</p>
+                            <ul class="requirements-list">
+                                <li>Al menos 6 caracteres</li>
+                                <li>Una letra mayúscula</li>
+                                <li>Una letra minúscula</li>
+                                <li>Un número</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Confirmar contraseña -->
+                    <div class="form-group">
+                        <label for="confirmarContrasena" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                            Confirmar contraseña
+                        </label>
+                        <input type="password" 
+                               id="confirmarContrasena" 
+                               name="confirmarContrasena" 
+                               class="form-input" 
+                               placeholder="••••••••"
+                               required 
+                               autocomplete="new-password" />
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-registro">
+                            <span>Crear cuenta</span>
+                            <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        
+                        <button type="button" class="btn-volver" onclick="window.location.href='@Url.Action("Login", "Auth")'">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Volver al inicio de sesión</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </body>
-
 </html>

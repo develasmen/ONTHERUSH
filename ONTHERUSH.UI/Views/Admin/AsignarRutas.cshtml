@@ -11,107 +11,233 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Asignar rutas - ON THE RUSH</title>
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/pages/admin-asignar-rutas.css" />
+    <title>Asignar Rutas - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
+    <link rel="stylesheet" href="~/css/pages/assign-routes.css" />
 </head>
-
 <body>
-    <div class="wrap">
-        <h2>Asignar rutas</h2>
-        <div style="margin-bottom:15px;">
-            <a asp-controller="Admin"asp-action="PanelAdministrador"class="btn-link btn-secondary">
-                ← Volver al panel
-            </a>
-        </div>
-        <div class="hint">Selecciona un conductor, marca reservas y define el orden de recogida.</div>
+    <div class="table-page-container">
+        <!-- Header -->
+        <header class="table-header">
+            <div class="table-header-content">
+                <a href="@Url.Action("PanelAdministrador", "Admin")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al panel</span>
+                </a>
+                <div class="table-header-info">
+                    <h1 class="table-title">Asignar Rutas</h1>
+                    <p class="table-subtitle">Seleccione un conductor, marque reservas y defina el orden de recogida</p>
+                </div>
+            </div>
+        </header>
 
-        @if (TempData["Exito"] != null)
-        {
-            <div class="ok">@TempData["Exito"]</div>
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div class="err">@TempData["Error"]</div>
-        }
+        <!-- Contenido principal -->
+        <main class="table-main">
+            <div class="table-container">
+                
+                <!-- Alertas -->
+                @if (TempData["Exito"] != null)
+                {
+                    <div class="alert alert-success">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>@TempData["Exito"]</span>
+                    </div>
+                }
 
-        <div class="card">
-            <form asp-action="AsignarRutas" asp-controller="Admin" method="post" id="formAsignar">
-                @Html.AntiForgeryToken()
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        <span>@TempData["Error"]</span>
+                    </div>
+                }
 
-                <div class="row">
-                    <div>
-                        <label><b>Conductor</b></label><br />
-                        <select name="conductorId" style="min-width:340px;">
-                            @foreach (var c in conductores)
-                            {
-                                <option value="@c.Id">@c.Email</option>
-                            }
-                        </select>
-                        <div class="hint">Se asignará la lista al conductor seleccionado.</div>
+                <!-- Formulario -->
+                <form asp-action="AsignarRutas" asp-controller="Admin" method="post" id="formAsignar">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Selector de conductor y botón -->
+                    <div class="form-header-section">
+                        <div class="form-group-inline">
+                            <div class="form-group">
+                                <label for="conductorId" class="form-label">
+                                    <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                                        <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                                    </svg>
+                                    Conductor
+                                </label>
+                                <select name="conductorId" id="conductorId" class="form-input" required>
+                                    <option value="">Seleccionar conductor...</option>
+                                    @if (conductores != null)
+                                    {
+                                        @foreach (var c in conductores)
+                                        {
+                                            <option value="@c.Id">@c.Nombre @c.Apellido (@c.Email)</option>
+                                        }
+                                    }
+                                </select>
+                                <small class="form-hint">La ruta se asignará al conductor seleccionado</small>
+                            </div>
+
+                            <button type="submit" class="btn-submit">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                                <span>Asignar Ruta</span>
+                            </button>
+                        </div>
+
+                        <!-- Info box -->
+                        <div class="info-tip">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            </svg>
+                            <span><strong>Orden:</strong> 1, 2, 3... según el recorrido. <strong>Ubicación:</strong> Provincia / Cantón / Distrito</span>
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn">Asignar ruta</button>
-                </div>
+                    @if (reservas != null && reservas.Any())
+                    {
+                        <!-- Tabla de reservas -->
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="checkbox-col">
+                                            <input type="checkbox" id="selectAll" class="table-checkbox" title="Seleccionar todas" />
+                                        </th>
+                                        <th>Reserva</th>
+                                        <th>Ubicación</th>
+                                        <th class="order-col">Orden</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < reservas.Count; i++)
+                                    {
+                                        var r = reservas[i];
 
-                <div class="small">
-                    Tip: Orden = 1,2,3... según el recorrido. Ubicación = Provincia / Cantón / Distrito.
-                </div>
+                                        <tr>
+                                            <td class="checkbox-col">
+                                                <input type="checkbox" class="chkReserva table-checkbox" data-index="@i" />
+                                            </td>
+                                            <td>
+                                                <div class="reservation-info">
+                                                    <div class="reservation-id">Reserva #@r.ReservaId</div>
+                                                    <div class="reservation-meta">
+                                                        <span class="meta-badge">
+                                                            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            @r.FechaReserva.ToString("dd/MM/yyyy HH:mm")
+                                                        </span>
+                                                        <span class="meta-badge status-@r.Estado.ToLower()">
+                                                            @r.Estado
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="location-info">
+                                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    <span>@r.Provincia, @r.Canton, @r.Distrito</span>
+                                                </div>
+                                            </td>
+                                            <td class="order-col">
+                                                <input type="number" 
+                                                       class="txtOrden order-input" 
+                                                       data-index="@i" 
+                                                       value="@(i + 1)" 
+                                                       min="1" 
+                                                       max="100"
+                                                       title="Orden de recogida" />
+                                            </td>
+                                            <td style="display:none;">
+                                                <input type="hidden" id="realid_@i" value="@r.ReservaId" />
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
 
-                <div style="margin-top:12px;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Seleccionar</th>
-                                <th>Reserva</th>
-                                <th>Ubicación</th>
-                                <th>Orden</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (int i = 0; i < reservas.Count; i++)
-                            {
-                                var r = reservas[i];
+                        <!-- Contador de seleccionadas -->
+                        <div class="selection-counter">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span id="selectedCount">0 reservas seleccionadas</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Estado vacío -->
+                        <div class="empty-state">
+                            <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                            </svg>
+                            <h3>No hay reservas disponibles</h3>
+                            <p>No existen reservas pendientes para asignar a conductores</p>
+                        </div>
+                    }
+                </form>
 
-                                <tr>
-                                    <td>
-                                        <input type="checkbox"                          class="chkReserva"                 data-index="@i" />
-                                    </td>
+            </div>
+        </main>
 
-                                    <td>
-                                        <div><b>Reserva #@r.ReservaId</b></div>
-                                        <div class="pill">@r.FechaReserva.ToString("dd/MM/yyyy HH:mm")</div>
-                                        <div class="pill">@r.Estado</div>
-                                    </td>
-
-                                    <td>
-                                        <div>@r.Provincia, @r.Canton, @r.Distrito</div>
-                                    </td>
-
-                                    <td>
-                                        <input type="number"                        class="txtOrden"                                            data-index="@i"                                    value="@(i + 1)"                            min="1"
-                                               style="width:90px;" />
-                                    </td>
-
-                                    <td style="display:none;">
-                                        <input type="hidden" id="realid_@i" value="@r.ReservaId" />
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </form>
-        </div>
+        <!-- Footer -->
+        <footer class="table-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Administrador</p>
+        </footer>
     </div>
 
     <script>
-            const form = document.getElementById("formAsignar");
+        const form = document.getElementById("formAsignar");
+        const selectAllCheckbox = document.getElementById("selectAll");
+        const checkboxes = document.querySelectorAll(".chkReserva");
+        const selectedCountSpan = document.getElementById("selectedCount");
 
+        // Seleccionar/deseleccionar todas
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener("change", function() {
+                checkboxes.forEach(chk => {
+                    chk.checked = this.checked;
+                });
+                updateCounter();
+            });
+        }
+
+        // Actualizar contador cuando cambia cualquier checkbox
+        checkboxes.forEach(chk => {
+            chk.addEventListener("change", updateCounter);
+        });
+
+        function updateCounter() {
+            const count = document.querySelectorAll(".chkReserva:checked").length;
+            if (selectedCountSpan) {
+                selectedCountSpan.textContent = count + (count === 1 ? " reserva seleccionada" : " reservas seleccionadas");
+            }
+
+            // Actualizar estado del selectAll
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = count === checkboxes.length && count > 0;
+                selectAllCheckbox.indeterminate = count > 0 && count < checkboxes.length;
+            }
+        }
+
+        // Submit del formulario
+        if (form) {
             form.addEventListener("submit", function (e) {
-
-                // Borra inputs dinámicos previos (si intenta 2 veces)
+                // Borrar inputs dinámicos previos
                 document.querySelectorAll(".dyn-input").forEach(x => x.remove());
 
                 const checks = document.querySelectorAll(".chkReserva");
@@ -119,7 +245,6 @@
 
                 checks.forEach(chk => {
                     const i = chk.getAttribute("data-index");
-
                     const realId = document.getElementById("realid_" + i).value;
                     const orden = document.querySelector(".txtOrden[data-index='" + i + "']").value;
 
@@ -146,10 +271,13 @@
 
                 if (seleccionados === 0) {
                     e.preventDefault();
-                    alert("Debes seleccionar al menos una reserva.");
+                    alert("Debe seleccionar al menos una reserva.");
                 }
             });
+        }
+
+        // Inicializar contador
+        updateCounter();
     </script>
 </body>
-
 </html>

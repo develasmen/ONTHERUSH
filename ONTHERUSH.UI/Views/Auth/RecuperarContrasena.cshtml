@@ -1,94 +1,123 @@
 @{
-    ViewData["Title"] = "Recuperar contraseña";
-}
-@{
-    ViewData["Title"] = "Recuperar contraseña";
+    Layout = null;
 }
 
-<link rel="stylesheet" href="~/css/auth.css" />
-
-<div class="auth-page">
-    <div class="auth-card">
-
-        <div class="auth-brand">
-            <div class="auth-logo">ON</div>
-            <div class="auth-brand-text">
-                <div class="auth-app">ONTHERUSH</div>
-                <div class="auth-sub">Recuperación de acceso</div>
-            </div>
-        </div>
-
-        <div class="auth-header">
-            <h2>Recuperar contraseña</h2>
-            <p>
-                Ingresá tu correo y te enviaremos un enlace para restablecer tu contraseña.
-            </p>
-        </div>
-
-        @* Mensajes *@
-        @if (ViewBag.Exito != null)
-        {
-            <div class="auth-alert auth-alert-success" role="alert">
-                @ViewBag.Exito
-            </div>
-        }
-
-        @if (ViewBag.Error != null)
-        {
-            <div class="auth-alert auth-alert-danger" role="alert">
-                @ViewBag.Error
-            </div>
-        }
-
-        <form asp-action="RecuperarContrasena" method="post" class="auth-form" id="frmRecuperar">
-            @Html.AntiForgeryToken()
-
-            <div class="auth-field">
-                <label for="correo">Correo electrónico</label>
-                <input type="email"
-                       id="correo"
-                       name="correo"
-                       class="auth-input"
-                       placeholder="usuario@correo.com"
-                       autocomplete="email"
-                       required />
-                <div class="auth-hint">
-                    Por seguridad, verás el mismo mensaje aunque el correo no exista.
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recuperar contraseña - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/auth-recuperar.css" />
+</head>
+<body>
+    <div class="recuperar-wrapper">
+        <!-- Panel izquierdo - Branding -->
+        <div class="recuperar-brand-panel">
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <img src="~/images/OnTheRush-removebg-preview.png" alt="On The Rush" />
+                </div>
+                <h1 class="brand-title">¿Olvidaste tu contraseña?</h1>
+                <p class="brand-subtitle">No te preocupes, te ayudaremos a recuperar el acceso a tu cuenta</p>
+                
+                <!-- Footer del panel izquierdo -->
+                <div class="brand-footer">
+                    <p class="copyright">© @DateTime.Now.Year ON THE RUSH. Todos los derechos reservados.</p>
+                    <div class="brand-links">
+                        <a href="#" class="brand-link">Términos y condiciones</a>
+                        <span class="separator">·</span>
+                        <a href="#" class="brand-link">Política de privacidad</a>
+                    </div>
                 </div>
             </div>
-
-            <button type="submit" class="auth-btn" id="btnEnviar">
-                Enviar enlace
-            </button>
-        </form>
-
-        <div class="auth-divider"></div>
-
-        <div class="auth-footer">
-            <a asp-controller="Auth" asp-action="Login" class="auth-link">
-                Volver a iniciar sesión
-            </a>
         </div>
 
-        <div class="auth-copy">
-            © @DateTime.Now.Year ONTHERUSH
-        </div>
+        <!-- Panel derecho - Formulario -->
+        <div class="recuperar-form-panel">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Recuperar contraseña</h2>
+                    <p>Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña</p>
+                </div>
 
+                @if (ViewBag.Exito != null)
+                {
+                    <div class="alert alert-success">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        @ViewBag.Exito
+                    </div>
+                }
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        @ViewBag.Error
+                    </div>
+                }
+
+                <form asp-action="RecuperarContrasena" asp-controller="Auth" method="post" class="recuperar-form" id="frmRecuperar">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label for="correo" class="form-label">
+                            <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                            Correo electrónico
+                        </label>
+                        <input type="email" 
+                               id="correo" 
+                               name="correo" 
+                               class="form-input" 
+                               placeholder="tucorreo@ejemplo.com"
+                               required 
+                               autocomplete="email" />
+                        <small class="form-hint">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            </svg>
+                            Por seguridad, verás el mismo mensaje aunque el correo no exista
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn-recuperar" id="btnEnviar">
+                        <span>Enviar enlace de recuperación</span>
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="form-footer">
+                    <p>¿Recordaste tu contraseña?</p>
+                    <a href="@Url.Action("Login", "Auth")" class="login-link">
+                        Volver a iniciar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-@section Scripts {
-<script>
-    (function () {
-        const form = document.getElementById('frmRecuperar');
-        const btn = document.getElementById('btnEnviar');
+    <script>
+        (function () {
+            const form = document.getElementById('frmRecuperar');
+            const btn = document.getElementById('btnEnviar');
 
-        if (!form || !btn) return;
+            if (!form || !btn) return;
 
-        form.addEventListener('submit', function () {
-            btn.disabled = true;
-            btn.textContent = 'Enviando...';
-        });
-    })();
-</script>
-}
+            form.addEventListener('submit', function () {
+                btn.disabled = true;
+                btn.innerHTML = '<span>Enviando...</span>';
+            });
+        })();
+    </script>
+</body>
+</html>
