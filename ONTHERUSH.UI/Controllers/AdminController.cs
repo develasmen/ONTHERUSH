@@ -18,6 +18,7 @@ namespace ONTHERUSH.UI.Controllers
         private readonly ISolicitudCambioService _solicitudCambioService;
         private readonly IViajeService _viajeService;
         private readonly IReservaService _reservaService;
+        private readonly IVehiculoService _vehiculoService;
 
         public AdminController(
             IAdminService adminService,
@@ -25,7 +26,8 @@ namespace ONTHERUSH.UI.Controllers
             RutaAsignacionService rutaAsignacionService,
             ISolicitudCambioService solicitudCambioService,
             IViajeService viajeService,
-            IReservaService reservaService)
+            IReservaService reservaService,
+            IVehiculoService vehiculoService)
         {
             _adminService = adminService;
             _userManager = userManager;
@@ -33,6 +35,7 @@ namespace ONTHERUSH.UI.Controllers
             _solicitudCambioService = solicitudCambioService;
             _viajeService = viajeService;
             _reservaService = reservaService;
+            _vehiculoService = vehiculoService;
         }
 
         public IActionResult PanelAdministrador()
@@ -285,6 +288,75 @@ namespace ONTHERUSH.UI.Controllers
         public IActionResult ActualizarSolicitud()
         {
             return View();
+        }
+
+
+        // GET: Admin/GestionarVehiculos
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> GestionarVehiculos()
+        {
+            var vehiculos = await _vehiculoService.ObtenerVehiculos();
+            return View(vehiculos);
+        }
+
+        // POST: Admin/AgregarVehiculo
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgregarVehiculo(VehiculoDto vehiculo)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Datos inválidos";
+                return RedirectToAction(nameof(GestionarVehiculos));
+            }
+
+            var resultado = await _vehiculoService.AgregarVehiculo(vehiculo);
+
+            if (resultado.Exito)
+                TempData["Exito"] = resultado.Mensaje;
+            else
+                TempData["Error"] = resultado.Mensaje;
+
+            return RedirectToAction(nameof(GestionarVehiculos));
+        }
+
+        // POST: Admin/EditarVehiculo
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarVehiculo(VehiculoDto vehiculo)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Datos inválidos";
+                return RedirectToAction(nameof(GestionarVehiculos));
+            }
+
+            var resultado = await _vehiculoService.ActualizarVehiculo(vehiculo);
+
+            if (resultado.Exito)
+                TempData["Exito"] = resultado.Mensaje;
+            else
+                TempData["Error"] = resultado.Mensaje;
+
+            return RedirectToAction(nameof(GestionarVehiculos));
+        }
+
+        // POST: Admin/EliminarVehiculo
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarVehiculo(int id)
+        {
+            var resultado = await _vehiculoService.EliminarVehiculo(id);
+
+            if (resultado.Exito)
+                TempData["Exito"] = resultado.Mensaje;
+            else
+                TempData["Error"] = resultado.Mensaje;
+
+            return RedirectToAction(nameof(GestionarVehiculos));
         }
     }
 }
