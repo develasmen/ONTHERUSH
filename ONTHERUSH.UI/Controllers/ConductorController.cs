@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ONTHERUSH.Abstracciones.DTOs;
 using ONTHERUSH.Abstracciones.Interfaces;
+using ONTHERUSH.Abstracciones.Interfaces.Services;
 using ONTHERUSH.AccesoADatos.Models;
 using ONTHERUSH.LogicaDeNegocio.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace ONTHERUSH.UI.Controllers
 {
@@ -19,19 +21,22 @@ namespace ONTHERUSH.UI.Controllers
         private readonly IAdminService _adminService;
         private readonly IReservaService _reservaService;
         private readonly IViajeService _viajeService;
+        private readonly IIncidenteService _incidenteService;
 
         public ConductorController(
             UserManager<ApplicationUser> userManager,
             RutaAsignacionService rutaAsignacionService,
             IAdminService adminService,
             IReservaService reservaService,
-            IViajeService viajeService)
+            IViajeService viajeService,
+            IIncidenteService incidenteService)
         {
             _userManager = userManager;
             _rutaAsignacionService = rutaAsignacionService;
             _adminService = adminService;
             _reservaService = reservaService;
             _viajeService = viajeService;
+            _incidenteService = incidenteService;
         }
 
         [HttpGet]
@@ -171,6 +176,49 @@ namespace ONTHERUSH.UI.Controllers
                 : $" {resultado.Mensaje}";
 
             return RedirectToAction("VerViaje");
+        }
+
+        [HttpGet]
+        public IActionResult ReportarIncidente()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReportarIncidente(CrearIncidenteDto dto)
+        {
+            if (!ModelState.IsValid)
+                return View(dto);
+
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
+
+            if (conductor == null)
+            {
+                TempData["Mensaje"] = "No se encontró el registro del conductor.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            await _incidenteService.CrearIncidenteAsync(conductorUser.Id, dto);
+
+            TempData["Mensaje"] = "Incidente reportado correctamente.";
+            return RedirectToAction("PanelConductor");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MisIncidentes()
+        {
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var incidentes = await _incidenteService.ObtenerIncidentesPorConductorAsync(conductorUser.Id);
+            return View(incidentes);
         }
     }
 }

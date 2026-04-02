@@ -6,22 +6,29 @@
     var hayParadas = Model != null && Model.Any();
 
     bool EsRecogido(string? s) =>
-        string.Equals((s ?? "").Trim(), "Recogido", StringComparison.OrdinalIgnoreCase);
+    string.Equals((s ?? "").Trim(), "Recogido", StringComparison.OrdinalIgnoreCase);
 
     var todosRecogidos = hayParadas && Model.All(x => EsRecogido(x.Estado));
 
     var destinoAeropuerto = Uri.EscapeDataString("Aeropuerto Internacional Juan Santamaría");
-    var urlAeropuerto = $"https://www.google.com/maps/dir/?api=1&destination={destinoAeropuerto}";
+
+    var urlAeropuertoMaps =
+    $"https://www.google.com/maps/dir/?api=1&destination={destinoAeropuerto}";
+
+    var urlAeropuertoWaze =
+    $"https://waze.com/ul?q={destinoAeropuerto}&navigate=yes";
 }
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ver Viaje - ON THE RUSH</title>
     <link rel="stylesheet" href="~/css/pages/table-base.css" />
 </head>
+
 <body>
     <div class="table-page-container">
         <!-- Header -->
@@ -29,183 +36,241 @@
             <div class="table-header-content">
                 <a href="@Url.Action("PanelConductor", "Conductor")" class="back-button">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                              clip-rule="evenodd" />
                     </svg>
                     <span>Volver al panel</span>
                 </a>
                 <div class="table-header-info">
                     <h1 class="table-title">Ver Viaje</h1>
-                    <p class="table-subtitle">Reservas asignadas en orden. Abra Google Maps para ir a recoger a cada cliente</p>
+                    <p class="table-subtitle">Reservas asignadas en orden. Use Waze o Google Maps para ir a recoger a
+                        cada cliente</p>
+                    </div>
                 </div>
-            </div>
-        </header>
+            </header>
 
-        <!-- Contenido principal -->
-        <main class="table-main">
-            <div class="table-container">
-                
-                <!-- Alertas -->
-                @if (TempData["Mensaje"] != null)
-                {
-                    <div class="alert alert-success">
-                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        <span>@TempData["Mensaje"]</span>
-                    </div>
-                }
+            <!-- Contenido principal -->
+            <main class="table-main">
+                <div class="table-container">
 
-                @if (!hayParadas)
-                {
-                    <!-- Estado vacío -->
-                    <div class="empty-state">
-                        <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
-                        </svg>
-                        <h3>No tiene un viaje activo</h3>
-                        <p>Cuando el administrador le asigne reservas, aparecerán aquí</p>
-                    </div>
-                }
-                else
-                {
-                    <!-- Tabla de paradas -->
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Orden</th>
-                                    <th>Cliente</th>
-                                    <th>Ubicación</th>
-                                    <th class="text-center">Estado</th>
-                                    <th class="text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var p in Model.OrderBy(x => x.Orden))
-                                {
-                                    var destino = Uri.EscapeDataString(p.Direccion ?? "");
-                                    var googleMapsUrl = $"https://www.google.com/maps/dir/?api=1&destination={destino}";
-
-                                    var estadoTxt = (p.Estado ?? "").Trim();
-                                    var recogido = string.Equals(estadoTxt, "Recogido", StringComparison.OrdinalIgnoreCase);
-
-                                    <tr class="@(recogido ? "row-completed" : "")">
-                                        <td>
-                                            <div class="order-badge">@p.Orden</div>
-                                        </td>
-                                        <td>
-                                            <div class="user-info">
-                                                <div class="user-avatar">
-                                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </div>
-                                                <div class="user-name">@p.NombreCliente</div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="location-info">
-                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span>@p.Direccion</span>
-                                            </div>
-                                        </td>
-                                        <td class="text-center">
-                                            @if (recogido)
-                                            {
-                                                <span class="status-badge status-completed">
-                                                    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                    </svg>
-                                                    Recogido
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="status-badge status-pending">
-                                                    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                                    </svg>
-                                                    Pendiente
-                                                </span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <div class="action-group">
-                                                <!-- Botón Google Maps -->
-                                                <a href="@googleMapsUrl" target="_blank" rel="noopener" class="btn-action btn-maps" title="Abrir en Google Maps">
-                                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                                                    </svg>
-                                                    Ir a recoger
-                                                </a>
-
-                                                <!-- Botón Marcar Recogido -->
-                                                @if (!recogido)
-                                                {
-                                                    <form asp-action="MarcarRecogido" asp-controller="Conductor" method="post" class="inline-form">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="id" value="@p.Id" />
-                                                        <button type="submit" class="btn-action btn-approve" title="Marcar como recogido">
-                                                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            Marcar recogido
-                                                        </button>
-                                                    </form>
-                                                }
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Botones de finalización (si todos recogidos) -->
-                    @if (todosRecogidos)
+                    <!-- Alertas -->
+                    @if (TempData["Mensaje"] != null)
                     {
-                        <div class="completion-actions">
-                            <div class="completion-message">
-                                <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                <div>
-                                    <h4>¡Todos los pasajeros recogidos!</h4>
-                                    <p>Ahora puede dirigirse al aeropuerto o finalizar el viaje</p>
-                                </div>
-                            </div>
-                            <div class="completion-buttons">
-                                <a href="@urlAeropuerto" target="_blank" rel="noopener" class="btn btn-primary">
-                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                                    </svg>
-                                    <span>Ir al Aeropuerto Juan Santamaría</span>
-                                </a>
-                                <form asp-action="FinalizarViaje" asp-controller="Conductor" method="post" class="inline-form" 
-                                      onsubmit="return confirm('¿Está seguro de finalizar el viaje?')">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-secondary">
-                                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                        </svg>
-                                        <span>Finalizar Viaje</span>
-                                    </button>
-                                </form>
-                            </div>
+                        <div class="alert alert-success">
+                            <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                      clip-rule="evenodd" />
+                            </svg>
+                            <span>@TempData["Mensaje"]</span>
                         </div>
                     }
-                }
 
-            </div>
-        </main>
+                    @if (!hayParadas)
+                    {
+                        <!-- Estado vacío -->
+                        <div class="empty-state">
+                            <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                                <path
+                                d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                            </svg>
+                            <h3>No tiene un viaje activo</h3>
+                            <p>Cuando el administrador le asigne reservas, aparecerán aquí</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Tabla de paradas -->
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Orden</th>
+                                        <th>Cliente</th>
+                                        <th>Ubicación</th>
+                                        <th class="text-center">Estado</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var p in Model.OrderBy(x => x.Orden))
+                                    {
+                                        var destino = Uri.EscapeDataString(p.Direccion ?? "");
+                                        var googleMapsUrl = $"https://www.google.com/maps/dir/?api=1&destination={destino}";
+                                        var wazeUrl = $"https://waze.com/ul?q={destino}&navigate=yes";
 
-        <!-- Footer -->
-        <footer class="table-footer">
-            <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
-        </footer>
-    </div>
-</body>
+                                        var estadoTxt = (p.Estado ?? "").Trim();
+                                        var recogido = string.Equals(estadoTxt, "Recogido", StringComparison.OrdinalIgnoreCase);
+
+                                        <tr class="@(recogido ? "row-completed" : "")">
+                                            <td>
+                                                <div class="order-badge">@p.Orden</div>
+                                            </td>
+                                            <td>
+                                                <div class="user-info">
+                                                    <div class="user-avatar">
+                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                                                  clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                    <div class="user-name">@p.NombreCliente</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="location-info">
+                                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd"
+                                                              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                                              clip-rule="evenodd" />
+                                                    </svg>
+                                                    <span>@p.Direccion</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (recogido)
+                                                {
+                                                    <span class="status-badge status-completed">
+                                                        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                  clip-rule="evenodd" />
+                                                        </svg>
+                                                        Recogido
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="status-badge status-pending">
+                                                        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                                                  clip-rule="evenodd" />
+                                                        </svg>
+                                                        Pendiente
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="action-group">
+
+                                                    <!-- Google Maps -->
+                                                    <a href="@googleMapsUrl" target="_blank" rel="noopener"
+                                                           class="btn-action btn-maps" title="Abrir en Google Maps">
+
+                                                        <img src="https://cdn-icons-png.flaticon.com/512/2991/2991231.png"
+                                                             width="16" style="margin-right:4px;" />
+
+                                                        Maps
+                                                    </a>
+
+                                                    <!-- Waze -->
+                                                    <a href="@wazeUrl" target="_blank" rel="noopener" class="btn-action btn-maps"
+                                                           title="Abrir en Waze">
+
+                                                        <img src="https://cdn-icons-png.flaticon.com/512/3771/3771472.png"
+                                                             width="16" style="margin-right:4px;" />
+
+                                                        Waze
+                                                    </a>
+
+                                                    <!-- Botón Marcar Recogido -->
+                                                    @if (!recogido)
+                                                    {
+                                                        <form asp-action="MarcarRecogido" asp-controller="Conductor" method="post"
+                                                              class="inline-form">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="id" value="@p.Id" />
+                                                            <button type="submit" class="btn-action btn-approve"
+                                                                    title="Marcar como recogido">
+                                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd"
+                                                                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                          clip-rule="evenodd" />
+                                                                </svg>
+                                                                Marcar recogido
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Botones de finalización (si todos recogidos) -->
+                        @if (todosRecogidos)
+                        {
+                            <div class="completion-actions">
+                                <div class="completion-message">
+                                    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                              clip-rule="evenodd" />
+                                    </svg>
+                                    <div>
+                                        <h4>¡Todos los pasajeros recogidos!</h4>
+                                        <p>Ahora puede dirigirse al aeropuerto o finalizar el viaje</p>
+                                    </div>
+                                </div>
+                                <div class="completion-buttons">
+
+                                    <!-- Maps aeropuerto -->
+                                    <a href="@urlAeropuertoMaps" target="_blank" rel="noopener" class="btn btn-primary">
+
+                                        <img src="https://cdn-icons-png.flaticon.com/512/2991/2991231.png" width="18"
+                                             style="margin-right:6px;" />
+
+                                        Maps Aeropuerto
+                                    </a>
+
+
+                                    <!-- Waze aeropuerto -->
+                                    <a href="@urlAeropuertoWaze" target="_blank" rel="noopener" class="btn btn-primary">
+
+                                        <img src="https://cdn-icons-png.flaticon.com/512/3771/3771472.png" width="18"
+                                             style="margin-right:6px;" />
+
+                                        Waze Aeropuerto
+                                    </a>
+
+
+                                    <!-- Finalizar viaje -->
+                                    <form asp-action="FinalizarViaje" asp-controller="Conductor" method="post" class="inline-form"
+                                          onsubmit="return confirm('¿Está seguro de finalizar el viaje?')">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit" class="btn btn-secondary">
+                                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                      clip-rule="evenodd" />
+                                            </svg>
+
+                                            <span>Finalizar Viaje</span>
+                                        </button>
+
+                                    </form>
+
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="table-footer">
+                <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
+            </footer>
+        </div>
+    </body>
+
 </html>
