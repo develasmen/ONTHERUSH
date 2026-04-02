@@ -220,5 +220,18 @@ namespace ONTHERUSH.UI.Controllers
             var incidentes = await _incidenteService.ObtenerIncidentesPorConductorAsync(conductorUser.Id);
             return View(incidentes);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> HistorialViajes()
+        {
+            var conductorUser = await _userManager.GetUserAsync(User);
+
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var historial = new List<ReporteViajeDTO>();
+
+            return View(historial);
+        }
     }
 }

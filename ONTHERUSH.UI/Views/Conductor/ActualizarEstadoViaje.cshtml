@@ -1,5 +1,6 @@
 @{
     Layout = null;
+    ViewData["Title"] = "Actualizar estado de viaje";
 }
 
 <!DOCTYPE html>
@@ -8,67 +9,103 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Actualizar estado de viaje - ON THE RUSH</title>
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/components/buttons.css" />
-    <link rel="stylesheet" href="~/css/components/forms.css" />
-    <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="stylesheet" href="~/css/pages/form-base.css" />
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>Actualizar estado de viaje</h1>
-                <p>Seleccione el viaje y el resultado de la actualización.</p>
+    <div class="form-page-container">
+
+        <!-- Header -->
+        <header class="form-header">
+            <div class="form-header-content">
+                <a href="@Url.Action("PanelConductor", "Conductor")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                              clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al panel</span>
+                </a>
+
+                <div class="form-header-info">
+                    <h1 class="form-title">Actualizar estado de viaje</h1>
+                    <p class="form-subtitle">
+                        Seleccione el viaje y el resultado de la actualización
+                    </p>
+                </div>
             </div>
+        </header>
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger">
-                    @ViewBag.Error
+        <!-- Contenido principal -->
+        <main class="form-main">
+            <div class="form-container">
+                <div class="form-card">
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            <span>@ViewBag.Error</span>
+                        </div>
+                    }
+
+                    @if (ViewBag.Info != null)
+                    {
+                        <div class="alert alert-warning">
+                            <span>@ViewBag.Info</span>
+                        </div>
+                    }
+
+                    @if (ViewBag.Exito != null)
+                    {
+                        <div class="alert alert-success">
+                            <span>@ViewBag.Exito</span>
+                        </div>
+                    }
+
+                    <form asp-action="ActualizarEstadoViaje"
+                          asp-controller="Conductor"
+                          method="post">
+
+                        <div class="form-group">
+                            <label for="idViaje" class="form-label">ID del viaje</label>
+                            <input type="text"
+                                   id="idViaje"
+                                   name="idViaje"
+                                   class="form-control"
+                                   placeholder="Ingrese el ID del viaje"
+                                   required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="accion" class="form-label">Resultado</label>
+                            <select id="accion"
+                                    name="accion"
+                                    class="form-control">
+                                <option value="ok">Estado exitoso</option>
+                                <option value="error">Error de actualización</option>
+                                <option value="yaActualizada">Ruta ya actualizada</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="@Url.Action("PanelConductor", "Conductor")"
+                               class="btn btn-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-primary">
+                                Actualizar estado
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
-            }
+            </div>
+        </main>
 
-            @if (ViewBag.Info != null)
-            {
-                <div class="alert alert-warning">
-                    @ViewBag.Info
-                </div>
-            }
-
-            @if (ViewBag.Exito != null)
-            {
-                <div class="alert alert-success">
-                    @ViewBag.Exito
-                </div>
-            }
-
-            <form asp-action="ActualizarEstadoViaje" asp-controller="Conductor" method="post" class="auth-form">
-                <div class="form-group">
-                    <label for="idViaje">ID del viaje</label>
-                    <input type="text" id="idViaje" name="idViaje" class="form-input" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="accion">Resultado (simulación)</label>
-                    <select id="accion" name="accion" class="form-input">
-                        <option value="ok">Estado exitoso</option>
-                        <option value="error">Error de actualización</option>
-                        <option value="yaActualizada">Ruta ya actualizada</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    Actualizar
-                </button>
-
-                <button type="button"
-                        class="btn btn-secondary"
-                        onclick="window.location.href='@Url.Action("PanelConductor", "Conductor")'">
-                    Volver al panel de conductor
-                </button>
-            </form>
-        </div>
+        <!-- Footer -->
+        <footer class="form-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
+        </footer>
     </div>
 </body>
 </html>
