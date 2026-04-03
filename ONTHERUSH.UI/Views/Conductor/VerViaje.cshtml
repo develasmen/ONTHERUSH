@@ -10,7 +10,12 @@
 
     var todosRecogidos = hayParadas && Model.All(x => EsRecogido(x.Estado));
 
-    var destinoAeropuerto = Uri.EscapeDataString("Aeropuerto Internacional Juan Santamaría");
+    var totalParadas = hayParadas ? Model.Count : 0;
+    var totalRecogidos = hayParadas ? Model.Count(x => EsRecogido(x.Estado)) : 0;
+    var totalPendientes = hayParadas ? Model.Count(x => !EsRecogido(x.Estado)) : 0;
+    var destinoFinalTexto = "Aeropuerto Internacional Juan Santamaría";
+
+    var destinoAeropuerto = Uri.EscapeDataString(destinoFinalTexto);
 
     var urlAeropuertoMaps =
     $"https://www.google.com/maps/dir/?api=1&destination={destinoAeropuerto}";
@@ -66,7 +71,30 @@
                             <span>@TempData["Mensaje"]</span>
                         </div>
                     }
+                    @if (hayParadas)
+                    {
+                        <div class="trip-summary">
+                            <div class="trip-summary-card">
+                                <span class="trip-summary-label">Paradas asignadas</span>
+                                <span class="trip-summary-value">@totalParadas</span>
+                            </div>
 
+                            <div class="trip-summary-card">
+                                <span class="trip-summary-label">Pendientes</span>
+                                <span class="trip-summary-value">@totalPendientes</span>
+                            </div>
+
+                            <div class="trip-summary-card">
+                                <span class="trip-summary-label">Recogidos</span>
+                                <span class="trip-summary-value">@totalRecogidos</span>
+                            </div>
+
+                            <div class="trip-summary-card">
+                                <span class="trip-summary-label">Destino final</span>
+                                <span class="trip-summary-value trip-summary-destination">@destinoFinalTexto</span>
+                            </div>
+                        </div>
+                    }
                     @if (!hayParadas)
                     {
                         <!-- Estado vacío -->

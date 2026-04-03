@@ -7,13 +7,14 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Historial de viajes - ON THE RUSH</title>
-
     <link rel="stylesheet" href="~/css/pages/table-base.css" />
 </head>
+
 <body>
     <div class="table-page-container">
 
@@ -38,61 +39,100 @@
             </div>
         </header>
 
-        <!-- Contenido -->
+        <!-- Main -->
         <main class="table-main">
             <div class="table-container">
-                <div class="table-card">
 
-                    @if (Model == null || !Model.Any())
-                    {
-                        <div class="empty-state">
-                            <h3>No hay viajes registrados</h3>
-                            <p>
-                                Cuando finalice viajes, aparecerán aquí para consulta histórica.
-                            </p>
-                        </div>
-                    }
-                    else
-                    {
-                        <table class="custom-table">
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="empty-state">
+                        <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm10 6H4v6h12V8z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                        <h3>No hay viajes registrados</h3>
+                        <p>Aún no se han encontrado viajes finalizados para este conductor.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-wrapper">
+                        <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Fecha</th>
+                                    <th>Salida</th>
+                                    <th>Llegada</th>
                                     <th>Ruta</th>
                                     <th>Conductor</th>
                                     <th>Vehículo</th>
-                                    <th>Pasajeros</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th class="text-center">Pasajeros</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var viaje in Model)
                                 {
+                                    var finalizado = string.Equals(viaje.Estado, "Finalizado",
+                            StringComparison.OrdinalIgnoreCase);
+
                                     <tr>
-                                        <td>@viaje.Fecha.ToString("dd/MM/yyyy")</td>
-                                        <td>@viaje.Ruta</td>
-                                        <td>@viaje.Conductor</td>
-                                        <td>@viaje.Vehiculo</td>
-                                        <td>@viaje.CantidadPasajeros</td>
-                                        <td>
-                                            <span class="status-badge @(viaje.Estado == "Finalizado" ? "success" : "warning")">
-                                                @viaje.Estado
-                                            </span>
+                                        <td data-label="Salida">
+                                            <span class="date-text">@viaje.Salida.ToString("dd/MM/yyyy")</span>
+                                            <span class="time-text">@viaje.Salida.ToString("HH:mm")</span>
                                         </td>
-                                        <td>
-                                            <a href="@Url.Action("DetalleHistorialViaje", "Conductor", new { id = viaje.ViajeId })"
-                                               class="btn btn-secondary btn-sm">
-                                                Ver detalle
-                                            </a>
+
+                                        <td data-label="Llegada">
+                                            <span class="date-text">@viaje.Llegada.ToString("dd/MM/yyyy")</span>
+                                            <span class="time-text">@viaje.Llegada.ToString("HH:mm")</span>
+                                        </td>
+
+                                        <td data-label="Ruta">
+                                            <div class="user-name">@viaje.Ruta</div>
+                                        </td>
+
+                                        <td data-label="Conductor">
+                                            <div class="user-name">@viaje.Conductor</div>
+                                        </td>
+
+                                        <td data-label="Vehículo">
+                                            <span class="table-badge">@viaje.Vehiculo</span>
+                                        </td>
+
+                                        <td data-label="Pasajeros" class="text-center">
+                                            @viaje.Pasajeros
+                                        </td>
+
+                                        <td data-label="Estado" class="text-center">
+                                            @if (finalizado)
+                                            {
+                                                <span class="status-badge status-completed">
+                                                    Finalizado
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge status-pending">
+                                                    @viaje.Estado
+                                                </span>
+                                            }
+                                        </td>
+
+                                        <td data-label="Acciones">
+                                            <div class="action-group">
+                                                <a href="@Url.Action("DetalleViaje", "Conductor")" class="btn btn-secondary">
+                                                    Ver detalle
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
-                    }
+                    </div>
+                }
 
-                </div>
             </div>
         </main>
 
@@ -102,4 +142,7 @@
         </footer>
     </div>
 </body>
+
+</html>
+
 </html>

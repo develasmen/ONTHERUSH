@@ -1,3 +1,5 @@
+@model ONTHERUSH.Abstracciones.DTOs.ActualizarEstadoViajeViewModel
+
 @{
     Layout = null;
     ViewData["Title"] = "Actualizar estado de viaje";
@@ -10,11 +12,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Actualizar estado de viaje - ON THE RUSH</title>
     <link rel="stylesheet" href="~/css/pages/form-base.css" />
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
 </head>
 <body>
     <div class="form-page-container">
 
-        <!-- Header -->
         <header class="form-header">
             <div class="form-header-content">
                 <a href="@Url.Action("PanelConductor", "Conductor")" class="back-button">
@@ -29,61 +31,76 @@
                 <div class="form-header-info">
                     <h1 class="form-title">Actualizar estado de viaje</h1>
                     <p class="form-subtitle">
-                        Seleccione el viaje y el resultado de la actualización
+                        Cambie el estado actual de su viaje asignado
                     </p>
                 </div>
             </div>
         </header>
 
-        <!-- Contenido principal -->
         <main class="form-main">
             <div class="form-container">
                 <div class="form-card">
 
-                    @if (ViewBag.Error != null)
+                    @if (TempData["Mensaje"] != null)
                     {
-                        <div class="alert alert-danger">
-                            <span>@ViewBag.Error</span>
+                        <div class="alert alert-success" style="margin-bottom: 24px;">
+                            @TempData["Mensaje"]
                         </div>
                     }
 
-                    @if (ViewBag.Info != null)
-                    {
-                        <div class="alert alert-warning">
-                            <span>@ViewBag.Info</span>
+                    <div class="trip-summary" style="margin-bottom: 28px;">
+                        <div class="trip-summary-card">
+                            <span class="trip-summary-label">Ruta</span>
+                            <span class="trip-summary-value">@Model.Ruta</span>
                         </div>
-                    }
 
-                    @if (ViewBag.Exito != null)
-                    {
-                        <div class="alert alert-success">
-                            <span>@ViewBag.Exito</span>
+                        <div class="trip-summary-card">
+                            <span class="trip-summary-label">Salida</span>
+                            <span class="trip-summary-value">
+                                @Model.Salida.ToString("dd/MM/yyyy HH:mm")
+                            </span>
                         </div>
-                    }
+
+                        <div class="trip-summary-card">
+                            <span class="trip-summary-label">Estado actual</span>
+                            <span class="trip-summary-value">@Model.EstadoActual</span>
+                        </div>
+
+                        <div class="trip-summary-card">
+                            <span class="trip-summary-label">Pasajeros</span>
+                            <span class="trip-summary-value">@Model.Pasajeros</span>
+                        </div>
+                    </div>
 
                     <form asp-action="ActualizarEstadoViaje"
                           asp-controller="Conductor"
                           method="post">
 
-                        <div class="form-group">
-                            <label for="idViaje" class="form-label">ID del viaje</label>
-                            <input type="text"
-                                   id="idViaje"
-                                   name="idViaje"
-                                   class="form-control"
-                                   placeholder="Ingrese el ID del viaje"
-                                   required />
-                        </div>
+                        @Html.AntiForgeryToken()
+
+                        <input asp-for="ViajeId" type="hidden" />
+                        <input asp-for="Ruta" type="hidden" />
+                        <input asp-for="Salida" type="hidden" />
+                        <input asp-for="EstadoActual" type="hidden" />
+                        <input asp-for="Pasajeros" type="hidden" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger validation-summary"></div>
 
                         <div class="form-group">
-                            <label for="accion" class="form-label">Resultado</label>
-                            <select id="accion"
-                                    name="accion"
-                                    class="form-control">
-                                <option value="ok">Estado exitoso</option>
-                                <option value="error">Error de actualización</option>
-                                <option value="yaActualizada">Ruta ya actualizada</option>
+                            <label asp-for="NuevoEstado" class="form-label">
+                                Nuevo estado del viaje
+                            </label>
+
+                            <select asp-for="NuevoEstado" class="form-control">
+                                <option value="">Seleccione una opción</option>
+                                <option value="Programado">Programado</option>
+                                <option value="En camino">En camino</option>
+                                <option value="Retrasado">Retrasado</option>
+                                <option value="Completado">Completado</option>
+                                <option value="Finalizado">Finalizado</option>
                             </select>
+
+                            <span asp-validation-for="NuevoEstado" class="text-danger"></span>
                         </div>
 
                         <div class="form-actions">
@@ -102,10 +119,11 @@
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="form-footer">
             <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
         </footer>
     </div>
+
+    <partial name="_ValidationScriptsPartial" />
 </body>
 </html>

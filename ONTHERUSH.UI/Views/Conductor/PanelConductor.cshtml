@@ -4,12 +4,14 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Panel de Conductor - ON THE RUSH</title>
     <link rel="stylesheet" href="~/css/pages/dashboard-base.css" />
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Header del dashboard -->
@@ -123,12 +125,30 @@
                         para seguimiento administrativo.
                     </p>
 
-                    <a href="@Url.Action("ReportarIncidente", "Conductor")"     class="btn btn-primary">
+                    <a href="@Url.Action("ReportarIncidente", "Conductor")" class="btn btn-primary">
 
                         Registrar incidente
 
                     </a>
 
+                </div>
+
+                <!-- Tarjeta: Mis Accidentes -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M18 13V7a2 2 0 00-2-2h-3V4a2 2 0 10-4 0v1H6a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2zM8 9a1 1 0 100 2h4a1 1 0 100-2H8z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                    </div>
+
+                    <h3>Mis incidentes</h3>
+                    <p>Consulte los incidentes reportados y su estado de seguimiento.</p>
+
+                    <a href="@Url.Action("MisIncidentes", "Conductor")" class="btn btn-primary">
+                        Ver incidentes
+                    </a>
                 </div>
 
                 <!-- Tarjeta: Solicitud de cambio de ruta -->
@@ -154,6 +174,24 @@
                             </svg>
                         </a>
                     </div>
+                </div>
+
+                <!-- Tarjeta: Historial de viajes -->
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm10 6H4v6h12V8z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                    </div>
+
+                    <h3>Historial de viajes</h3>
+                    <p>Consulte los viajes realizados anteriormente y su información general.</p>
+
+                    <a href="@Url.Action("HistorialViajes", "Conductor")" class="btn btn-primary">
+                        Ver historial
+                    </a>
                 </div>
 
                 <!-- Tarjeta: Cerrar sesión -->
