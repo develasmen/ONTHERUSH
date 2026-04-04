@@ -79,7 +79,7 @@
 
                             @if (Model.Viajes != null && Model.Viajes.Any())
                             {
-                                <a asp-action="ExportarPdf" 
+                                <a asp-action="ExportarPdfViajes"
                                    asp-controller="Reporte"
                                    asp-route-fechaInicio="@Model.FechaInicio?.ToString("yyyy-MM-dd")"
                                    asp-route-fechaFin="@Model.FechaFin?.ToString("yyyy-MM-dd")"

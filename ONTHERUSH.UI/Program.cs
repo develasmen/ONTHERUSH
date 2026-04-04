@@ -35,8 +35,9 @@ builder.Services.AddSingleton<RutaAsignacionService>();
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<ISolicitudCambioService, SolicitudCambioService>();
 builder.Services.AddScoped<IViajeService, ViajeService>();
-builder.Services.AddScoped<ReporteViajesService>();
+builder.Services.AddScoped<ReporteService>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();
+builder.Services.AddScoped<IReporteService, ReporteService>();
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

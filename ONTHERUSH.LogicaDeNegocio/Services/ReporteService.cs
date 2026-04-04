@@ -1,4 +1,5 @@
 ﻿using ONTHERUSH.Abstracciones.DTOs;
+using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Data;
 using System;
 using System.Collections.Generic;
@@ -8,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace ONTHERUSH.LogicaDeNegocio.Services
 {
-    public class ReporteViajesService
+    public class ReporteService : IReporteService
     {
         private readonly ApplicationDbContext _context;
 
-        public ReporteViajesService(ApplicationDbContext context)
+        public ReporteService(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public List<ReporteViajeDTO> ObtenerReporte(DateTime inicio, DateTime fin)
+        public List<ReporteViajeDTO> ObtenerReporteViaje(DateTime inicio, DateTime fin)
         {
             return _context.Viajes
                 .Where(v => v.FechaHoraSalida.Date >= inicio.Date &&
@@ -33,6 +34,24 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
                     Pasajeros = v.CantidadPasajeros
                 })
                 .OrderBy(v => v.Salida)
+                .ToList();
+        }
+
+        public List<UsuarioReporteDTO> ObtenerUsuarios(DateTime fechaInicio, DateTime fechaFin)
+        {
+            return _context.Users
+                .Where(u => u.FechaRegistro >= fechaInicio && u.FechaRegistro <= fechaFin)
+                .Select(u => new UsuarioReporteDTO
+                {
+                    NombreCompleto = u.Nombre + " " + u.Apellido,
+                    Email = u.Email,
+                    FechaRegistro = u.FechaRegistro,
+
+                    TipoUsuario = _context.Administradores.Any(a => a.UserId == u.Id) ? "Administrador"
+                                   : _context.Conductores.Any(c => c.UserId == u.Id) ? "Conductor"
+                                   : "Usuario"
+                })
+                .OrderByDescending(x => x.FechaRegistro)
                 .ToList();
         }
     }

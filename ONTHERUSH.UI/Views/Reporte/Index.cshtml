@@ -1,0 +1,117 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reportes - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/dashboard-base.css" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header del dashboard -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo-section">
+                        <img src="~/images/OnTheRush-removebg-preview.png" alt="ON THE RUSH" class="dashboard-logo" />
+                    </div>
+                    <div class="header-info">
+                        <h1 class="dashboard-title">Reportes</h1>
+                        <p class="dashboard-subtitle">Generación de Reportes</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <span class="role-badge">
+                        <svg class="badge-icon" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                        Administrador
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenido principal -->
+        <main class="dashboard-main col-sm-12">
+
+            <!-- Grid de tarjetas -->
+            <div class="dashboard-grid col-sm-12">
+
+
+                <!-- Tarjeta: Reportes de viajes -->
+                <div class="dashboard-card col-sm-3">
+                    <div class="card-content">
+                        <h3 class="card-title">Reportes de viajes</h3>
+                        <p class="card-description">Descargue el reporte generado por los viajes en formato PDF</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("Viajes", "Reporte")" class="btn btn-primary">
+                            <span>Generar reportes</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Reporte de -->
+                <div class="dashboard-card col-sm-3">
+                    <div class="card-content">
+                        <h3 class="card-title">Reporte de nuevos usuarios</h3>
+                        <p class="card-description">Descargue el reporte generado de los usuarios nuevos en los últimos 30 días en formato PDF</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("Usuarios", "Reporte")" class="btn btn-primary">
+                            <span>Gestionar usuarios</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Reporte de -->
+                <div class="dashboard-card col-sm-3">
+                    <div class="card-content">
+                        <h3 class="card-title">Solicitudes de usuarios</h3>
+                        <p class="card-description">Revise y gestione solicitudes de actualización de datos</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("GestionarSolicitudes", "Admin")" class="btn btn-primary">
+                            <span>Ver solicitudes</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Asignar rutas -->
+                <div class="dashboard-card col-sm-3">
+                    <div class="card-content">
+                        <h3 class="card-title">Asignar rutas</h3>
+                        <p class="card-description">Asigne rutas a conductores y gestione cambios de recorrido</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("AsignarRutas", "Admin")" class="btn btn-primary">
+                            <span>Asignar rutas</span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Reportes</p>
+        </footer>
+    </div>
+</body>
+</html>

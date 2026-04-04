@@ -1,5 +1,6 @@
 ﻿namespace ONTHERUSH.UI.Helpers
 {
+    using Microsoft.EntityFrameworkCore.Metadata.Internal;
     using ONTHERUSH.Abstracciones.DTOs;
     using QuestPDF.Fluent;
     using QuestPDF.Helpers;
@@ -50,6 +51,89 @@
                     });
                 });
             }).GeneratePdf();
+        }
+
+        public static byte[] GenerarReporteUsuarios(List<UsuarioReporteDTO> datos)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(30);
+
+                    // HEADER
+                    page.Header().Column(col =>
+                    {
+                        col.Item().Text("Reporte de Usuarios")
+                            .FontSize(20)
+                            .Bold()
+                            .AlignCenter();
+
+                        col.Item().Text($"Fecha de generación: {DateTime.Now:dd/MM/yyyy HH:mm}")
+                            .FontSize(10)
+                            .AlignCenter();
+                    });
+
+                    // CONTENT
+                    page.Content().PaddingVertical(10).Table(table =>
+                    {
+                        // Columnas
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.RelativeColumn(3); // Nombre
+                            columns.RelativeColumn(3); // Email
+                            columns.RelativeColumn(2); // Fecha
+                            columns.RelativeColumn(2); // Tipo
+                        });
+
+                        // HEADER TABLE
+                        table.Header(header =>
+                        {
+                            header.Cell().Element(CellStyle).Text("Nombre").Bold();
+                            header.Cell().Element(CellStyle).Text("Email").Bold();
+                            header.Cell().Element(CellStyle).Text("Fecha Registro").Bold();
+                            header.Cell().Element(CellStyle).Text("Tipo Usuario").Bold();
+
+                            static IContainer CellStyle(IContainer container)
+                            {
+                                return container
+                                    .Padding(5)
+                                    .Background(Colors.Grey.Lighten2)
+                                    .Border(1);
+                            }
+                        });
+
+                        // DATA
+                        foreach (var item in datos)
+                        {
+                            table.Cell().Element(CellStyle).Text(item.NombreCompleto);
+                            table.Cell().Element(CellStyle).Text(item.Email);
+                            table.Cell().Element(CellStyle).Text(item.FechaRegistro.ToString("dd/MM/yyyy"));
+                            table.Cell().Element(CellStyle).Text(item.TipoUsuario);
+
+                            static IContainer CellStyle(IContainer container)
+                            {
+                                return container
+                                    .Padding(5)
+                                    .Border(1);
+                            }
+                        }
+                    });
+
+                    // FOOTER
+                    page.Footer()
+                        .AlignCenter()
+                        .Text(x =>
+                        {
+                            x.Span("Página ");
+                            x.CurrentPageNumber();
+                        });
+                });
+            });
+
+            return document.GeneratePdf();
         }
     }
 }
