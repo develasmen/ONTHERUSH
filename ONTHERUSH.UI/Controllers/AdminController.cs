@@ -6,6 +6,7 @@ using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Models;
 using ONTHERUSH.LogicaDeNegocio.Services;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace ONTHERUSH.UI.Controllers
 {
@@ -45,13 +46,28 @@ namespace ONTHERUSH.UI.Controllers
 
         public async Task<IActionResult> GestionarUsuarios()
         {
-            var usuariosSinRolObj = await _adminService.ObtenerUsuariosSinRol();
+            var usuariosPendientesObj = await _adminService.ObtenerUsuariosSinRol();
+            var usuariosPendientes = usuariosPendientesObj.Cast<ApplicationUser>().ToList();
+            
+            var usuariosActivos = await _userManager.Users
+                .OrderByDescending(u => u.FechaRegistro)
+                .ToListAsync();
 
-            var usuariosSinRol = usuariosSinRolObj
-                .Cast<ApplicationUser>()
-                .ToList();
+            var usuariosConRoles = new List<(ApplicationUser usuario, IList<string> roles)>();
+            
+            foreach (var usuario in usuariosActivos)
+            {
+                var roles = await _userManager.GetRolesAsync(usuario);
+                if (roles.Any()) 
+                {
+                    usuariosConRoles.Add((usuario, roles));
+                }
+            }
 
-            return View(usuariosSinRol);
+            ViewBag.UsuariosPendientes = usuariosPendientes;
+            ViewBag.UsuariosActivos = usuariosConRoles;
+
+            return View();
         }
 
         [HttpPost]
@@ -358,5 +374,65 @@ namespace ONTHERUSH.UI.Controllers
 
             return RedirectToAction(nameof(GestionarVehiculos));
         }
-    }
+
+
+        // POST: Admin/EliminarUsuarioActivo
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarUsuarioActivo(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "ID de usuario inválido";
+                return RedirectToAction(nameof(GestionarUsuarios));
+            }
+
+            var usuario = await _userManager.FindByIdAsync(userId);
+            if (usuario == null)
+            {
+                TempData["Error"] = "Usuario no encontrado";
+                return RedirectToAction(nameof(GestionarUsuarios));
+            }
+
+            var roles = await _userManager.GetRolesAsync(usuario);
+            if (!roles.Any())
+            {
+                TempData["Error"] = "Este usuario no tiene un rol asignado";
+                return RedirectToAction(nameof(GestionarUsuarios));
+            }
+
+            // no se permite que un admin se elimine a si mismo
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser?.Id == userId)
+            {
+                TempData["Error"] = "No puedes eliminar tu propia cuenta de administrador";
+                return RedirectToAction(nameof(GestionarUsuarios));
+            }
+
+            try
+            {
+                // DESHABILITAR en lugar de eliminar
+                usuario.Estado = false;
+                usuario.LockoutEnabled = true;  
+                usuario.LockoutEnd = DateTimeOffset.MaxValue; 
+
+                var result = await _userManager.UpdateAsync(usuario);
+
+                if (result.Succeeded)
+                {
+                    TempData["Exito"] = $"Usuario {usuario.Nombre} {usuario.Apellido} deshabilitado exitosamente";
+                }
+                else
+                {
+                    TempData["Error"] = $"Error al deshabilitar usuario: {string.Join(", ", result.Errors.Select(e => e.Description))}";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error al deshabilitar el usuario: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(GestionarUsuarios));
+        }
+    }  
 }

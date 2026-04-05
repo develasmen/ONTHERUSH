@@ -1,0 +1,451 @@
+/* ============================================
+   USERS TABS - ON THE RUSH
+   Estilos para pestañas de gestión de usuarios
+   ============================================ */
+
+/* Variables */
+:root {
+    --primary-green: #6bc044;
+    --dark-green: #5aa838;
+    --white: #ffffff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --purple-500: #8b5cf6;
+    --purple-600: #7c3aed;
+    --orange-500: #f97316;
+}
+
+/* ============================================
+   CONTENEDOR DE PESTAÑAS
+   ============================================ */
+.tabs-container {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ============================================
+   HEADER DE PESTAÑAS
+   ============================================ */
+.tabs-header {
+    display: flex;
+    gap: 8px;
+    padding: 16px;
+    background: var(--gray-50);
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.tab-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.tab-button svg {
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+    background: var(--white);
+    color: var(--gray-900);
+}
+
+.tab-button.active {
+    background: var(--white);
+    color: var(--primary-green);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tab-button.active svg {
+    color: var(--primary-green);
+}
+
+/* Badge de conteo en pestañas */
+.tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--white);
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+    border-radius: 999px;
+}
+
+.tab-button.active .tab-badge {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+    box-shadow: 0 2px 8px rgba(107, 192, 68, 0.3);
+}
+
+/* ============================================
+   CONTENIDO DE PESTAÑAS
+   ============================================ */
+.tab-content {
+    display: none;
+    padding: 24px;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   INFORMACIÓN DE USUARIO
+   ============================================ */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.user-avatar svg {
+    color: var(--gray-500);
+}
+
+.user-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-900);
+    line-height: 1.4;
+}
+
+.user-email {
+    font-size: 13px;
+    color: var(--gray-500);
+    line-height: 1.4;
+}
+
+/* ============================================
+   BADGES DE ROL
+   ============================================ */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.role-badge svg {
+    flex-shrink: 0;
+}
+
+/* Administrador - Púrpura */
+.role-admin {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
+    color: var(--purple-600);
+}
+
+.role-admin svg {
+    color: var(--purple-500);
+}
+
+/* Conductor - Azul */
+.role-conductor {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%);
+    color: var(--blue-600);
+}
+
+.role-conductor svg {
+    color: var(--blue-500);
+}
+
+/* Pasajero - Verde */
+.role-pasajero {
+    background: linear-gradient(135deg, rgba(107, 192, 68, 0.15) 0%, rgba(90, 168, 56, 0.15) 100%);
+    color: var(--dark-green);
+}
+
+.role-pasajero svg {
+    color: var(--primary-green);
+}
+
+/* ============================================
+   FORMULARIOS INLINE
+   ============================================ */
+.inline-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-select {
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-700);
+    background: var(--white);
+    border: 2px solid var(--gray-300);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.action-select:hover {
+    border-color: var(--gray-400);
+}
+
+.action-select:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(107, 192, 68, 0.1);
+}
+
+/* ============================================
+   BOTONES DE ACCIÓN
+   ============================================ */
+.action-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-action svg {
+    flex-shrink: 0;
+}
+
+/* Aprobar - Verde */
+.btn-approve {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+    color: var(--white);
+    box-shadow: 0 2px 8px rgba(107, 192, 68, 0.25);
+}
+
+.btn-approve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(107, 192, 68, 0.35);
+}
+
+/* Rechazar - Rojo */
+.btn-reject {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: var(--white);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+}
+
+.btn-reject:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
+
+/* ============================================
+   BADGES DE ESTADO
+   ============================================ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background: rgba(107, 192, 68, 0.1);
+    color: var(--dark-green);
+}
+
+.status-active svg {
+    color: var(--primary-green);
+}
+
+/* ============================================
+   BADGE GENÉRICO (para cédula, etc)
+   ============================================ */
+.table-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+/* ============================================
+   TEXTO MUTED
+   ============================================ */
+.text-muted {
+    color: var(--gray-500);
+}
+
+/* ============================================
+   RESPONSIVE - TABLET
+   ============================================ */
+@media (max-width: 1024px) {
+    .tabs-header {
+        gap: 6px;
+        padding: 12px;
+    }
+
+    .tab-button {
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+
+    .tab-content {
+        padding: 20px;
+    }
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE
+   ============================================ */
+@media (max-width: 768px) {
+    .tabs-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .tab-button {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 14px 16px;
+    }
+
+    .tab-content {
+        padding: 16px;
+    }
+
+    .user-info {
+        gap: 10px;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .user-name {
+        font-size: 14px;
+    }
+
+    .user-email {
+        font-size: 12px;
+    }
+
+    .action-group {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .inline-form {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .action-select {
+        width: 100%;
+    }
+
+    .btn-action {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .role-badge {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+
+    .table-badge {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab-button span {
+        font-size: 13px;
+    }
+
+    .tab-badge {
+        min-width: 20px;
+        height: 20px;
+        font-size: 11px;
+        padding: 0 6px;
+    }
+}
+
+/* Eliminar - Rojo (para usuarios activos) */
+.btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: var(--white);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+}
+
+.btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
