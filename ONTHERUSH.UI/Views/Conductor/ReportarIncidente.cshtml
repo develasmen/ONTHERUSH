@@ -1,0 +1,95 @@
+@model ONTHERUSH.Abstracciones.DTOs.CrearIncidenteDto
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Reportar Incidente";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reportar Incidente - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/form-base.css" />
+</head>
+<body>
+    <div class="form-page-container">
+
+        <!-- Header -->
+        <header class="form-header">
+            <div class="form-header-content">
+                <a href="@Url.Action("PanelConductor", "Conductor")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al panel</span>
+                </a>
+
+                <div class="form-header-info">
+                    <h1 class="form-title">Reportar Incidente</h1>
+                    <p class="form-subtitle">
+                        Registre cualquier situación ocurrida durante la ruta para seguimiento administrativo
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenido principal -->
+        <main class="form-main">
+            <div class="form-container">
+                <div class="form-card">
+
+                    <form asp-action="ReportarIncidente" asp-controller="Conductor" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger validation-summary"></div>
+
+                        <div class="form-group">
+                            <label asp-for="Tipo" class="form-label">Tipo de incidente</label>
+                            <select asp-for="Tipo" class="form-control">
+                                <option value="">Seleccione una opción</option>
+                                <option value="Cliente no se presentó">Cliente no se presentó</option>
+                                <option value="Retraso en ruta">Retraso en ruta</option>
+                                <option value="Avería mecánica">Avería mecánica</option>
+                                <option value="Accidente">Accidente</option>
+                                <option value="Problema con pasajero">Problema con pasajero</option>
+                                <option value="Cambio de recorrido">Cambio de recorrido</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                            <span asp-validation-for="Tipo" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Descripcion" class="form-label">Descripción</label>
+                            <textarea asp-for="Descripcion"
+                                      class="form-control"
+                                      rows="6"
+                                      placeholder="Describa lo sucedido durante la ruta"></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="@Url.Action("PanelConductor", "Conductor")" class="btn btn-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-primary">
+                                Registrar incidente
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="form-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
+        </footer>
+    </div>
+
+    <partial name="_ValidationScriptsPartial" />
+</body>
+</html>

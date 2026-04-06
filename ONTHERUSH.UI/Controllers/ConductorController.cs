@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ONTHERUSH.Abstracciones.DTOs;
 using ONTHERUSH.Abstracciones.Interfaces;
+using ONTHERUSH.Abstracciones.Interfaces.Services;
 using ONTHERUSH.AccesoADatos.Models;
 using ONTHERUSH.LogicaDeNegocio.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace ONTHERUSH.UI.Controllers
 {
@@ -19,19 +21,22 @@ namespace ONTHERUSH.UI.Controllers
         private readonly IAdminService _adminService;
         private readonly IReservaService _reservaService;
         private readonly IViajeService _viajeService;
+        private readonly IIncidenteService _incidenteService;
 
         public ConductorController(
             UserManager<ApplicationUser> userManager,
             RutaAsignacionService rutaAsignacionService,
             IAdminService adminService,
             IReservaService reservaService,
-            IViajeService viajeService)
+            IViajeService viajeService,
+            IIncidenteService incidenteService)
         {
             _userManager = userManager;
             _rutaAsignacionService = rutaAsignacionService;
             _adminService = adminService;
             _reservaService = reservaService;
             _viajeService = viajeService;
+            _incidenteService = incidenteService;
         }
 
         [HttpGet]
@@ -41,15 +46,219 @@ namespace ONTHERUSH.UI.Controllers
         }
 
         [HttpGet]
-        public IActionResult ActualizarEstadoViaje()
+        public async Task<IActionResult> ActualizarEstadoViaje()
         {
-            return View();
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
+
+            if (conductor == null)
+            {
+                TempData["Mensaje"] = "No se encontró el registro del conductor.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            var reservasObj = await _reservaService.ObtenerReservasAsignadasPorConductor(conductor.ConductorId);
+            var reservas = reservasObj.Cast<Reserva>().ToList();
+
+            if (reservas.Count == 0)
+            {
+                TempData["Mensaje"] = "No tiene un viaje activo para actualizar.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            var viajeIdActual = reservas.FirstOrDefault()?.ViajeId;
+
+            if (viajeIdActual == null)
+            {
+                TempData["Mensaje"] = "No se encontró el viaje actual.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            var viajeObj = await _viajeService.ObtenerViajePorId(viajeIdActual.Value);
+            var viajeActual = viajeObj as Viaje;
+
+            if (viajeActual == null)
+            {
+                TempData["Mensaje"] = "No se encontró el viaje actual.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            var model = new ActualizarEstadoViajeViewModel
+            {
+                ViajeId = viajeActual.ViajeId,
+                Ruta = string.IsNullOrWhiteSpace(viajeActual.NombreRuta) ? "Ruta actual" : viajeActual.NombreRuta,
+                Salida = viajeActual.FechaHoraSalida,
+                EstadoActual = string.IsNullOrWhiteSpace(viajeActual.Estado) ? "Programado" : viajeActual.Estado,
+                Pasajeros = viajeActual.CantidadPasajeros,
+                NuevoEstado = string.IsNullOrWhiteSpace(viajeActual.Estado) ? "Programado" : viajeActual.Estado
+            };
+
+            return View(model);
         }
 
-        [HttpGet]
-        public IActionResult SolicitarActualizacionRuta()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ActualizarEstadoViaje(ActualizarEstadoViajeViewModel model)
         {
-            return View();
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
+
+            if (conductor == null)
+            {
+                TempData["Mensaje"] = "No se encontró el registro del conductor.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            var resultado = await _viajeService.ActualizarEstadoViaje(model.ViajeId, model.NuevoEstado);
+
+            TempData["Mensaje"] = resultado.Exito
+                ? $"Estado del viaje actualizado a: {model.NuevoEstado}"
+                : resultado.Mensaje;
+
+            return RedirectToAction("VerViaje");
+        }
+        [HttpGet]
+        public async Task<IActionResult> SolicitarActualizacionRuta()
+        {
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
+
+            if (conductor == null)
+            {
+                TempData["Mensaje"] = "No se encontró el registro del conductor.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            var reservasObj = await _reservaService.ObtenerReservasAsignadasPorConductor(conductor.ConductorId);
+            var reservas = reservasObj.Cast<Reserva>().ToList();
+
+            if (reservas.Count == 0)
+            {
+                TempData["Mensaje"] = "No tiene reservas asignadas para solicitar cambios.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            var viajeId = reservas.First().ViajeId ?? 0;
+
+            var paradas = new List<ParadaAsignadaDto>();
+            int orden = 1;
+
+            foreach (var r in reservas.OrderBy(r => r.FechaReserva))
+            {
+                paradas.Add(new ParadaAsignadaDto
+                {
+                    Id = r.ReservaId,
+                    Orden = orden++,
+                    NombreCliente = r.Usuario != null
+                        ? $"{r.Usuario.Nombre} {r.Usuario.Apellido}"
+                        : $"Usuario {r.UserId}",
+                    Direccion = $"{r.Provincia}, {r.Canton}, {r.Distrito}",
+                    Estado = r.Estado
+                });
+            }
+
+            var recogidos = paradas.Count(p => p.Estado == "Recogido");
+            var pendientes = paradas.Count(p => p.Estado != "Recogido");
+
+            var model = new SolicitudCambioRutaViewModel
+            {
+                ViajeId = viajeId,
+                Ruta = $"Ruta {DateTime.Now:ddMMyyyy-HHmm}",
+                Salida = reservas.First().FechaReserva,
+                Estado = "Programado",
+                Pasajeros = reservas.Count,
+                TotalParadas = paradas.Count,
+                Pendientes = pendientes,
+                Recogidos = recogidos,
+                DestinoFinal = "Aeropuerto Internacional Juan Santamaría",
+                Paradas = paradas
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SolicitarActualizacionRuta(SolicitudCambioRutaViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var conductorUserInvalid = await _userManager.GetUserAsync(User);
+                if (conductorUserInvalid != null)
+                {
+                    var conductorObjInvalid = await _adminService.ObtenerConductorPorUserId(conductorUserInvalid.Id);
+                    var conductorInvalid = conductorObjInvalid as Conductor;
+
+                    if (conductorInvalid != null)
+                    {
+                        var reservasObj = await _reservaService.ObtenerReservasAsignadasPorConductor(conductorInvalid.ConductorId);
+                        var reservas = reservasObj.Cast<Reserva>().ToList();
+
+                        var paradas = new List<ParadaAsignadaDto>();
+                        int orden = 1;
+
+                        foreach (var r in reservas.OrderBy(r => r.FechaReserva))
+                        {
+                            paradas.Add(new ParadaAsignadaDto
+                            {
+                                Id = r.ReservaId,
+                                Orden = orden++,
+                                NombreCliente = r.Usuario != null
+                                    ? $"{r.Usuario.Nombre} {r.Usuario.Apellido}"
+                                    : $"Usuario {r.UserId}",
+                                Direccion = $"{r.Provincia}, {r.Canton}, {r.Distrito}",
+                                Estado = r.Estado
+                            });
+                        }
+
+                        model.Paradas = paradas;
+                        model.TotalParadas = paradas.Count;
+                        model.Pendientes = paradas.Count(p => p.Estado != "Recogido");
+                        model.Recogidos = paradas.Count(p => p.Estado == "Recogido");
+                        model.Pasajeros = reservas.Count;
+                        model.DestinoFinal = "Aeropuerto Internacional Juan Santamaría";
+
+                        var primeraReserva = reservas.FirstOrDefault();
+                        if (primeraReserva != null)
+                        {
+                            model.Salida = primeraReserva.FechaReserva;
+                        }
+                    }
+                }
+
+                return View(model);
+            }
+
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
+
+            if (conductor == null)
+            {
+                TempData["Mensaje"] = "No se encontró el registro del conductor.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            TempData["Mensaje"] = "Solicitud de cambio de ruta enviada correctamente al administrador.";
+            return RedirectToAction("PanelConductor");
         }
 
         [HttpGet]
@@ -76,6 +285,29 @@ namespace ONTHERUSH.UI.Controllers
 
             var reservasObj = await _reservaService.ObtenerReservasAsignadasPorConductor(conductor.ConductorId);
             var reservas = reservasObj.Cast<Reserva>().ToList();
+            var viajeIdActual = reservas.FirstOrDefault()?.ViajeId;
+
+            if (viajeIdActual != null)
+            {
+                var viajeObj = await _viajeService.ObtenerViajePorId(viajeIdActual.Value);
+                var viajeActual = viajeObj as Viaje;
+
+                if (viajeActual != null)
+                {
+                    ViewBag.EstadoViaje = viajeActual.Estado;
+                    ViewBag.RutaViaje = viajeActual.NombreRuta;
+                }
+                else
+                {
+                    ViewBag.EstadoViaje = "Programado";
+                    ViewBag.RutaViaje = "Ruta actual";
+                }
+            }
+            else
+            {
+                ViewBag.EstadoViaje = "Programado";
+                ViewBag.RutaViaje = "Ruta actual";
+            }
 
             if (reservas.Count == 0)
             {
@@ -171,6 +403,96 @@ namespace ONTHERUSH.UI.Controllers
                 : $" {resultado.Mensaje}";
 
             return RedirectToAction("VerViaje");
+        }
+
+        [HttpGet]
+        public IActionResult ReportarIncidente()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReportarIncidente(CrearIncidenteDto dto)
+        {
+            if (!ModelState.IsValid)
+                return View(dto);
+
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
+
+            if (conductor == null)
+            {
+                TempData["Mensaje"] = "No se encontró el registro del conductor.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            await _incidenteService.CrearIncidenteAsync(conductorUser.Id, dto);
+
+            TempData["Mensaje"] = "Incidente reportado correctamente.";
+            return RedirectToAction("PanelConductor");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MisIncidentes()
+        {
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var incidentes = await _incidenteService.ObtenerIncidentesPorConductorAsync(conductorUser.Id);
+            return View(incidentes);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> HistorialViajes()
+        {
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
+
+            if (conductor == null)
+            {
+                TempData["Mensaje"] = "No se encontró el registro del conductor.";
+                return View(new List<ReporteViajeDTO>());
+            }
+
+            var historial = await _viajeService.ObtenerHistorialViajesPorConductor(conductor.ConductorId);
+            return View(historial);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DetalleViaje(int id)
+        {
+            var conductorUser = await _userManager.GetUserAsync(User);
+            if (conductorUser == null)
+                return RedirectToAction("Login", "Auth");
+
+            var conductorObj = await _adminService.ObtenerConductorPorUserId(conductorUser.Id);
+            var conductor = conductorObj as Conductor;
+
+            if (conductor == null)
+            {
+                TempData["Mensaje"] = "No se encontró el registro del conductor.";
+                return RedirectToAction("HistorialViajes");
+            }
+
+            var viaje = await _viajeService.ObtenerDetalleViajePorConductor(id, conductor.ConductorId);
+
+            if (viaje == null)
+            {
+                TempData["Mensaje"] = "No se encontró el viaje solicitado.";
+                return RedirectToAction("HistorialViajes");
+            }
+
+            return View(viaje);
         }
     }
 }

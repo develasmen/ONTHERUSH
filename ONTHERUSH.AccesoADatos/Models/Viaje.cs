@@ -42,7 +42,7 @@ namespace ONTHERUSH.AccesoADatos.Models
         public DateTime FechaAsignacion { get; set; } = DateTime.Now;
 
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
-
+        public DateTime? FechaUltimaModificacion { get; set; }
         public string? Observaciones { get; set; }
 
         [ForeignKey("ConductorId")]
@@ -54,8 +54,7 @@ namespace ONTHERUSH.AccesoADatos.Models
         [ForeignKey("AsignadoPorAdminId")]
         public Administrador AsignadoPor { get; set; } = null!;
 
-
-
         public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
+
     }
 }

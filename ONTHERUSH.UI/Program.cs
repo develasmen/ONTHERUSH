@@ -8,6 +8,7 @@ using ONTHERUSH.LogicaDeNegocio.Services;
 using QuestPDF.Infrastructure;
 using ONTHERUSH.LogicaDeNegocio.Services;
 using ONTHERUSH.AccesoADatos.Repositories;
+using ONTHERUSH.Abstracciones.Interfaces.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,7 @@ builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
 builder.Services.AddScoped<ISolicitudCambioRepository, SolicitudCambioRepository>();
 builder.Services.AddScoped<IViajeRepository, ViajeRepository>();
 builder.Services.AddScoped<IVehiculoRepository, VehiculoRepository>();
+builder.Services.AddScoped<IIncidenteService, IncidenteService>();
 
 // Registrar Servicios
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -37,6 +39,7 @@ builder.Services.AddScoped<ISolicitudCambioService, SolicitudCambioService>();
 builder.Services.AddScoped<IViajeService, ViajeService>();
 builder.Services.AddScoped<ReporteViajesService>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();
+
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

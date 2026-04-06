@@ -1,6 +1,7 @@
 using ONTHERUSH.Abstracciones.DTOs;
 using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ONTHERUSH.LogicaDeNegocio.Services
 {
@@ -54,6 +55,21 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
         public async Task<ResultadoOperacion> FinalizarViaje(int viajeId)
         {
             return await _viajeRepository.FinalizarViaje(viajeId);
+        }
+
+        public async Task<List<ReporteViajeDTO>> ObtenerHistorialViajesPorConductor(int conductorId)
+        {
+            return await _viajeRepository.ObtenerHistorialViajesPorConductor(conductorId);
+        }
+
+        public async Task<DetalleViajeDTO?> ObtenerDetalleViajePorConductor(int viajeId, int conductorId)
+        {
+            return await _viajeRepository.ObtenerDetalleViajePorConductor(viajeId, conductorId);
+        }
+
+        public async Task<ResultadoOperacion> ActualizarEstadoViaje(int viajeId, string nuevoEstado)
+        {
+            return await _viajeRepository.ActualizarEstadoViaje(viajeId, nuevoEstado);
         }
     }
 }
