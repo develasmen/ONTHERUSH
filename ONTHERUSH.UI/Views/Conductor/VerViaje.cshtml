@@ -73,6 +73,36 @@
                     }
                     @if (hayParadas)
                     {
+                        <div class="alert alert-info"
+                             style="margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>@ViewBag.RutaViaje</strong>
+                            </div>
+
+                            <div>
+                                @{
+                                    var estadoViaje = ViewBag.EstadoViaje?.ToString() ?? "Programado";
+                                    var claseEstado = "status-pending";
+
+                                    if (estadoViaje == "En camino")
+                                    {
+                                        claseEstado = "status-info";
+                                    }
+                                    else if (estadoViaje == "Retrasado")
+                                    {
+                                        claseEstado = "status-warning";
+                                    }
+                                    else if (estadoViaje == "Finalizado" || estadoViaje == "Completado")
+                                    {
+                                        claseEstado = "status-completed";
+                                    }
+                                }
+
+                                <span class="status-badge @claseEstado">
+                                    Estado del viaje: @estadoViaje
+                                </span>
+                            </div>
+                        </div>
                         <div class="trip-summary">
                             <div class="trip-summary-card">
                                 <span class="trip-summary-label">Paradas asignadas</span>
@@ -299,6 +329,84 @@
                 <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
             </footer>
         </div>
+        <style>
+                .status-info {
+                    background-color: #dbeafe;
+                    color: #1d4ed8;
+                }
+
+                .status-warning {
+                    background-color: #fef3c7;
+                    color: #b45309;
+                }
+
+                .trip-summary {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                    gap: 16px;
+                    margin: 25px 0 30px;
+                }
+
+                .trip-summary-card {
+                    background: #ffffff;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 16px;
+                    padding: 18px;
+                    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                }
+
+                .trip-summary-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.10);
+                }
+
+                .trip-summary-label {
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .trip-summary-value {
+                    font-size: 28px;
+                    font-weight: 700;
+                    color: #111827;
+                }
+
+                .trip-summary-value.pending {
+                    color: #d97706;
+                }
+
+                .trip-summary-value.success {
+                    color: #16a34a;
+                }
+
+                .destination-card {
+                    grid-column: span 2;
+                }
+
+                .trip-summary-destination {
+                    font-size: 16px;
+                    line-height: 1.4;
+                    color: #1f2937;
+                }
+
+                @@media
+                (max-width: 768px) {
+                    .destination-card {
+                        grid-column: span 1;
+                    }
+
+                    .trip-summary {
+                        grid-template-columns: 1fr;
+                    }
+                }
+        </style>
     </body>
 
 </html>

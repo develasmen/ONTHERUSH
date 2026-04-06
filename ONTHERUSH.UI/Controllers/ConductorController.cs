@@ -61,25 +61,40 @@ namespace ONTHERUSH.UI.Controllers
                 return RedirectToAction("PanelConductor");
             }
 
-            var historial = await _viajeService.ObtenerHistorialViajesPorConductor(conductor.ConductorId);
-            var viajeActivo = historial
-                .OrderByDescending(v => v.Salida)
-                .FirstOrDefault(v => !string.Equals(v.Estado, "Finalizado", StringComparison.OrdinalIgnoreCase));
+            var reservasObj = await _reservaService.ObtenerReservasAsignadasPorConductor(conductor.ConductorId);
+            var reservas = reservasObj.Cast<Reserva>().ToList();
 
-            if (viajeActivo == null)
+            if (reservas.Count == 0)
             {
                 TempData["Mensaje"] = "No tiene un viaje activo para actualizar.";
                 return RedirectToAction("PanelConductor");
             }
 
+            var viajeIdActual = reservas.FirstOrDefault()?.ViajeId;
+
+            if (viajeIdActual == null)
+            {
+                TempData["Mensaje"] = "No se encontró el viaje actual.";
+                return RedirectToAction("PanelConductor");
+            }
+
+            var viajeObj = await _viajeService.ObtenerViajePorId(viajeIdActual.Value);
+            var viajeActual = viajeObj as Viaje;
+
+            if (viajeActual == null)
+            {
+                TempData["Mensaje"] = "No se encontró el viaje actual.";
+                return RedirectToAction("PanelConductor");
+            }
+
             var model = new ActualizarEstadoViajeViewModel
             {
-                ViajeId = viajeActivo.ViajeId,
-                Ruta = viajeActivo.Ruta,
-                Salida = viajeActivo.Salida,
-                EstadoActual = viajeActivo.Estado,
-                Pasajeros = viajeActivo.Pasajeros,
-                NuevoEstado = viajeActivo.Estado
+                ViajeId = viajeActual.ViajeId,
+                Ruta = string.IsNullOrWhiteSpace(viajeActual.NombreRuta) ? "Ruta actual" : viajeActual.NombreRuta,
+                Salida = viajeActual.FechaHoraSalida,
+                EstadoActual = string.IsNullOrWhiteSpace(viajeActual.Estado) ? "Programado" : viajeActual.Estado,
+                Pasajeros = viajeActual.CantidadPasajeros,
+                NuevoEstado = string.IsNullOrWhiteSpace(viajeActual.Estado) ? "Programado" : viajeActual.Estado
             };
 
             return View(model);
@@ -270,6 +285,29 @@ namespace ONTHERUSH.UI.Controllers
 
             var reservasObj = await _reservaService.ObtenerReservasAsignadasPorConductor(conductor.ConductorId);
             var reservas = reservasObj.Cast<Reserva>().ToList();
+            var viajeIdActual = reservas.FirstOrDefault()?.ViajeId;
+
+            if (viajeIdActual != null)
+            {
+                var viajeObj = await _viajeService.ObtenerViajePorId(viajeIdActual.Value);
+                var viajeActual = viajeObj as Viaje;
+
+                if (viajeActual != null)
+                {
+                    ViewBag.EstadoViaje = viajeActual.Estado;
+                    ViewBag.RutaViaje = viajeActual.NombreRuta;
+                }
+                else
+                {
+                    ViewBag.EstadoViaje = "Programado";
+                    ViewBag.RutaViaje = "Ruta actual";
+                }
+            }
+            else
+            {
+                ViewBag.EstadoViaje = "Programado";
+                ViewBag.RutaViaje = "Ruta actual";
+            }
 
             if (reservas.Count == 0)
             {
