@@ -1,22 +1,15 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace ONTHERUSH.Abstracciones.DTOs
 {
     public class SolicitudCambioRutaDTO
     {
+        public int SolicitudCambioRutaId { get; set; }
         public int ViajeId { get; set; }
-
-        public string Ruta { get; set; } = string.Empty;
-
-        public DateTime Salida { get; set; }
-
-        public string Estado { get; set; } = string.Empty;
-
-        public int Pasajeros { get; set; }
-
-        [Required(ErrorMessage = "Debe ingresar el motivo de la solicitud.")]
+        public int ConductorId { get; set; }
+        public string RutaActual { get; set; } = string.Empty;
+        public string NuevoOrdenPropuesto { get; set; } = string.Empty;
         public string Motivo { get; set; } = string.Empty;
-
-        public bool HayCambios { get; set; }
+        public string Estado { get; set; } = string.Empty;
+        public DateTime FechaSolicitud { get; set; }
+        public string NombreConductor { get; set; } = string.Empty;
     }
 }

@@ -6,5 +6,6 @@ namespace ONTHERUSH.Abstracciones.Interfaces.Services
     {
         Task CrearIncidenteAsync(string conductorId, CrearIncidenteDto dto);
         Task<List<IncidenteDto>> ObtenerIncidentesPorConductorAsync(string conductorId);
+        Task<List<IncidenteDto>> ObtenerTodosLosIncidentesAsync();
     }
 }

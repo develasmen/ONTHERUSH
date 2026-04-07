@@ -1,0 +1,124 @@
+@model IEnumerable<ONTHERUSH.Abstracciones.DTOs.IncidenteDto>
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Gestionar Incidentes";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestionar Incidentes - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
+</head>
+<body>
+    <div class="table-page-container">
+
+        <header class="table-header">
+            <div class="table-header-content">
+                <a href="@Url.Action("PanelAdministrador", "Admin")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                              clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al panel</span>
+                </a>
+
+                <div class="table-header-info">
+                    <h1 class="table-title">Gestionar Incidentes</h1>
+                    <p class="table-subtitle">
+                        Revise los incidentes reportados por los conductores
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <main class="table-main">
+            <div class="table-container">
+
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="empty-state">
+                        <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.518 11.591c.75 1.334-.213 2.99-1.742 2.99H3.48c-1.53 0-2.492-1.656-1.743-2.99L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-6a1 1 0 00-1 1v3a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                        <h3>No hay incidentes reportados</h3>
+                        <p>Cuando un conductor reporte un incidente, aparecerá aquí.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Conductor</th>
+                                    <th>Viaje</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th class="text-center">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var incidente in Model)
+                                {
+                                    var pendiente = string.Equals(incidente.Estado, "Pendiente", StringComparison.OrdinalIgnoreCase);
+
+                                    <tr>
+                                        <td>
+                                            <span class="date-text">@incidente.Fecha.ToString("dd/MM/yyyy")</span>
+                                            <span class="time-text">@incidente.Fecha.ToString("HH:mm")</span>
+                                        </td>
+
+                                        <td>
+                                            <span class="table-badge">@incidente.NombreConductor</span>
+                                        </td>
+
+                                        <td>
+                                            @(incidente.ViajeId.HasValue ? incidente.ViajeId.ToString() : "Sin viaje")
+                                        </td>
+
+                                        <td>
+                                            <span class="table-badge">@incidente.Tipo</span>
+                                        </td>
+
+                                        <td>
+                                            <div class="value-new">@incidente.Descripcion</div>
+                                        </td>
+
+                                        <td class="text-center">
+                                            @if (pendiente)
+                                            {
+                                                <span class="status-badge status-pending">
+                                                    Pendiente
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge status-completed">
+                                                    @incidente.Estado
+                                                </span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+            </div>
+        </main>
+
+        <footer class="table-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Administrador</p>
+        </footer>
+    </div>
+</body>
+</html>

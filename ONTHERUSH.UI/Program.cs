@@ -6,8 +6,6 @@ using ONTHERUSH.AccesoADatos.Models;
 using ONTHERUSH.AccesoADatos.Repositories;
 using ONTHERUSH.LogicaDeNegocio.Services;
 using QuestPDF.Infrastructure;
-using ONTHERUSH.LogicaDeNegocio.Services;
-using ONTHERUSH.AccesoADatos.Repositories;
 using ONTHERUSH.Abstracciones.Interfaces.Services;
 
 
@@ -28,6 +26,7 @@ builder.Services.AddScoped<ISolicitudCambioRepository, SolicitudCambioRepository
 builder.Services.AddScoped<IViajeRepository, ViajeRepository>();
 builder.Services.AddScoped<IVehiculoRepository, VehiculoRepository>();
 builder.Services.AddScoped<IIncidenteService, IncidenteService>();
+builder.Services.AddScoped<ISolicitudCambioRutaRepository, SolicitudCambioRutaRepository>();
 
 // Registrar Servicios
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -39,6 +38,8 @@ builder.Services.AddScoped<ISolicitudCambioService, SolicitudCambioService>();
 builder.Services.AddScoped<IViajeService, ViajeService>();
 builder.Services.AddScoped<ReporteViajesService>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();
+builder.Services.AddScoped<ISolicitudCambioRutaService, SolicitudCambioRutaService>();
+
 
 
 // Identity

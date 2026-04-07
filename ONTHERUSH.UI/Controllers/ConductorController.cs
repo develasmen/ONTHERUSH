@@ -22,6 +22,7 @@ namespace ONTHERUSH.UI.Controllers
         private readonly IReservaService _reservaService;
         private readonly IViajeService _viajeService;
         private readonly IIncidenteService _incidenteService;
+        private readonly ISolicitudCambioRutaService _solicitudCambioRutaService;
 
         public ConductorController(
             UserManager<ApplicationUser> userManager,
@@ -29,7 +30,8 @@ namespace ONTHERUSH.UI.Controllers
             IAdminService adminService,
             IReservaService reservaService,
             IViajeService viajeService,
-            IIncidenteService incidenteService)
+            IIncidenteService incidenteService,
+            ISolicitudCambioRutaService solicitudCambioRutaService)
         {
             _userManager = userManager;
             _rutaAsignacionService = rutaAsignacionService;
@@ -37,6 +39,7 @@ namespace ONTHERUSH.UI.Controllers
             _reservaService = reservaService;
             _viajeService = viajeService;
             _incidenteService = incidenteService;
+            _solicitudCambioRutaService = solicitudCambioRutaService;
         }
 
         [HttpGet]
@@ -256,6 +259,17 @@ namespace ONTHERUSH.UI.Controllers
                 TempData["Mensaje"] = "No se encontró el registro del conductor.";
                 return RedirectToAction("PanelConductor");
             }
+
+            var dto = new SolicitudCambioRutaDTO
+            {
+                ViajeId = model.ViajeId,
+                ConductorId = conductor.ConductorId,
+                RutaActual = model.Ruta,
+                NuevoOrdenPropuesto = model.DescripcionCambio,
+                Motivo = model.Motivo
+            };
+
+            await _solicitudCambioRutaService.CrearSolicitud(dto);
 
             TempData["Mensaje"] = "Solicitud de cambio de ruta enviada correctamente al administrador.";
             return RedirectToAction("PanelConductor");
