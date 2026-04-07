@@ -47,5 +47,34 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
                 })
                 .ToListAsync();
         }
+
+        public async Task<List<IncidenteDto>> ObtenerTodosLosIncidentesAsync()
+        {
+            return await _context.Incidentes
+                .GroupJoin(
+                    _context.Users,
+                    incidente => incidente.ConductorId,
+                    usuario => usuario.Id,
+                    (incidente, usuarios) => new { incidente, usuarios }
+                )
+                .SelectMany(
+                    x => x.usuarios.DefaultIfEmpty(),
+                    (x, usuario) => new IncidenteDto
+                    {
+                        Id = x.incidente.Id,
+                        ConductorId = x.incidente.ConductorId,
+                        ViajeId = x.incidente.ViajeId,
+                        Tipo = x.incidente.Tipo,
+                        Descripcion = x.incidente.Descripcion,
+                        Fecha = x.incidente.Fecha,
+                        Estado = x.incidente.Estado,
+                        NombreConductor = usuario != null
+                            ? usuario.Nombre + " " + usuario.Apellido
+                            : x.incidente.ConductorId
+                    }
+                )
+                .OrderByDescending(x => x.Fecha)
+                .ToListAsync();
+        }
     }
 }

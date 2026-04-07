@@ -5,6 +5,7 @@ namespace ONTHERUSH.Abstracciones.DTOs
         public int Id { get; set; }
         public string ConductorId { get; set; }
         public int? ViajeId { get; set; }
+        public string NombreConductor { get; set; } = string.Empty;
         public string Tipo { get; set; }
         public string Descripcion { get; set; }
         public DateTime Fecha { get; set; }
