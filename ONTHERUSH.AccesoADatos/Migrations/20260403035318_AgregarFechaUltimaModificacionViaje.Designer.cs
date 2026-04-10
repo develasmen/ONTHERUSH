@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ONTHERUSH.AccesoADatos.Data;
 
@@ -11,9 +12,11 @@ using ONTHERUSH.AccesoADatos.Data;
 namespace ONTHERUSH.AccesoADatos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260403035318_AgregarFechaUltimaModificacionViaje")]
+    partial class AgregarFechaUltimaModificacionViaje
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -471,58 +474,6 @@ namespace ONTHERUSH.AccesoADatos.Migrations
                     b.ToTable("SolicitudesCambio");
                 });
 
-            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.SolicitudCambioRuta", b =>
-                {
-                    b.Property<int>("SolicitudCambioRutaId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SolicitudCambioRutaId"));
-
-                    b.Property<string>("ComentarioAdministrador")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("ConductorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("FechaResolucion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FechaSolicitud")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Motivo")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("NuevoOrdenPropuesto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RutaActual")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("ViajeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SolicitudCambioRutaId");
-
-                    b.HasIndex("ConductorId");
-
-                    b.HasIndex("ViajeId");
-
-                    b.ToTable("SolicitudesCambioRuta");
-                });
-
             modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Vehiculo", b =>
                 {
                     b.Property<int>("VehiculoId")
@@ -740,25 +691,6 @@ namespace ONTHERUSH.AccesoADatos.Migrations
                         .IsRequired();
 
                     b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.SolicitudCambioRuta", b =>
-                {
-                    b.HasOne("ONTHERUSH.AccesoADatos.Models.Conductor", "Conductor")
-                        .WithMany()
-                        .HasForeignKey("ConductorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ONTHERUSH.AccesoADatos.Models.Viaje", "Viaje")
-                        .WithMany()
-                        .HasForeignKey("ViajeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Conductor");
-
-                    b.Navigation("Viaje");
                 });
 
             modelBuilder.Entity("ONTHERUSH.AccesoADatos.Models.Viaje", b =>

@@ -1,0 +1,154 @@
+@model List<ONTHERUSH.Abstracciones.DTOs.SolicitudCambioRutaDTO>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestionar Solicitudes de Ruta - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
+</head>
+<body>
+    <div class="table-page-container">
+        <!-- Header -->
+        <header class="table-header">
+            <div class="table-header-content">
+                <a href="@Url.Action("PanelAdministrador", "Admin")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al panel</span>
+                </a>
+                <div class="table-header-info">
+                    <h1 class="table-title">Solicitudes de Cambio de Ruta</h1>
+                    <p class="table-subtitle">Revise, apruebe o rechace las solicitudes enviadas por los conductores</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenido principal -->
+        <main class="table-main">
+            <div class="table-container">
+
+                <!-- Alertas -->
+                @if (TempData["Exito"] != null)
+                {
+                    <div class="alert alert-success">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>@TempData["Exito"]</span>
+                    </div>
+                }
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        <span>@TempData["Error"]</span>
+                    </div>
+                }
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Conductor</th>
+                                    <th>Viaje</th>
+                                    <th>Ruta actual</th>
+                                    <th>Cambio solicitado</th>
+                                    <th>Motivo</th>
+                                    <th>Fecha solicitud</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var solicitud in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="table-badge">#@solicitud.SolicitudCambioRutaId</span>
+                                        </td>
+                                        <td>
+                                            <div class="user-info">
+                                                <div class="user-avatar">
+                                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <div class="user-name">@solicitud.NombreConductor</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@solicitud.ViajeId</td>
+                                        <td class="text-muted">@solicitud.RutaActual</td>
+                                        <td>@solicitud.NuevoOrdenPropuesto</td>
+                                        <td>@solicitud.Motivo</td>
+                                        <td>@solicitud.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>
+                                            <div class="action-group">
+                                                <form asp-action="AprobarSolicitudRuta" asp-controller="Admin" method="post" class="inline-form">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="solicitudId" value="@solicitud.SolicitudCambioRutaId" />
+                                                    <button type="submit" class="btn-action btn-approve" title="Aprobar solicitud">
+                                                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                        </svg>
+                                                        Aprobar
+                                                    </button>
+                                                </form>
+
+                                                <form asp-action="RechazarSolicitudRuta" asp-controller="Admin" method="post" class="inline-form">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="solicitudId" value="@solicitud.SolicitudCambioRutaId" />
+                                                    <input type="text"
+                                                           name="comentarioAdministrador"
+                                                           class="action-select"
+                                                           placeholder="Motivo del rechazo"
+                                                           required />
+                                                    <button type="submit" class="btn-action btn-reject" title="Rechazar solicitud">
+                                                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                        </svg>
+                                                        Rechazar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <h3>No hay solicitudes pendientes</h3>
+                        <p>No existen solicitudes de cambio de ruta por revisar en este momento</p>
+                    </div>
+                }
+
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="table-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Administrador</p>
+        </footer>
+    </div>
+</body>
+</html>

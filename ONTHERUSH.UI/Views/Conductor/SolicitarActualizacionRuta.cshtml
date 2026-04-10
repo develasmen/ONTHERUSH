@@ -1,5 +1,8 @@
+@model ONTHERUSH.Abstracciones.DTOs.SolicitudCambioRutaViewModel
+
 @{
     Layout = null;
+    ViewData["Title"] = "Solicitar actualización de ruta";
 }
 
 <!DOCTYPE html>
@@ -8,68 +11,191 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Solicitar actualización de ruta - ON THE RUSH</title>
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/components/buttons.css" />
-    <link rel="stylesheet" href="~/css/components/forms.css" />
-    <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="stylesheet" href="~/css/pages/form-base.css" />
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>Solicitar actualización de ruta</h1>
-                <p>Describa el cambio que desea solicitar.</p>
+    <div class="table-page-container">
+
+        <header class="table-header">
+            <div class="table-header-content">
+                <a href="@Url.Action("PanelConductor", "Conductor")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                              clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al panel</span>
+                </a>
+
+                <div class="table-header-info">
+                    <h1 class="table-title">Solicitar actualización de ruta</h1>
+                    <p class="table-subtitle">
+                        Revise el orden actual de sus paradas y envíe una solicitud de cambio al administrador
+                    </p>
+                </div>
             </div>
+        </header>
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger">
-                    @ViewBag.Error
+        <main class="table-main">
+            <div class="table-container">
+
+                @if (TempData["Mensaje"] != null)
+                {
+                    <div class="alert alert-success">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                        <span>@TempData["Mensaje"]</span>
+                    </div>
+                }
+
+                <div class="trip-summary">
+                    <div class="trip-summary-card">
+                        <span class="trip-summary-label">Paradas asignadas</span>
+                        <span class="trip-summary-value">@Model.TotalParadas</span>
+                    </div>
+
+                    <div class="trip-summary-card">
+                        <span class="trip-summary-label">Pendientes</span>
+                        <span class="trip-summary-value">@Model.Pendientes</span>
+                    </div>
+
+                    <div class="trip-summary-card">
+                        <span class="trip-summary-label">Recogidos</span>
+                        <span class="trip-summary-value">@Model.Recogidos</span>
+                    </div>
+
+                    <div class="trip-summary-card">
+                        <span class="trip-summary-label">Destino final</span>
+                        <span class="trip-summary-value trip-summary-destination">@Model.DestinoFinal</span>
+                    </div>
                 </div>
-            }
 
-            @if (ViewBag.Info != null)
-            {
-                <div class="alert alert-warning">
-                    @ViewBag.Info
+                <div class="table-wrapper" style="margin-bottom: 28px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Orden actual</th>
+                                <th>Cliente</th>
+                                <th>Ubicación</th>
+                                <th class="text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var parada in Model.Paradas.OrderBy(p => p.Orden))
+                            {
+                                var recogido = string.Equals(parada.Estado, "Recogido", StringComparison.OrdinalIgnoreCase);
+
+                                <tr class="@(recogido ? "row-completed" : "")">
+                                    <td data-label="Orden actual">
+                                        <div class="order-badge">@parada.Orden</div>
+                                    </td>
+
+                                    <td data-label="Cliente">
+                                        <div class="user-info">
+                                            <div class="user-avatar">
+                                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                                          clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <div class="user-name">@parada.NombreCliente</div>
+                                        </div>
+                                    </td>
+
+                                    <td data-label="Ubicación">
+                                        <div class="location-info">
+                                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                                      clip-rule="evenodd" />
+                                            </svg>
+                                            <span>@parada.Direccion</span>
+                                        </div>
+                                    </td>
+
+                                    <td data-label="Estado" class="text-center">
+                                        @if (recogido)
+                                        {
+                                            <span class="status-badge status-completed">Recogido</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-pending">Pendiente</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            }
 
-            @if (ViewBag.Exito != null)
-            {
-                <div class="alert alert-success">
-                    @ViewBag.Exito
+                <div class="form-card">
+                    <form asp-action="SolicitarActualizacionRuta"
+                          asp-controller="Conductor"
+                          method="post">
+                        @Html.AntiForgeryToken()
+
+                        <input asp-for="ViajeId" type="hidden" />
+                        <input asp-for="Ruta" type="hidden" />
+                        <input asp-for="Estado" type="hidden" />
+                        <input asp-for="Pasajeros" type="hidden" />
+                        <input asp-for="TotalParadas" type="hidden" />
+                        <input asp-for="Pendientes" type="hidden" />
+                        <input asp-for="Recogidos" type="hidden" />
+                        <input asp-for="DestinoFinal" type="hidden" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger validation-summary"></div>
+
+                        <div class="form-group">
+                            <label asp-for="Motivo" class="form-label">Motivo de la solicitud</label>
+                            <input asp-for="Motivo"
+                                   class="form-control"
+                                   placeholder="Ejemplo: Reordenar paradas por cercanía" />
+                            <span asp-validation-for="Motivo" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DescripcionCambio" class="form-label">Descripción del cambio solicitado</label>
+                            <textarea asp-for="DescripcionCambio"
+                                      class="form-control"
+                                      rows="5"
+                                      placeholder="Explique al administrador cómo desea reorganizar el orden de las paradas"></textarea>
+                            <span asp-validation-for="DescripcionCambio" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-check-label">
+                                <input asp-for="HayCambios" type="checkbox" />
+                                Confirmo que esta solicitud corresponde a una modificación del orden o recorrido actual
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="@Url.Action("PanelConductor", "Conductor")"
+                               class="btn btn-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-primary">
+                                Enviar solicitud
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            }
 
-            <form asp-action="SolicitarActualizacionRuta" asp-controller="Conductor" method="post" class="auth-form">
-                <div class="form-group">
-                    <label for="idRuta">ID de la ruta</label>
-                    <input type="text" id="idRuta" name="idRuta" class="form-input" required />
-                </div>
+            </div>
+        </main>
 
-                <div class="form-group">
-                    <label for="motivo">Motivo de la actualización</label>
-                    <textarea id="motivo" name="motivo" class="form-input" rows="3" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <input type="checkbox" id="hayCambios" name="hayCambios" value="true" />
-                    <label for="hayCambios">He realizado cambios en esta solicitud</label>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    Enviar
-                </button>
-
-                <button type="button"
-                        class="btn btn-secondary"
-                        onclick="window.location.href='@Url.Action("PanelConductor", "Conductor")'">
-                    Volver al panel de conductor
-                </button>
-            </form>
-        </div>
+        <footer class="table-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
+        </footer>
     </div>
+
+    <partial name="_ValidationScriptsPartial" />
 </body>
 </html>

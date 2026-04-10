@@ -6,6 +6,8 @@ using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Models;
 using ONTHERUSH.LogicaDeNegocio.Services;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using ONTHERUSH.Abstracciones.Interfaces.Services;
 
 namespace ONTHERUSH.UI.Controllers
 {
@@ -19,6 +21,8 @@ namespace ONTHERUSH.UI.Controllers
         private readonly IViajeService _viajeService;
         private readonly IReservaService _reservaService;
         private readonly IVehiculoService _vehiculoService;
+        private readonly ISolicitudCambioRutaService _solicitudCambioRutaService;
+        private readonly IIncidenteService _incidenteService;
 
         public AdminController(
             IAdminService adminService,
@@ -27,7 +31,9 @@ namespace ONTHERUSH.UI.Controllers
             ISolicitudCambioService solicitudCambioService,
             IViajeService viajeService,
             IReservaService reservaService,
-            IVehiculoService vehiculoService)
+            IVehiculoService vehiculoService,
+            ISolicitudCambioRutaService solicitudCambioRutaService,
+            IIncidenteService incidenteService)
         {
             _adminService = adminService;
             _userManager = userManager;
@@ -36,6 +42,8 @@ namespace ONTHERUSH.UI.Controllers
             _viajeService = viajeService;
             _reservaService = reservaService;
             _vehiculoService = vehiculoService;
+            _solicitudCambioRutaService = solicitudCambioRutaService;
+            _incidenteService = incidenteService;
         }
 
         public IActionResult PanelAdministrador()
@@ -45,13 +53,28 @@ namespace ONTHERUSH.UI.Controllers
 
         public async Task<IActionResult> GestionarUsuarios()
         {
-            var usuariosSinRolObj = await _adminService.ObtenerUsuariosSinRol();
+            var usuariosPendientesObj = await _adminService.ObtenerUsuariosSinRol();
+            var usuariosPendientes = usuariosPendientesObj.Cast<ApplicationUser>().ToList();
 
-            var usuariosSinRol = usuariosSinRolObj
-                .Cast<ApplicationUser>()
-                .ToList();
+            var usuariosActivos = await _userManager.Users
+                .OrderByDescending(u => u.FechaRegistro)
+                .ToListAsync();
 
-            return View(usuariosSinRol);
+            var usuariosConRoles = new List<(ApplicationUser usuario, IList<string> roles)>();
+
+            foreach (var usuario in usuariosActivos)
+            {
+                var roles = await _userManager.GetRolesAsync(usuario);
+                if (roles.Any())
+                {
+                    usuariosConRoles.Add((usuario, roles));
+                }
+            }
+
+            ViewBag.UsuariosPendientes = usuariosPendientes;
+            ViewBag.UsuariosActivos = usuariosConRoles;
+
+            return View();
         }
 
         [HttpPost]
@@ -357,6 +380,100 @@ namespace ONTHERUSH.UI.Controllers
                 TempData["Error"] = resultado.Mensaje;
 
             return RedirectToAction(nameof(GestionarVehiculos));
+        }
+
+
+        // POST: Admin/EliminarUsuarioActivo
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarUsuarioActivo(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "ID de usuario inválido";
+                return RedirectToAction(nameof(GestionarUsuarios));
+            }
+
+            var usuario = await _userManager.FindByIdAsync(userId);
+            if (usuario == null)
+            {
+                TempData["Error"] = "Usuario no encontrado";
+                return RedirectToAction(nameof(GestionarUsuarios));
+            }
+
+            var roles = await _userManager.GetRolesAsync(usuario);
+            if (!roles.Any())
+            {
+                TempData["Error"] = "Este usuario no tiene un rol asignado";
+                return RedirectToAction(nameof(GestionarUsuarios));
+            }
+
+            // no se permite que un admin se elimine a si mismo
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser?.Id == userId)
+            {
+                TempData["Error"] = "No puedes eliminar tu propia cuenta de administrador";
+                return RedirectToAction(nameof(GestionarUsuarios));
+            }
+
+            try
+            {
+                // DESHABILITAR en lugar de eliminar
+                usuario.Estado = false;
+                usuario.LockoutEnabled = true;
+                usuario.LockoutEnd = DateTimeOffset.MaxValue;
+
+                var result = await _userManager.UpdateAsync(usuario);
+
+                if (result.Succeeded)
+                {
+                    TempData["Exito"] = $"Usuario {usuario.Nombre} {usuario.Apellido} deshabilitado exitosamente";
+                }
+                else
+                {
+                    TempData["Error"] = $"Error al deshabilitar usuario: {string.Join(", ", result.Errors.Select(e => e.Description))}";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error al deshabilitar el usuario: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(GestionarUsuarios));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GestionarSolicitudesRuta()
+        {
+            var solicitudes = await _solicitudCambioRutaService.ObtenerSolicitudesPendientes();
+            return View(solicitudes);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AprobarSolicitudRuta(int solicitudId)
+        {
+            await _solicitudCambioRutaService.AprobarSolicitud(solicitudId);
+
+            TempData["Exito"] = "Solicitud de cambio de ruta aprobada correctamente.";
+            return RedirectToAction(nameof(GestionarSolicitudesRuta));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RechazarSolicitudRuta(int solicitudId, string comentarioAdministrador)
+        {
+            await _solicitudCambioRutaService.RechazarSolicitud(solicitudId, comentarioAdministrador);
+
+            TempData["Exito"] = "Solicitud de cambio de ruta rechazada correctamente.";
+            return RedirectToAction(nameof(GestionarSolicitudesRuta));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GestionarIncidentes()
+        {
+            var incidentes = await _incidenteService.ObtenerTodosLosIncidentesAsync();
+            return View(incidentes);
         }
     }
 }

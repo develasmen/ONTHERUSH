@@ -17,6 +17,8 @@ namespace ONTHERUSH.AccesoADatos.Data
         public DbSet<Viaje> Viajes { get; set; }
         public DbSet<Reserva> Reservas { get; set; }
         public DbSet<Auditoria> Auditorias { get; set; }
+        public DbSet<Incidente> Incidentes { get; set; }
+        public DbSet<SolicitudCambioRuta> SolicitudesCambioRuta { get; set; }
 
 
 

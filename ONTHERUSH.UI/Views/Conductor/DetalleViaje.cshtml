@@ -1,0 +1,108 @@
+@model ONTHERUSH.Abstracciones.DTOs.ReporteViajeDTO
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Detalle de viaje";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalle de viaje - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
+</head>
+<body>
+    <div class="table-page-container">
+
+        <header class="table-header">
+            <div class="table-header-content">
+                <a href="@Url.Action("HistorialViajes", "Conductor")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                              clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al historial</span>
+                </a>
+
+                <div class="table-header-info">
+                    <h1 class="table-title">Detalle de viaje</h1>
+                    <p class="table-subtitle">
+                        Información general del viaje seleccionado
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <main class="table-main">
+            <div class="table-container">
+
+                <div class="trip-summary">
+                    <div class="trip-summary-card">
+                        <span class="trip-summary-label">Ruta</span>
+                        <span class="trip-summary-value trip-summary-destination">@Model.Ruta</span>
+                    </div>
+
+                    <div class="trip-summary-card">
+                        <span class="trip-summary-label">Conductor</span>
+                        <span class="trip-summary-value">@Model.Conductor</span>
+                    </div>
+
+                    <div class="trip-summary-card">
+                        <span class="trip-summary-label">Vehículo</span>
+                        <span class="trip-summary-value">@Model.Vehiculo</span>
+                    </div>
+
+                    <div class="trip-summary-card">
+                        <span class="trip-summary-label">Pasajeros</span>
+                        <span class="trip-summary-value">@Model.Pasajeros</span>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Salida</th>
+                                <th>Llegada</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="Salida">
+                                    <span class="date-text">@Model.Salida.ToString("dd/MM/yyyy")</span>
+                                    <span class="time-text">@Model.Salida.ToString("HH:mm")</span>
+                                </td>
+
+                                <td data-label="Llegada">
+                                    <span class="date-text">@Model.Llegada.ToString("dd/MM/yyyy")</span>
+                                    <span class="time-text">@Model.Llegada.ToString("HH:mm")</span>
+                                </td>
+
+                                <td data-label="Estado">
+                                    @if (string.Equals(Model.Estado, "Finalizado", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="status-badge status-completed">Finalizado</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-pending">@Model.Estado</span>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </main>
+
+        <footer class="table-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
+        </footer>
+    </div>
+</body>
+</html>

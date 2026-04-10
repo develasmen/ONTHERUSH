@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace ONTHERUSH.Abstracciones.DTOs
 {
-    public class ReporteViajeDTO
+    public class DetalleViajeDTO
     {
         public int ViajeId { get; set; }
         public string Ruta { get; set; } = string.Empty;
@@ -16,5 +10,6 @@ namespace ONTHERUSH.Abstracciones.DTOs
         public string Vehiculo { get; set; } = string.Empty;
         public string Estado { get; set; } = string.Empty;
         public int Pasajeros { get; set; }
+        public string Observaciones { get; set; } = string.Empty;
     }
 }
