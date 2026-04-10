@@ -1,11 +1,6 @@
 ﻿using ONTHERUSH.Abstracciones.DTOs;
 using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ONTHERUSH.LogicaDeNegocio.Services
 {
@@ -52,6 +47,45 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
                                    : "Usuario"
                 })
                 .OrderByDescending(x => x.FechaRegistro)
+                .ToList();
+        }
+
+        public List<VehiculoReporteDTO> ObtenerVehiculos()
+        {
+            return _context.Vehiculos
+                .Select(v => new VehiculoReporteDTO
+                {
+                    Placa = v.Placa,
+                    MarcaModelo = v.Marca + " " + v.Modelo,
+                    Annio = v.Año,
+                    Capacidad = v.CapacidadPasajeros,
+                    Estado = v.Estado,
+                    FechaRegistro = v.FechaRegistro
+                })
+                .OrderByDescending(v => v.FechaRegistro)
+                .ToList();
+        }
+
+        public List<ReservaReporteDTO> ObtenerReservas(DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            var query = _context.Reservas.AsQueryable();
+
+            if (fechaInicio.HasValue)
+                query = query.Where(r => r.FechaReserva >= fechaInicio.Value);
+
+            if (fechaFin.HasValue)
+                query = query.Where(r => r.FechaReserva <= fechaFin.Value);
+
+            return query
+                .Select(r => new ReservaReporteDTO
+                {
+                    ReservaId = r.ReservaId,
+                    Cliente = r.Usuario.Nombre, 
+                    Ruta = r.Viaje.NombreRuta,
+                    FechaReserva = r.FechaReserva,
+                    Estado = r.Estado
+                })
+                .OrderByDescending(r => r.FechaReserva)
                 .ToList();
         }
     }

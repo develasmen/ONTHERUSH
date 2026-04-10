@@ -1,4 +1,4 @@
-﻿@model ReporteUsuariosVM
+﻿@model ReporteVehiculoVM
 
 @{
     Layout = null;
@@ -25,8 +25,8 @@
                     <span>Volver al panel</span>
                 </a>
                 <div class="table-header-info">
-                    <h1 class="table-title">Reporte de Usuarios</h1>
-                    <p class="table-subtitle">Consulte y exporte el reporte de usuarios de los últimos 30 días</p>
+                    <h1 class="table-title">Reporte de Vehículos</h1>
+                    <p class="table-subtitle">Consulte y exporte el reporte de vehículos</p>
                 </div>
             </div>
         </header>
@@ -36,11 +36,11 @@
             <div class="table-container">
 
 
-                @if (Model.Usuarios != null && Model.Usuarios.Any())
+                @if (Model.Vehiculos != null && Model.Vehiculos.Any())
                 {
                     <div class=" align-content-md-center">
 
-                        <a asp-action="ExportarPdfUsuarios"
+                        <a asp-action="ExportarVehiculosPdf"
                            asp-controller="Reporte"
                            class="btn btn-danger btn-sm">
                             <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
@@ -52,52 +52,46 @@
                 }
 
                 <!-- Resultados -->
-                @if (Model != null && Model.Usuarios.Any())
+                @if (Model != null && Model.Vehiculos.Any())
                 {
                     <!-- Tabla de viajes -->
                     <div class="results-header">
                         <h3 class="results-title">Resultados</h3>
-                        <span class="results-count">@Model.Usuarios.Count() @(Model.Usuarios.Count() == 1 ? "usuarios encontrados" : "usuarios encontrados")</span>
+                        <span class="results-count">@Model.Vehiculos.Count() @(Model.Vehiculos.Count() == 1 ? "vehículos encontrados" : "vehículos encontrados")</span>
                     </div>
 
                     <div class="table-wrapper">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Nombre Completo</th>
-                                    <th>Email</th>
-                                    <th>Fecha de Registro</th>
-                                    <th>Tipo de Usuario</th>
+                                    <th>Placa</th>
+                                    <th>Marca/Modelo</th>
+                                    <th>Estado</th>
+                                    <th>Año</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var v in Model.Usuarios)
+                                @foreach (var v in Model.Vehiculos)
                                 {
                                     <tr>
                                         <td>
                                             <div class="driver-info">
-                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span>@v.NombreCompleto</span>
+                                                <span>@v.Placa</span>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="driver-info">
-                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span>@v.Email</span>
+
+                                                <span>@v.MarcaModelo</span>
                                             </div>
                                         </td>
-                                        <td>
-                                            <div class="datetime-info">
-                                                <span class="date">@v.FechaRegistro.ToString("dd/MM/yyyy")</span>
-                                                <span class="time">@v.FechaRegistro.ToString("HH:mm")</span>
-                                            </div>
+                                        <td class="text-center">
+                                            <span class="status-badge status-completado">
+                                                @v.Estado
+                                            </span>
                                         </td>
                                         <td>
-                                            <span>@v.TipoUsuario</span>
+                                            <span>@v.Annio</span>
                                         </td>
                                     </tr>
                                 }

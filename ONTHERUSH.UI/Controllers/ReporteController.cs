@@ -56,6 +56,28 @@ namespace ONTHERUSH.UI.Controllers
         }
 
         [HttpGet]
+        public IActionResult Vehiculos()
+        {
+            var vm = new ReporteVehiculoVM();
+            vm.Vehiculos = _reporteService.ObtenerVehiculos();
+            return View(vm);
+        }
+
+        [HttpGet]
+        public IActionResult Reservas(DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            var vm = new ReporteReservaVM
+            {
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin
+            };
+
+            vm.Reservas = _reporteService.ObtenerReservas(fechaInicio, fechaFin);
+
+            return View(vm);
+        }
+
+        [HttpGet]
         public IActionResult ExportarPdfViajes(DateTime fechaInicio, DateTime fechaFin)
         {
             var datos = _reporteService.ObtenerReporteViaje(fechaInicio, fechaFin);
@@ -73,6 +95,22 @@ namespace ONTHERUSH.UI.Controllers
             var pdf = PdfHelper.GenerarReporteUsuarios(datos);
 
             return File(pdf, "application/pdf", "ReporteUsuarios.pdf");
+        }
+
+        public IActionResult ExportarVehiculosPdf()
+        {
+            var datos = _reporteService.ObtenerVehiculos();
+            var pdf = PdfHelper.GenerarReporteVehiculos(datos);
+
+            return File(pdf, "application/pdf", "ReporteVehiculos.pdf");
+        }
+
+        public IActionResult ExportarReservasPdf(DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            var datos = _reporteService.ObtenerReservas(fechaInicio, fechaFin);
+            var pdf = PdfHelper.GenerarReporteReservas(datos);
+
+            return File(pdf, "application/pdf", "ReporteReservas.pdf");
         }
     }
 }

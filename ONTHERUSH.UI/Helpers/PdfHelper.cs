@@ -1,11 +1,9 @@
 ﻿namespace ONTHERUSH.UI.Helpers
 {
-    using Microsoft.EntityFrameworkCore.Metadata.Internal;
     using ONTHERUSH.Abstracciones.DTOs;
     using QuestPDF.Fluent;
     using QuestPDF.Helpers;
     using QuestPDF.Infrastructure;
-    using System.Reflection.Metadata;
 
     public static class PdfHelper
     {
@@ -130,6 +128,144 @@
                             x.Span("Página ");
                             x.CurrentPageNumber();
                         });
+                });
+            });
+
+            return document.GeneratePdf();
+        }
+
+        public static byte[] GenerarReporteVehiculos(List<VehiculoReporteDTO> datos)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(30);
+
+                    page.Header().Column(col =>
+                    {
+                        col.Item().Text("Reporte de Vehículos")
+                            .FontSize(20).Bold().AlignCenter();
+
+                        col.Item().Text($"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}")
+                            .FontSize(10).AlignCenter();
+                    });
+
+                    page.Content().PaddingVertical(10).Table(table =>
+                    {
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.RelativeColumn(2); // Placa
+                            columns.RelativeColumn(3); // Marca
+                            columns.RelativeColumn(1); // Año
+                            columns.RelativeColumn(2); // Capacidad
+                            columns.RelativeColumn(2); // Estado
+                        });
+
+                        table.Header(header =>
+                        {
+                            header.Cell().Element(CellStyle).Text("Placa").Bold();
+                            header.Cell().Element(CellStyle).Text("Marca/Modelo").Bold();
+                            header.Cell().Element(CellStyle).Text("Año").Bold();
+                            header.Cell().Element(CellStyle).Text("Capacidad").Bold();
+                            header.Cell().Element(CellStyle).Text("Estado").Bold();
+
+                            static IContainer CellStyle(IContainer container)
+                            {
+                                return container
+                                    .Padding(5)
+                                    .Background(Colors.Grey.Lighten2)
+                                    .Border(1);
+                            }
+
+                        });
+
+                        foreach (var v in datos)
+                        {
+                            table.Cell().Element(Cell).Text(v.Placa);
+                            table.Cell().Element(Cell).Text(v.MarcaModelo);
+                            table.Cell().Element(Cell).Text(v.Annio.ToString());
+                            table.Cell().Element(Cell).Text(v.Capacidad.ToString());
+                            table.Cell().Element(Cell).Text(v.Estado);
+
+                            static IContainer Cell(IContainer c) =>
+                                c.Padding(5).Border(1);
+                        }
+                    });
+
+                    page.Footer().AlignCenter().Text(x =>
+                    {
+                        x.Span("Página ");
+                        x.CurrentPageNumber();
+                    });
+                });
+            });
+
+            return document.GeneratePdf();
+        }
+
+        public static byte[] GenerarReporteReservas(List<ReservaReporteDTO> datos)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(30);
+
+                    page.Header().Column(col =>
+                    {
+                        col.Item().Text("Reporte de Reservas")
+                            .FontSize(20).Bold().AlignCenter();
+
+                        col.Item().Text($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm}")
+                            .FontSize(10).AlignCenter();
+                    });
+
+                    page.Content().Table(table =>
+                    {
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.ConstantColumn(50);
+                            columns.RelativeColumn(3);
+                            columns.RelativeColumn(2);
+                            columns.RelativeColumn(2);
+                            columns.RelativeColumn(2);
+                        });
+
+                        table.Header(header =>
+                        {
+                            header.Cell().Element(CellStyle).Text("ID").Bold();
+                            header.Cell().Element(CellStyle).Text("Cliente").Bold();
+                            header.Cell().Element(CellStyle).Text("Ruta").Bold();
+                            header.Cell().Element(CellStyle).Text("Estado").Bold();
+                            header.Cell().Element(CellStyle).Text("Fecha de Reserva").Bold();
+
+                            static IContainer CellStyle(IContainer c) =>
+                                c.Padding(5).Border(1);
+                        });
+
+                        foreach (var r in datos)
+                        {
+                            table.Cell().Element(Cell).Text(r.ReservaId.ToString());
+                            table.Cell().Element(Cell).Text(r.Cliente);
+                            table.Cell().Element(Cell).Text(r.Ruta);
+                            table.Cell().Element(Cell).Text(r.FechaReserva.ToString("dd/MM/yyyy"));
+                            table.Cell().Element(Cell).Text(r.Estado);
+
+                            static IContainer Cell(IContainer c) =>
+                                c.Padding(5).Border(1);
+                        }
+                    });
+
+                    page.Footer().AlignCenter().Text(x =>
+                    {
+                        x.Span("Página ");
+                        x.CurrentPageNumber();
+                    });
                 });
             });
 

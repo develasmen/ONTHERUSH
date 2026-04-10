@@ -11,5 +11,7 @@ namespace ONTHERUSH.Abstracciones.Interfaces
     {
         public List<ReporteViajeDTO> ObtenerReporteViaje(DateTime inicio, DateTime fin);
         public List<UsuarioReporteDTO> ObtenerUsuarios(DateTime fechaInicio, DateTime fechaFin);
+        public List<VehiculoReporteDTO> ObtenerVehiculos();
+        public List<ReservaReporteDTO> ObtenerReservas(DateTime? fechaInicio, DateTime? fechaFin);
     }
 }

@@ -50,7 +50,7 @@
                     </div>
                     <div class="card-footer">
                         <a href="@Url.Action("Viajes", "Reporte")" class="btn btn-primary">
-                            <span>Generar reportes</span>
+                            <span>Generar reporte</span>
                             <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
@@ -66,7 +66,7 @@
                     </div>
                     <div class="card-footer">
                         <a href="@Url.Action("Usuarios", "Reporte")" class="btn btn-primary">
-                            <span>Gestionar usuarios</span>
+                            <span>Generar reporte</span>
                             <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
@@ -77,12 +77,12 @@
                 <!-- Tarjeta: Reporte de -->
                 <div class="dashboard-card col-sm-3">
                     <div class="card-content">
-                        <h3 class="card-title">Solicitudes de usuarios</h3>
-                        <p class="card-description">Revise y gestione solicitudes de actualización de datos</p>
+                        <h3 class="card-title">Reporte de Vehículos</h3>
+                        <p class="card-description">Descargue el reporte generado de los vehículos en formato PDF</p>
                     </div>
                     <div class="card-footer">
-                        <a href="@Url.Action("GestionarSolicitudes", "Admin")" class="btn btn-primary">
-                            <span>Ver solicitudes</span>
+                        <a href="@Url.Action("Vehiculos", "Reporte")" class="btn btn-primary">
+                            <span>Generar reporte</span>
                             <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
@@ -90,15 +90,14 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta: Asignar rutas -->
-                <div class="dashboard-card col-sm-3">
++                <div class="dashboard-card col-sm-3">
                     <div class="card-content">
-                        <h3 class="card-title">Asignar rutas</h3>
-                        <p class="card-description">Asigne rutas a conductores y gestione cambios de recorrido</p>
+                        <h3 class="card-title">Reporte de Reservas</h3>
+                        <p class="card-description">Descargue el reporte generado de las reservas en formato PDF por rango de fechas</p>
                     </div>
                     <div class="card-footer">
-                        <a href="@Url.Action("AsignarRutas", "Admin")" class="btn btn-primary">
-                            <span>Asignar rutas</span>
+                        <a href="@Url.Action("Reservas", "Reporte")" class="btn btn-primary">
+                            <span>Generar Reporte</span>
                             <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
