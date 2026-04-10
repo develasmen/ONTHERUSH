@@ -1,4 +1,4 @@
-﻿@model ReporteViajesVM
+﻿@model ReporteReservaVM
 
 @{
     Layout = null;
@@ -25,8 +25,8 @@
                     <span>Volver al panel</span>
                 </a>
                 <div class="table-header-info">
-                    <h1 class="table-title">Reporte de Viajes</h1>
-                    <p class="table-subtitle">Consulte y exporte reportes de viajes por rango de fechas</p>
+                    <h1 class="table-title">Reporte de Reservas</h1>
+                    <p class="table-subtitle">Consulte y exporte el reporte de reservas</p>
                 </div>
             </div>
         </header>
@@ -34,9 +34,9 @@
         <!-- Contenido principal -->
         <main class="table-main">
             <div class="table-container">
-                
+
                 <!-- Filtros -->
-                <form method="get" asp-action="Viajes" asp-controller="Reporte" class="filters-section">
+                <form method="get" asp-action="Reservas" asp-controller="Reporte" class="filters-section">
                     <div class="filters-grid">
                         <!-- Fecha Inicio -->
                         <div class="form-group">
@@ -46,10 +46,10 @@
                                 </svg>
                                 Fecha inicio
                             </label>
-                            <input type="date" 
-                                   class="form-input" 
+                            <input type="date"
+                                   class="form-input"
                                    id="fechaInicio"
-                                   name="fechaInicio" 
+                                   name="fechaInicio"
                                    value="@Model.FechaInicio?.ToString("yyyy-MM-dd")" />
                         </div>
 
@@ -61,10 +61,10 @@
                                 </svg>
                                 Fecha fin
                             </label>
-                            <input type="date" 
-                                   class="form-input" 
+                            <input type="date"
+                                   class="form-input"
                                    id="fechaFin"
-                                   name="fechaFin" 
+                                   name="fechaFin"
                                    value="@Model.FechaFin?.ToString("yyyy-MM-dd")" />
                         </div>
 
@@ -77,9 +77,9 @@
                                 <span>Consultar</span>
                             </button>
 
-                            @if (Model.Viajes != null && Model.Viajes.Any())
+                            @if (Model.Reservas != null && Model.Reservas.Any())
                             {
-                                <a asp-action="ExportarPdfViajes"
+                                <a asp-action="ExportarReservasPdf"
                                    asp-controller="Reporte"
                                    asp-route-fechaInicio="@Model.FechaInicio?.ToString("yyyy-MM-dd")"
                                    asp-route-fechaFin="@Model.FechaFin?.ToString("yyyy-MM-dd")"
@@ -95,90 +95,52 @@
                 </form>
 
                 <!-- Resultados -->
-                @if (Model.Viajes != null && Model.Viajes.Any())
+                @if (Model != null && Model.Reservas.Any())
                 {
-                    <!-- Tabla de viajes -->
                     <div class="results-header">
                         <h3 class="results-title">Resultados</h3>
-                        <span class="results-count">@Model.Viajes.Count() @(Model.Viajes.Count() == 1 ? "viaje encontrado" : "viajes encontrados")</span>
+                        <span class="results-count">@Model.Reservas.Count() @(Model.Reservas.Count() == 1 ? "reservas encontradas" : "Reservas encontradas")</span>
                     </div>
 
                     <div class="table-wrapper">
                         <table class="data-table">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
                                     <th>Ruta</th>
-                                    <th>Salida</th>
-                                    <th>Llegada</th>
-                                    <th>Conductor</th>
-                                    <th>Vehículo</th>
-                                    <th class="text-center">Pasajeros</th>
-                                    <th class="text-center">Estado</th>
+                                    <th>Fecha de Reserva</th>
+                                    <th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var v in Model.Viajes)
+                                @foreach (var v in Model.Reservas)
                                 {
                                     <tr>
                                         <td>
-                                            <div class="route-info">
-                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span>@v.Ruta</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="datetime-info">
-                                                <span class="date">@v.Salida.ToString("dd/MM/yyyy")</span>
-                                                <span class="time">@v.Salida.ToString("HH:mm")</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="datetime-info">
-                                                <span class="date">@v.Llegada.ToString("dd/MM/yyyy")</span>
-                                                <span class="time">@v.Llegada.ToString("HH:mm")</span>
-                                            </div>
+                                            <span>@v.ReservaId</span>
                                         </td>
                                         <td>
                                             <div class="driver-info">
                                                 <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                                                 </svg>
-                                                <span>@v.Conductor</span>
+                                                <span>@v.Cliente</span>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="vehicle-info">
-                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                                                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
-                                                </svg>
-                                                <span>@v.Vehiculo</span>
+                                            <span>@v.Ruta</span>
+                                        </td>
+                                        <td>
+                                            <div class="datetime-info">
+                                                <span class="date">@v.FechaReserva.ToString("dd/MM/yyyy")</span>
+                                                <span class="time">@v.FechaReserva.ToString("HH:mm")</span>
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            <span class="passenger-badge">@v.Pasajeros</span>
-                                        </td>
-                                        <td class="text-center">
-                                            @if (v.Estado == "Programado")
-                                            {
-                                                <span class="status-badge status-programado">
-                                                    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                                    </svg>
-                                                    @v.Estado
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="status-badge status-completado">
-                                                    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                    </svg>
-                                                    @v.Estado
-                                                </span>
-                                            }
+                                            <span class="status-badge status-completado">
+                                                @v.Estado
+                                            </span>
                                         </td>
                                     </tr>
                                 }
@@ -195,7 +157,6 @@
                             <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                         </svg>
                         <h3>No hay datos para mostrar</h3>
-                        <p>Seleccione un rango de fechas y presione "Consultar" para ver los viajes</p>
                     </div>
                 }
 

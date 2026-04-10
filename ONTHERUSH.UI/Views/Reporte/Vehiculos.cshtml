@@ -1,0 +1,123 @@
+﻿@model ReporteVehiculoVM
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reporte de Viajes - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
+    <link rel="stylesheet" href="~/css/pages/reports.css" />
+</head>
+<body>
+    <div class="table-page-container">
+        <!-- Header -->
+        <header class="table-header">
+            <div class="table-header-content">
+                <a href="@Url.Action("PanelAdministrador", "Admin")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver al panel</span>
+                </a>
+                <div class="table-header-info">
+                    <h1 class="table-title">Reporte de Vehículos</h1>
+                    <p class="table-subtitle">Consulte y exporte el reporte de vehículos</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenido principal -->
+        <main class="table-main">
+            <div class="table-container">
+
+
+                @if (Model.Vehiculos != null && Model.Vehiculos.Any())
+                {
+                    <div class=" align-content-md-center">
+
+                        <a asp-action="ExportarVehiculosPdf"
+                           asp-controller="Reporte"
+                           class="btn btn-danger btn-sm">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Exportar PDF</span>
+                        </a>
+                    </div>
+                }
+
+                <!-- Resultados -->
+                @if (Model != null && Model.Vehiculos.Any())
+                {
+                    <!-- Tabla de viajes -->
+                    <div class="results-header">
+                        <h3 class="results-title">Resultados</h3>
+                        <span class="results-count">@Model.Vehiculos.Count() @(Model.Vehiculos.Count() == 1 ? "vehículos encontrados" : "vehículos encontrados")</span>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Placa</th>
+                                    <th>Marca/Modelo</th>
+                                    <th>Estado</th>
+                                    <th>Año</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var v in Model.Vehiculos)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="driver-info">
+                                                <span>@v.Placa</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="driver-info">
+
+                                                <span>@v.MarcaModelo</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="status-badge status-completado">
+                                                @v.Estado
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span>@v.Annio</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <!-- Estado vacío -->
+                    <div class="empty-state">
+                        <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                        </svg>
+                        <h3>No hay datos para mostrar</h3>
+                    </div>
+                }
+
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="table-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Administrador</p>
+        </footer>
+    </div>
+</body>
+</html>
