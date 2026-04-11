@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reportes - ON THE RUSH</title>
     <link rel="stylesheet" href="~/css/pages/dashboard-base.css" />
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
 </head>
 <body>
     <div class="dashboard-container">
@@ -16,6 +17,14 @@
         <header class="dashboard-header">
             <div class="header-content">
                 <div class="header-left">
+                    <!-- Botón de volver (estilo consistente) -->
+                    <a href="@Url.Action("PanelAdministrador", "Admin")" class="back-button" style="margin-right: 20px;">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Volver al panel</span>
+                    </a>
+                    
                     <div class="logo-section">
                         <img src="~/images/OnTheRush-removebg-preview.png" alt="ON THE RUSH" class="dashboard-logo" />
                     </div>

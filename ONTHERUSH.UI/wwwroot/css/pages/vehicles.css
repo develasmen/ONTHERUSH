@@ -409,3 +409,26 @@
         font-size: 13px;
     }
 }
+
+/* ============================================
+   FORMULARIO DE VEHÍCULOS (PÁGINA COMPLETA)
+   ============================================ */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 2px solid var(--gray-200);
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}

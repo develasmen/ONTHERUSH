@@ -236,6 +236,15 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    position: relative;
+}
+
+.form-group:has(.password-input-wrapper) {
+    gap: 0;
+}
+
+.form-group .form-label {
+    margin-bottom: 8px;
 }
 
 .form-label {
@@ -458,3 +467,4 @@ body {
         padding: 14px 20px;
     }
 }
+

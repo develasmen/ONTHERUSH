@@ -4,6 +4,7 @@
 
     var conductores = ViewBag.Conductores as IList<ApplicationUser>;
     var reservas = ViewBag.Reservas as List<Reserva>;
+    var vehiculos = ViewBag.Vehiculos as List<ONTHERUSH.Abstracciones.DTOs.VehiculoDto>;
 }
 
 <!DOCTYPE html>
@@ -28,7 +29,7 @@
                 </a>
                 <div class="table-header-info">
                     <h1 class="table-title">Asignar Rutas</h1>
-                    <p class="table-subtitle">Seleccione un conductor, marque reservas y defina el orden de recogida</p>
+                    <p class="table-subtitle">Seleccione un conductor, vehículo y marque reservas para definir el orden de recogida</p>
                 </div>
             </div>
         </header>
@@ -62,14 +63,14 @@
                 <form asp-action="AsignarRutas" asp-controller="Admin" method="post" id="formAsignar">
                     @Html.AntiForgeryToken()
 
-                    <!-- Selector de conductor y botón -->
+                    <!-- Selector de conductor, vehículo y botón -->
                     <div class="form-header-section">
                         <div class="form-group-inline">
+                            <!-- Conductor -->
                             <div class="form-group">
                                 <label for="conductorId" class="form-label">
                                     <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                                        <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                                     </svg>
                                     Conductor
                                 </label>
@@ -84,6 +85,30 @@
                                     }
                                 </select>
                                 <small class="form-hint">La ruta se asignará al conductor seleccionado</small>
+                            </div>
+
+                            <!-- Vehículo -->
+                            <div class="form-group">
+                                <label for="vehiculoId" class="form-label">
+                                    <svg class="label-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                                        <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                                    </svg>
+                                    Vehículo
+                                </label>
+                                <select name="vehiculoId" id="vehiculoId" class="form-input" required>
+                                    <option value="">Seleccionar vehículo...</option>
+                                    @if (vehiculos != null)
+                                    {
+                                        @foreach (var v in vehiculos)
+                                        {
+                                            <option value="@v.VehiculoId">
+                                                @v.Placa - @v.Marca @v.Modelo (@v.CapacidadPasajeros pax) - @v.Estado
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                <small class="form-hint">Seleccione el vehículo que realizará la ruta</small>
                             </div>
 
                             <button type="submit" class="btn-submit">

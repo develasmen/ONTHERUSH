@@ -1,4 +1,3 @@
-
 /* ============================================
    MODAL COMPONENT - ON THE RUSH
    Modal personalizado sin dependencias
@@ -39,6 +38,7 @@
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s ease;
+    padding: 20px;
 }
 
 .modal.modal-open {
@@ -53,9 +53,8 @@
     border-radius: 16px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow: hidden;
+    width: 100%;
+    max-height: calc(100vh - 40px);
     display: flex;
     flex-direction: column;
     animation: slideUp 0.3s ease;
@@ -69,6 +68,7 @@
     padding: 24px 28px;
     border-bottom: 1px solid var(--gray-200);
     background: var(--gray-100);
+    flex-shrink: 0;
 }
 
 .modal-title {
@@ -110,7 +110,9 @@
 .modal-body {
     padding: 28px;
     overflow-y: auto;
-    flex: 1;
+    overflow-x: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 /* Footer del modal */
@@ -122,6 +124,7 @@
     padding: 20px 28px;
     border-top: 1px solid var(--gray-200);
     background: var(--gray-100);
+    flex-shrink: 0;
 }
 
 /* Form group dentro del modal */
@@ -155,6 +158,9 @@
     transition: all 0.2s ease;
     outline: none;
     font-family: inherit;
+}
+
+.modal-body textarea.form-input {
     resize: vertical;
     min-height: 120px;
 }
@@ -168,8 +174,8 @@
 }
 
 .modal-body .form-input:focus {
-    border-color: var(--red-500);
-    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 4px rgba(107, 192, 68, 0.1);
 }
 
 /* Botones del modal */
@@ -237,60 +243,162 @@
 }
 
 /* ============================================
-   RESPONSIVE - MOBILE
+   RESPONSIVE - MOBILE (FULL SCREEN)
    ============================================ */
 @media (max-width: 768px) {
+    /* Modal ocupa toda la pantalla */
+    .modal {
+        padding: 0 !important;
+        align-items: flex-start !important;
+        overflow-y: auto !important;
+    }
+
     .modal-content {
-        max-width: 95%;
-        width: 95%;
+        max-width: 100% !important;
+        width: 100% !important;
+        max-height: none !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        animation: slideInFromRight 0.3s ease;
+        overflow: visible !important;
     }
 
     .modal-header {
-        padding: 20px 24px;
+        padding: 16px 20px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--gray-100);
     }
 
     .modal-title {
         font-size: 18px;
     }
 
+    /* Body ahora puede crecer libremente */
     .modal-body {
-        padding: 24px;
+        padding: 20px !important;
+        flex: none !important;
+        overflow: visible !important;
+        max-height: none !important;
+        height: auto !important;
     }
 
+    /* Footer sticky abajo */
     .modal-footer {
         flex-direction: column-reverse;
-        padding: 16px 24px;
+        padding: 16px 20px;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        background: var(--gray-100);
     }
 
     .modal-footer .btn {
         width: 100%;
     }
+
+    /* Animación desde la derecha en móvil */
+    @keyframes slideInFromRight {
+        from {
+            transform: translateX(100%);
+        }
+        to {
+            transform: translateX(0);
+        }
+    }
 }
 
 @media (max-width: 480px) {
-    .modal-content {
-        max-width: 100%;
-        width: 100%;
-        max-height: 100vh;
-        border-radius: 0;
+    .modal-header {
+        padding: 14px 16px;
     }
 
     .modal-title {
         font-size: 16px;
-        gap: 10px;
+        gap: 8px;
     }
 
     .modal-title svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
     }
 
     .modal-body {
-        padding: 20px;
+        padding: 16px !important;
+    }
+
+    .modal-body .form-label {
+        font-size: 14px;
     }
 
     .modal-body .form-input {
         font-size: 14px;
         padding: 12px 14px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px;
+    }
+
+    .modal-footer .btn {
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+
+    /* Reducir espacio entre campos */
+    .form-row {
+        gap: 14px !important;
+        margin-bottom: 14px !important;
+    }
+
+
+    /* Animación desde la derecha en móvil */
+    @keyframes slideInFromRight {
+        from {
+            transform: translateX(100%);
+        }
+        to {
+            transform: translateX(0);
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-header {
+        padding: 14px 16px;
+    }
+
+    .modal-title {
+        font-size: 16px;
+        gap: 8px;
+    }
+
+    .modal-title svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-body .form-label {
+        font-size: 14px;
+    }
+
+    .modal-body .form-input {
+        font-size: 14px;
+        padding: 12px 14px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px;
+    }
+
+    .modal-footer .btn {
+        padding: 12px 18px;
+        font-size: 14px;
     }
 }

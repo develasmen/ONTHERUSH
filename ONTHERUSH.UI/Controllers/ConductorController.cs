@@ -297,42 +297,81 @@ namespace ONTHERUSH.UI.Controllers
                 return View("VerViaje", new List<ParadaAsignadaDto>());
             }
 
+            // Obtener TODAS las reservas del conductor
             var reservasObj = await _reservaService.ObtenerReservasAsignadasPorConductor(conductor.ConductorId);
-            var reservas = reservasObj.Cast<Reserva>().ToList();
-            var viajeIdActual = reservas.FirstOrDefault()?.ViajeId;
+            var todasLasReservas = reservasObj.Cast<Reserva>().ToList();
 
-            if (viajeIdActual != null)
-            {
-                var viajeObj = await _viajeService.ObtenerViajePorId(viajeIdActual.Value);
-                var viajeActual = viajeObj as Viaje;
-
-                if (viajeActual != null)
-                {
-                    ViewBag.EstadoViaje = viajeActual.Estado;
-                    ViewBag.RutaViaje = viajeActual.NombreRuta;
-                }
-                else
-                {
-                    ViewBag.EstadoViaje = "Programado";
-                    ViewBag.RutaViaje = "Ruta actual";
-                }
-            }
-            else
-            {
-                ViewBag.EstadoViaje = "Programado";
-                ViewBag.RutaViaje = "Ruta actual";
-            }
-
-            if (reservas.Count == 0)
+            if (todasLasReservas.Count == 0)
             {
                 TempData["Mensaje"] = " No tienes reservas asignadas todavía.";
+                ViewBag.EstadoViaje = "Programado";
+                ViewBag.RutaViaje = "Ruta actual";
+                ViewBag.Vehiculo = "No asignado";
                 return View("VerViaje", new List<ParadaAsignadaDto>());
             }
 
+            // Agrupar reservas por ViajeId
+            var reservasPorViaje = todasLasReservas
+                .Where(r => r.ViajeId != null)
+                .GroupBy(r => r.ViajeId.Value)
+                .ToList();
+
+            if (reservasPorViaje.Count == 0)
+            {
+                TempData["Mensaje"] = " No tienes viajes asignados.";
+                ViewBag.EstadoViaje = "Programado";
+                ViewBag.RutaViaje = "Ruta actual";
+                ViewBag.Vehiculo = "No asignado";
+                return View("VerViaje", new List<ParadaAsignadaDto>());
+            }
+
+            // Buscar el primer viaje NO finalizado
+            Viaje? viajeActivo = null;
+            foreach (var grupo in reservasPorViaje)
+            {
+                var viajeObj = await _viajeService.ObtenerViajePorId(grupo.Key);
+                var viaje = viajeObj as Viaje;
+                
+                if (viaje != null && viaje.Estado != "Finalizado" && viaje.Estado != "Completado")
+                {
+                    viajeActivo = viaje;
+                    break;
+                }
+            }
+
+            // Si no hay viaje activo, mostrar mensaje
+            if (viajeActivo == null)
+            {
+                TempData["Mensaje"] = " No tienes un viaje activo. Todos tus viajes están finalizados.";
+                ViewBag.EstadoViaje = "Sin viajes activos";
+                ViewBag.RutaViaje = "N/A";
+                ViewBag.Vehiculo = "N/A";
+                return View("VerViaje", new List<ParadaAsignadaDto>());
+            }
+
+            // Configurar ViewBag con datos del viaje activo
+            ViewBag.EstadoViaje = viajeActivo.Estado;
+            ViewBag.RutaViaje = viajeActivo.NombreRuta;
+            
+            if (viajeActivo.Vehiculo != null)
+            {
+                ViewBag.Vehiculo = $"{viajeActivo.Vehiculo.Placa} - {viajeActivo.Vehiculo.Marca} {viajeActivo.Vehiculo.Modelo}";
+            }
+            else
+            {
+                ViewBag.Vehiculo = "No asignado";
+            }
+
+            // Filtrar SOLO las reservas del viaje activo
+            var reservasDelViajeActivo = todasLasReservas
+                .Where(r => r.ViajeId == viajeActivo.ViajeId)
+                .ToList();
+
+            // Crear paradas
             var paradas = new List<ParadaAsignadaDto>();
             int orden = 1;
 
-            foreach (var r in reservas)
+            foreach (var r in reservasDelViajeActivo)
             {
                 paradas.Add(new ParadaAsignadaDto
                 {

@@ -52,6 +52,7 @@ namespace ONTHERUSH.AccesoADatos.Repositories
         {
             return await _context.Viajes
                 .Include(x => x.Reservas)
+                .Include(x => x.Vehiculo)
                 .FirstOrDefaultAsync(x => x.ViajeId == viajeId);
         }
 

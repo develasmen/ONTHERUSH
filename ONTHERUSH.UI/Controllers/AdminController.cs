@@ -164,22 +164,35 @@ namespace ONTHERUSH.UI.Controllers
         public async Task<IActionResult> AsignarRutas()
         {
             var conductores = await _userManager.GetUsersInRoleAsync("Conductor");
-
             var reservasObj = await _reservaService.ObtenerReservasPendientes();
             var reservas = reservasObj.Cast<Reserva>().ToList();
+            var vehiculosObj = await _vehiculoService.ObtenerVehiculos();
+            
+            var vehiculos = vehiculosObj
+                .Where(v => v.Estado == "Activo")
+                .ToList();
 
             ViewBag.Conductores = conductores;
             ViewBag.Reservas = reservas;
+            ViewBag.Vehiculos = vehiculos;
 
             return View();
         }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AsignarRutas(string conductorId, int[] reservaIds, int[] ordenes)
+        public async Task<IActionResult> AsignarRutas(string conductorId, int vehiculoId, int[] reservaIds, int[] ordenes)
         {
             if (string.IsNullOrWhiteSpace(conductorId))
             {
                 TempData["Error"] = "Debe seleccionar un conductor.";
+                return RedirectToAction(nameof(AsignarRutas));
+            }
+
+            if (vehiculoId <= 0)
+            {
+                TempData["Error"] = "Debe seleccionar un vehículo.";
                 return RedirectToAction(nameof(AsignarRutas));
             }
 
@@ -259,7 +272,7 @@ namespace ONTHERUSH.UI.Controllers
             var resultadoViaje = await _viajeService.CrearViaje(
                 conductorId: conductor.ConductorId,
                 asignadoPorAdminId: admin.AdministradorId,
-                vehiculoId: 1,
+                vehiculoId: vehiculoId,
                 nombreRuta: nombreRuta,
                 puntoPartida: puntoPartida,
                 paradas: string.Join(" | ", paradasTexto),
@@ -474,6 +487,29 @@ namespace ONTHERUSH.UI.Controllers
         {
             var incidentes = await _incidenteService.ObtenerTodosLosIncidentesAsync();
             return View(incidentes);
+        }
+
+
+        [HttpGet]
+        public IActionResult AgregarVehiculoForm()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditarVehiculoForm(int id)
+        {
+            var vehiculos = await _vehiculoService.ObtenerVehiculos();
+            var vehiculoObj = vehiculos.FirstOrDefault(v => v.VehiculoId == id);
+            
+            if (vehiculoObj == null)
+            {
+                TempData["Error"] = "Vehículo no encontrado.";
+                return RedirectToAction("GestionarVehiculos");
+            }
+
+            var vehiculo = vehiculoObj as VehiculoDto;
+            return View(vehiculo);
         }
     }
 }
