@@ -18,8 +18,7 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
             var from = _config["EmailSettings:From"];
             var host = _config["EmailSettings:Host"];
             var user = _config["EmailSettings:User"];
-            var pass = _config["EmailSettings:AppPassword"];
-
+            var pass = _config["EmailSettings:AppPassword"]?.Replace(" ", "");
 
             int port = int.TryParse(_config["EmailSettings:Port"], out var p) ? p : 587;
             bool enableSsl = bool.TryParse(_config["EmailSettings:EnableSsl"], out var s) ? s : true;
@@ -33,12 +32,17 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
                     "EmailSettings incompleto en appsettings.json (From/Host/User/AppPassword).");
             }
 
-            using var msg = new MailMessage(from, para, asunto, html);
+            using var msg = new MailMessage();
+            msg.From = new MailAddress(from, "ONTHERUSH");
+            msg.To.Add(para);
+            msg.Subject = asunto;
+            msg.Body = html;
             msg.IsBodyHtml = true;
 
             using var smtp = new SmtpClient(host, port)
             {
                 EnableSsl = enableSsl,
+                UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(user, pass)
             };
 

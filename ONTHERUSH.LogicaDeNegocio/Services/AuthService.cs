@@ -1,6 +1,9 @@
 using ONTHERUSH.Abstracciones.DTOs;
 using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Models;
+using Microsoft.Extensions.Configuration;
+using System.Text;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace ONTHERUSH.LogicaDeNegocio.Services
 {
@@ -8,13 +11,16 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly EmailService _emailService;
+        private readonly IConfiguration _config;
 
         public AuthService(
             IUsuarioRepository usuarioRepository,
-            EmailService emailService)
+            EmailService emailService,
+            IConfiguration config)
         {
             _usuarioRepository = usuarioRepository;
             _emailService = emailService;
+            _config = config;
         }
 
         public async Task<ResultadoOperacion> RegistrarUsuario(RegistroUsuarioDto dto)
@@ -131,28 +137,77 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
             }
 
             var token = await _usuarioRepository.GenerarTokenRecuperacion(usuario);
-            var tokenUrl = System.Net.WebUtility.UrlEncode(token);
+            var tokenUrl = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            // Aquí el link debería generarse dinámicamente
-            // Por ahora usamos un placeholder
-            var link = $"https://localhost:5081/Auth/RestablecerContrasena?email={correo}&token={tokenUrl}";
+            var baseUrl = _config["AppSettings:BaseUrl"]?.TrimEnd('/');
+
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                return new ResultadoOperacion
+                {
+                    Exito = false,
+                    Mensaje = "No se ha configurado la URL base de la aplicación."
+                };
+            }
+
+            var link = $"{baseUrl}/Auth/RestablecerContrasena?email={correo}&token={tokenUrl}";
+
+            var asunto = $"Restablecimiento de contraseña - ONTHERUSH - {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
+
+            var cuerpo = $@"
+                <div style='font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 30px;'>
+                    <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);'>
+                    <h2 style='color: #1f2937; margin-bottom: 20px;'>Recuperación de contraseña</h2>
+
+                    <p style='color: #374151; font-size: 15px; line-height: 1.6;'>
+                        Hola,
+                    </p>
+
+                    <p style='color: #374151; font-size: 15px; line-height: 1.6;'>
+                        Recibimos una solicitud para restablecer la contraseña de tu cuenta en <strong>ONTHERUSH</strong>.
+                    </p>
+
+                    <p style='color: #374151; font-size: 15px; line-height: 1.6;'>
+                        Para continuar, haz clic en el siguiente botón:
+                    </p>
+
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <a href='{link}' style='background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 14px 24px; border-radius: 8px; font-size: 15px; display: inline-block;'>
+                            Restablecer contraseña
+                        </a>
+                    </div>
+
+                    <p style='color: #6b7280; font-size: 14px; line-height: 1.6;'>
+                        Si el botón no funciona, copia y pega este enlace en tu navegador:
+                    </p>
+
+                    <p style='word-break: break-all; color: #2563eb; font-size: 14px;'>
+                        {link}
+                    </p>
+
+                    <hr style='border: none; border-top: 1px solid #e5e7eb; margin: 25px 0;'>
+
+                    <p style='color: #6b7280; font-size: 13px; line-height: 1.6;'>
+                        Si no solicitaste este cambio, puedes ignorar este mensaje.
+                    </p>
+
+                    <p style='color: #6b7280; font-size: 13px; margin-top: 20px;'>
+                        Equipo ONTHERUSH
+                    </p>
+                </div>
+            </div>";
 
             try
             {
-                await _emailService.EnviarAsync(
-                    correo,
-                    "Restablecer contraseña - ONTHERUSH",
-                    $@"
-                    <p>Hola,</p>
-                    <p>Recibimos una solicitud para restablecer tu contraseña.</p>
-                    <p>Haz clic en el siguiente enlace para cambiarla:</p>
-                    <p><a href='{link}'>Restablecer contraseña</a></p>
-                    <p>Si no solicitaste este cambio, por favor contacta con soporte.</p>
-                ");
+                await _emailService.EnviarAsync(correo, asunto, cuerpo);
             }
-            catch
+            catch (Exception ex)
             {
-                // Silenciar errores de email por seguridad
+                return new ResultadoOperacion
+                {
+                    Exito = false,
+                    Mensaje = $"Error al enviar el correo: {ex.Message}"
+                };
             }
 
             return new ResultadoOperacion
@@ -163,9 +218,9 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
         }
 
         public async Task<ResultadoOperacion> RestablecerContrasena(
-            string email, 
-            string token, 
-            string nuevaContrasena, 
+            string email,
+            string token,
+            string nuevaContrasena,
             string confirmarContrasena)
         {
             if (string.IsNullOrWhiteSpace(nuevaContrasena) || string.IsNullOrWhiteSpace(confirmarContrasena))
@@ -197,7 +252,7 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
                 };
             }
 
-            var decodedToken = System.Net.WebUtility.UrlDecode(token);
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
             var resultado = await _usuarioRepository.RestablecerContrasenaConToken(usuario, decodedToken, nuevaContrasena);
 
             if (resultado.Exito)
