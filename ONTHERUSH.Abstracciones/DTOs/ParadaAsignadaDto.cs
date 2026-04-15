@@ -6,6 +6,7 @@ namespace ONTHERUSH.Abstracciones.DTOs
         public int Orden { get; set; }
         public string NombreCliente { get; set; } = "";
         public string Direccion { get; set; } = "";
+        public string Coordenadas { get; set; } = "";
         public string Estado { get; set; } = "Pendiente";
     }
 }

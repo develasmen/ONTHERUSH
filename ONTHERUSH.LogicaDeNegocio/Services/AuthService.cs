@@ -29,6 +29,7 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
                 string.IsNullOrWhiteSpace(dto.Nombre) ||
                 string.IsNullOrWhiteSpace(dto.Apellido) ||
                 string.IsNullOrWhiteSpace(dto.Correo) ||
+                string.IsNullOrWhiteSpace(dto.Ubicacion) ||
                 string.IsNullOrWhiteSpace(dto.Contrasena) ||
                 string.IsNullOrWhiteSpace(dto.ConfirmarContrasena))
             {
