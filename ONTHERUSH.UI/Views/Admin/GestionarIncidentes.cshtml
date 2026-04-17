@@ -7,12 +7,14 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestionar Incidentes - ON THE RUSH</title>
     <link rel="stylesheet" href="~/css/pages/table-base.css" />
 </head>
+
 <body>
     <div class="table-page-container">
 
@@ -39,6 +41,20 @@
         <main class="table-main">
             <div class="table-container">
 
+                @if (TempData["Exito"] != null)
+                {
+                    <div class="alert alert-success mb-3">
+                        @TempData["Exito"]
+                    </div>
+                }
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger mb-3">
+                        @TempData["Error"]
+                    </div>
+                }
+
                 @if (Model == null || !Model.Any())
                 {
                     <div class="empty-state">
@@ -47,8 +63,8 @@
                                   d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.518 11.591c.75 1.334-.213 2.99-1.742 2.99H3.48c-1.53 0-2.492-1.656-1.743-2.99L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-6a1 1 0 00-1 1v3a1 1 0 102 0V8a1 1 0 00-1-1z"
                                   clip-rule="evenodd" />
                         </svg>
-                        <h3>No hay incidentes reportados</h3>
-                        <p>Cuando un conductor reporte un incidente, aparecerá aquí.</p>
+                        <h3>No hay incidentes pendientes</h3>
+                        <p>Cuando un conductor reporte un incidente pendiente, aparecerá aquí.</p>
                     </div>
                 }
                 else
@@ -59,16 +75,17 @@
                                 <tr>
                                     <th>Fecha</th>
                                     <th>Conductor</th>
-                                    <th>Viaje</th>
                                     <th>Tipo</th>
                                     <th>Descripción</th>
                                     <th class="text-center">Estado</th>
+                                    <th class="text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var incidente in Model)
                                 {
-                                    var pendiente = string.Equals(incidente.Estado, "Pendiente", StringComparison.OrdinalIgnoreCase);
+                                    var pendiente = string.Equals(incidente.Estado, "Pendiente",
+                            StringComparison.OrdinalIgnoreCase);
 
                                     <tr>
                                         <td>
@@ -79,11 +96,6 @@
                                         <td>
                                             <span class="table-badge">@incidente.NombreConductor</span>
                                         </td>
-
-                                        <td>
-                                            @(incidente.ViajeId.HasValue ? incidente.ViajeId.ToString() : "Sin viaje")
-                                        </td>
-
                                         <td>
                                             <span class="table-badge">@incidente.Tipo</span>
                                         </td>
@@ -106,6 +118,24 @@
                                                 </span>
                                             }
                                         </td>
+
+                                        <td class="text-center">
+                                            @if (pendiente)
+                                            {
+                                                <form asp-action="MarcarIncidenteRevisado" asp-controller="Admin" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@incidente.Id" />
+
+                                                    <button type="submit" class="btn btn-success btn-sm">
+                                                        Marcar revisado
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Revisado</span>
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -121,4 +151,5 @@
         </footer>
     </div>
 </body>
+
 </html>

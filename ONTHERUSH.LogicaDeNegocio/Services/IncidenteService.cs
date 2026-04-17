@@ -76,5 +76,19 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
                 .OrderByDescending(x => x.Fecha)
                 .ToListAsync();
         }
+
+        public async Task MarcarIncidenteRevisadoAsync(int id)
+        {
+            var incidente = await _context.Incidentes.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (incidente == null)
+            {
+                throw new Exception("Incidente no encontrado");
+            }
+
+            incidente.Estado = "Revisado";
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

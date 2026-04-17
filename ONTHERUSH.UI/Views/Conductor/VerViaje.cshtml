@@ -6,7 +6,7 @@
     var hayParadas = Model != null && Model.Any();
 
     bool EsRecogido(string? s) =>
-    string.Equals((s ?? "").Trim(), "Recogido", StringComparison.OrdinalIgnoreCase);
+        string.Equals((s ?? "").Trim(), "Recogido", StringComparison.OrdinalIgnoreCase);
 
     var todosRecogidos = hayParadas && Model.All(x => EsRecogido(x.Estado));
 
@@ -18,10 +18,10 @@
     var destinoAeropuerto = Uri.EscapeDataString(destinoFinalTexto);
 
     var urlAeropuertoMaps =
-    $"https://www.google.com/maps/dir/?api=1&destination={destinoAeropuerto}";
+        $"https://www.google.com/maps/dir/?api=1&destination={destinoAeropuerto}";
 
     var urlAeropuertoWaze =
-    $"https://waze.com/ul?q={destinoAeropuerto}&navigate=yes";
+        $"https://waze.com/ul?q={destinoAeropuerto}&navigate=yes";
 }
 
 <!DOCTYPE html>
@@ -32,11 +32,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ver Viaje - ON THE RUSH</title>
     <link rel="stylesheet" href="~/css/pages/table-base.css" />
+    <link rel="stylesheet" href="~/css/pages/ver-viaje.css" />
 </head>
 
 <body>
     <div class="table-page-container">
-        <!-- Header -->
         <header class="table-header">
             <div class="table-header-content">
                 <a href="@Url.Action("PanelConductor", "Conductor")" class="back-button">
@@ -47,380 +47,287 @@
                     </svg>
                     <span>Volver al panel</span>
                 </a>
+
                 <div class="table-header-info">
                     <h1 class="table-title">Ver Viaje</h1>
-                    <p class="table-subtitle">Reservas asignadas en orden. Use Waze o Google Maps para ir a recoger a
-                        cada cliente</p>
-                    </div>
+                    <p class="table-subtitle">
+                        Reservas asignadas en orden. Use Waze o Google Maps para ir a recoger a cada cliente
+                    </p>
                 </div>
-            </header>
+            </div>
+        </header>
 
-            <!-- Contenido principal -->
-            <main class="table-main">
-                <div class="table-container">
+        <main class="table-main">
+            <div class="table-container">
 
-                    <!-- Alertas -->
-                    @if (TempData["Mensaje"] != null)
-                    {
-                        <div class="alert alert-success">
-                            <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                      clip-rule="evenodd" />
-                            </svg>
-                            <span>@TempData["Mensaje"]</span>
+                @if (TempData["Mensaje"] != null)
+                {
+                    <div class="alert alert-success">
+                        <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                        <span>@TempData["Mensaje"]</span>
+                    </div>
+                }
+
+                @if (hayParadas)
+                {
+                    <div class="alert alert-info trip-route-alert">
+                        <div>
+                            <strong>@ViewBag.RutaViaje</strong>
                         </div>
-                    }
-                    @if (hayParadas)
-                    {
-                        <div class="alert alert-info"
-                             style="margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <strong>@ViewBag.RutaViaje</strong>
-                            </div>
 
-                            <div>
-                                @{
-                                    var estadoViaje = ViewBag.EstadoViaje?.ToString() ?? "Programado";
-                                    var claseEstado = "status-pending";
+                        <div>
+                            @{
+                                var estadoViaje = ViewBag.EstadoViaje?.ToString() ?? "Programado";
+                                var claseEstado = "status-pending";
 
-                                    if (estadoViaje == "En camino")
-                                    {
-                                        claseEstado = "status-info";
-                                    }
-                                    else if (estadoViaje == "Retrasado")
-                                    {
-                                        claseEstado = "status-warning";
-                                    }
-                                    else if (estadoViaje == "Finalizado" || estadoViaje == "Completado")
-                                    {
-                                        claseEstado = "status-completed";
-                                    }
+                                if (estadoViaje == "En camino")
+                                {
+                                    claseEstado = "status-info";
                                 }
+                                else if (estadoViaje == "Retrasado")
+                                {
+                                    claseEstado = "status-warning";
+                                }
+                                else if (estadoViaje == "Finalizado" || estadoViaje == "Completado")
+                                {
+                                    claseEstado = "status-completed";
+                                }
+                            }
 
-                                <span class="status-badge @claseEstado">
-                                    Estado del viaje: @estadoViaje
-                                </span>
-                            </div>
+                            <span class="status-badge @claseEstado">
+                                Estado del viaje: @estadoViaje
+                            </span>
                         </div>
-                        
-                        <div class="trip-summary">
-                            <div class="trip-summary-card">
-                                <span class="trip-summary-label">Vehículo asignado</span>
-                                <span class="trip-summary-value" style="font-size: 20px;">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"
-                                         style="display:inline; vertical-align:middle; margin-right:6px;">
-                                        <path
-                                        d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                                        <path
-                                        d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
-                                    </svg>
-                                    @ViewBag.Vehiculo
-                                </span>
-                            </div>
+                    </div>
 
-                            <div class="trip-summary-card">
-                                <span class="trip-summary-label">Paradas asignadas</span>
-                                <span class="trip-summary-value">@totalParadas</span>
-                            </div>
-
-                            <div class="trip-summary-card">
-                                <span class="trip-summary-label">Pendientes</span>
-                                <span class="trip-summary-value">@totalPendientes</span>
-                            </div>
-
-                            <div class="trip-summary-card">
-                                <span class="trip-summary-label">Recogidos</span>
-                                <span class="trip-summary-value">@totalRecogidos</span>
-                            </div>
-
-                            <div class="trip-summary-card">
-                                <span class="trip-summary-label">Destino final</span>
-                                <span class="trip-summary-value trip-summary-destination">@destinoFinalTexto</span>
-                            </div>
+                    <div class="trip-summary">
+                        <div class="trip-summary-card">
+                            <span class="trip-summary-label">Vehículo asignado</span>
+                            <span class="trip-summary-value trip-summary-value-vehicle">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"
+                                     class="trip-summary-icon">
+                                    <path
+                                    d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                                    <path
+                                    d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                                </svg>
+                                @ViewBag.Vehiculo
+                            </span>
                         </div>
-                    }
-                    @if (!hayParadas)
-                    {
-                        <!-- Estado vacío -->
-                        <div class="empty-state">
-                            <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                                <path
-                                d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
-                            </svg>
-                            <h3>No tiene un viaje activo</h3>
-                            <p>Cuando el administrador le asigne reservas, aparecerán aquí</p>
+
+                        <div class="trip-summary-card">
+                            <span class="trip-summary-label">Paradas asignadas</span>
+                            <span class="trip-summary-value">@totalParadas</span>
                         </div>
-                    }
-                    else
-                    {
-                        <!-- Tabla de paradas -->
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Orden</th>
-                                        <th>Cliente</th>
-                                        <th>Ubicación</th>
-                                        <th class="text-center">Estado</th>
-                                        <th class="text-center">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var p in Model.OrderBy(x => x.Orden))
-                                    {
-                                        var destino = Uri.EscapeDataString(p.Coordenadas ?? "");
-                                        var googleMapsUrl = $"https://www.google.com/maps/dir/?api=1&destination={destino}";
-                                        var wazeUrl = $"https://waze.com/ul?q={destino}&navigate=yes";
 
-                                        var estadoTxt = (p.Estado ?? "").Trim();
-                                        var recogido = string.Equals(estadoTxt, "Recogido", StringComparison.OrdinalIgnoreCase);
+                        <div class="trip-summary-card">
+                            <span class="trip-summary-label">Pendientes</span>
+                            <span class="trip-summary-value pending">@totalPendientes</span>
+                        </div>
 
-                                        <tr class="@(recogido ? "row-completed" : "")">
-                                            <td>
-                                                <div class="order-badge">@p.Orden</div>
-                                            </td>
-                                            <td>
-                                                <div class="user-info">
-                                                    <div class="user-avatar">
-                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd"
-                                                                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                                                  clip-rule="evenodd" />
-                                                        </svg>
-                                                    </div>
-                                                    <div class="user-name">@p.NombreCliente</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="location-info">
-                                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                        <div class="trip-summary-card">
+                            <span class="trip-summary-label">Recogidos</span>
+                            <span class="trip-summary-value success">@totalRecogidos</span>
+                        </div>
+
+                        <div class="trip-summary-card destination-card">
+                            <span class="trip-summary-label">Destino final</span>
+                            <span class="trip-summary-value trip-summary-destination">@destinoFinalTexto</span>
+                        </div>
+                    </div>
+                }
+
+                @if (!hayParadas)
+                {
+                    <div class="empty-state">
+                        <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                            <path
+                            d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                        </svg>
+                        <h3>No tiene un viaje activo</h3>
+                        <p>Cuando el administrador le asigne reservas, aparecerán aquí</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Orden</th>
+                                    <th>Cliente</th>
+                                    <th>Ubicación</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in Model.OrderBy(x => x.Orden))
+                                {
+                                    var destino = Uri.EscapeDataString(p.Coordenadas ?? "");
+                                    var googleMapsUrl = $"https://www.google.com/maps/dir/?api=1&destination={destino}";
+                                    var wazeUrl = $"https://waze.com/ul?q={destino}&navigate=yes";
+
+                                    var estadoTxt = (p.Estado ?? "").Trim();
+                                    var recogido = string.Equals(estadoTxt, "Recogido", StringComparison.OrdinalIgnoreCase);
+
+                                    <tr class="@(recogido ? "row-completed" : "")">
+                                        <td data-label="Orden">
+                                            <div class="order-badge">@p.Orden</div>
+                                        </td>
+
+                                        <td data-label="Cliente">
+                                            <div class="user-info">
+                                                <div class="user-avatar">
+                                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd"
-                                                              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                                              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
                                                               clip-rule="evenodd" />
                                                     </svg>
-                                                    <span>@p.Direccion</span>
                                                 </div>
-                                            </td>
-                                            <td class="text-center">
-                                                @if (recogido)
+                                                <div class="user-name">@p.NombreCliente</div>
+                                            </div>
+                                        </td>
+
+                                        <td data-label="Ubicación">
+                                            <div class="location-info">
+                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                          d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                                          clip-rule="evenodd" />
+                                                </svg>
+                                                <span>@p.Direccion</span>
+                                            </div>
+                                        </td>
+
+                                        <td data-label="Estado" class="text-center">
+                                            @if (recogido)
+                                            {
+                                                <span class="status-badge status-completed">
+                                                    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd"
+                                                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                              clip-rule="evenodd" />
+                                                    </svg>
+                                                    Recogido
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge status-pending">
+                                                    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd"
+                                                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                                              clip-rule="evenodd" />
+                                                    </svg>
+                                                    Pendiente
+                                                </span>
+                                            }
+                                        </td>
+
+                                        <td data-label="Acciones">
+                                            <div class="action-group">
+                                                <a href="@googleMapsUrl" target="_blank" rel="noopener"
+                                                       class="btn-action btn-maps" title="Abrir en Google Maps">
+                                                    <img src="https://cdn-icons-png.flaticon.com/512/2991/2991231.png"
+                                                         width="16" class="action-icon" />
+                                                    Maps
+                                                </a>
+
+                                                <a href="@wazeUrl" target="_blank" rel="noopener" class="btn-action btn-maps"
+                                                       title="Abrir en Waze">
+                                                    <img src="https://cdn-icons-png.flaticon.com/512/3771/3771472.png"
+                                                         width="16" class="action-icon" />
+                                                    Waze
+                                                </a>
+
+                                                @if (!recogido)
                                                 {
-                                                    <span class="status-badge status-completed">
-                                                        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd"
-                                                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                  clip-rule="evenodd" />
-                                                        </svg>
-                                                        Recogido
-                                                    </span>
+                                                    <form asp-action="MarcarRecogido" asp-controller="Conductor" method="post"
+                                                          class="inline-form">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@p.Id" />
+
+                                                        <button type="submit" class="btn-action btn-approve"
+                                                                title="Marcar como recogido">
+                                                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fill-rule="evenodd"
+                                                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                      clip-rule="evenodd" />
+                                                            </svg>
+                                                            Marcar recogido
+                                                        </button>
+                                                    </form>
                                                 }
-                                                else
-                                                {
-                                                    <span class="status-badge status-pending">
-                                                        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd"
-                                                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                                                                  clip-rule="evenodd" />
-                                                        </svg>
-                                                        Pendiente
-                                                    </span>
-                                                }
-                                            </td>
-                                            <td>
-                                                <div class="action-group">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
-                                                    <!-- Google Maps -->
-                                                    <a href="@googleMapsUrl" target="_blank" rel="noopener"
-                                                           class="btn-action btn-maps" title="Abrir en Google Maps">
-
-                                                        <img src="https://cdn-icons-png.flaticon.com/512/2991/2991231.png"
-                                                             width="16" style="margin-right:4px;" />
-
-                                                        Maps
-                                                    </a>
-
-                                                    <!-- Waze -->
-                                                    <a href="@wazeUrl" target="_blank" rel="noopener" class="btn-action btn-maps"
-                                                           title="Abrir en Waze">
-
-                                                        <img src="https://cdn-icons-png.flaticon.com/512/3771/3771472.png"
-                                                             width="16" style="margin-right:4px;" />
-
-                                                        Waze
-                                                    </a>
-
-                                                    <!-- Botón Marcar Recogido -->
-                                                    @if (!recogido)
-                                                    {
-                                                        <form asp-action="MarcarRecogido" asp-controller="Conductor" method="post"
-                                                              class="inline-form">
-                                                            @Html.AntiForgeryToken()
-                                                            <input type="hidden" name="id" value="@p.Id" />
-                                                            <button type="submit" class="btn-action btn-approve"
-                                                                    title="Marcar como recogido">
-                                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                                    <path fill-rule="evenodd"
-                                                                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                          clip-rule="evenodd" />
-                                                                </svg>
-                                                                Marcar recogido
-                                                            </button>
-                                                        </form>
-                                                    }
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Botones de finalización (si todos recogidos) -->
-                        @if (todosRecogidos)
-                        {
-                            <div class="completion-actions">
-                                <div class="completion-message">
-                                    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd"
-                                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                              clip-rule="evenodd" />
-                                    </svg>
-                                    <div>
-                                        <h4>¡Todos los pasajeros recogidos!</h4>
-                                        <p>Ahora puede dirigirse al aeropuerto o finalizar el viaje</p>
-                                    </div>
-                                </div>
-                                <div class="completion-buttons">
-
-                                    <!-- Maps aeropuerto -->
-                                    <a href="@urlAeropuertoMaps" target="_blank" rel="noopener" class="btn btn-primary">
-
-                                        <img src="https://cdn-icons-png.flaticon.com/512/2991/2991231.png" width="18"
-                                             style="margin-right:6px;" />
-
-                                        Maps Aeropuerto
-                                    </a>
-
-
-                                    <!-- Waze aeropuerto -->
-                                    <a href="@urlAeropuertoWaze" target="_blank" rel="noopener" class="btn btn-primary">
-
-                                        <img src="https://cdn-icons-png.flaticon.com/512/3771/3771472.png" width="18"
-                                             style="margin-right:6px;" />
-
-                                        Waze Aeropuerto
-                                    </a>
-
-
-                                    <!-- Finalizar viaje -->
-                                    <form asp-action="FinalizarViaje" asp-controller="Conductor" method="post" class="inline-form"
-                                          onsubmit="return confirm('¿Está seguro de finalizar el viaje?')">
-
-                                        @Html.AntiForgeryToken()
-
-                                        <button type="submit" class="btn btn-secondary">
-                                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd"
-                                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                      clip-rule="evenodd" />
-                                            </svg>
-
-                                            <span>Finalizar Viaje</span>
-                                        </button>
-
-                                    </form>
-
+                    @if (todosRecogidos)
+                    {
+                        <div class="completion-actions">
+                            <div class="completion-message">
+                                <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                          clip-rule="evenodd" />
+                                </svg>
+                                <div>
+                                    <h4>¡Todos los pasajeros recogidos!</h4>
+                                    <p>Ahora puede dirigirse al aeropuerto o finalizar el viaje</p>
                                 </div>
                             </div>
-                        }
-                    }
 
-                </div>
-            </main>
+                            <div class="completion-buttons">
+                                <a href="@urlAeropuertoMaps" target="_blank" rel="noopener" class="btn btn-primary">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/2991/2991231.png" width="18"
+                                         class="completion-icon" />
+                                    Maps Aeropuerto
+                                </a>
 
-            <!-- Footer -->
-            <footer class="table-footer">
-                <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
-            </footer>
-        </div>
-        <style>
-                .status-info {
-                    background-color: #dbeafe;
-                    color: #1d4ed8;
-                }
+                                <a href="@urlAeropuertoWaze" target="_blank" rel="noopener" class="btn btn-primary">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/3771/3771472.png" width="18"
+                                         class="completion-icon" />
+                                    Waze Aeropuerto
+                                </a>
 
-                .status-warning {
-                    background-color: #fef3c7;
-                    color: #b45309;
-                }
+                                <form asp-action="FinalizarViaje" asp-controller="Conductor" method="post" class="inline-form"
+                                      onsubmit="return confirm('¿Está seguro de finalizar el viaje?')">
+                                    @Html.AntiForgeryToken()
 
-                .trip-summary {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-                    gap: 16px;
-                    margin: 25px 0 30px;
-                }
-
-                .trip-summary-card {
-                    background: #ffffff;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 16px;
-                    padding: 18px;
-                    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-                    display: flex;
-                    flex-direction: column;
-                    gap: 8px;
-                    transition: transform 0.2s ease, box-shadow 0.2s ease;
-                }
-
-                .trip-summary-card:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.10);
-                }
-
-                .trip-summary-label {
-                    font-size: 13px;
-                    font-weight: 600;
-                    color: #6b7280;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-
-                .trip-summary-value {
-                    font-size: 28px;
-                    font-weight: 700;
-                    color: #111827;
-                }
-
-                .trip-summary-value.pending {
-                    color: #d97706;
-                }
-
-                .trip-summary-value.success {
-                    color: #16a34a;
-                }
-
-                .destination-card {
-                    grid-column: span 2;
-                }
-
-                .trip-summary-destination {
-                    font-size: 16px;
-                    line-height: 1.4;
-                    color: #1f2937;
-                }
-
-                @@media (max-width: 768px) {
-                    .destination-card {
-                        grid-column: span 1;
-                    }
-
-                    .trip-summary {
-                        grid-template-columns: 1fr;
+                                    <button type="submit" class="btn btn-secondary">
+                                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                  clip-rule="evenodd" />
+                                        </svg>
+                                        <span>Finalizar Viaje</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     }
                 }
-        </style>
-    </body>
+
+            </div>
+        </main>
+
+        <footer class="table-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Conductor</p>
+        </footer>
+    </div>
+</body>
 
 </html>
+
+
+
