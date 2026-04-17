@@ -34,7 +34,7 @@
         <!-- Contenido principal -->
         <main class="table-main">
             <div class="table-container">
-                
+
                 <!-- Alertas -->
                 @if (TempData["Exito"] != null)
                 {
@@ -140,7 +140,7 @@
                                                         </form>
 
                                                         <!-- Formulario Rechazar -->
-                                                        <form asp-action="RechazarUsuario" asp-controller="Admin" method="post" class="inline-form" 
+                                                        <form asp-action="RechazarUsuario" asp-controller="Admin" method="post" class="inline-form"
                                                               onsubmit="return confirm('¿Está seguro de rechazar a @usuario.Nombre @usuario.Apellido? Esta acción eliminará la solicitud del usuario.');">
                                                             @Html.AntiForgeryToken()
                                                             <input type="hidden" name="userId" value="@usuario.Id" />
@@ -194,6 +194,7 @@
                                             var usuario = item.usuario;
                                             var roles = item.roles;
                                             var rolPrincipal = roles.FirstOrDefault() ?? "Sin rol";
+                                            var estaBloqueado = usuario.LockoutEnd.HasValue && usuario.LockoutEnd.Value > DateTimeOffset.UtcNow;
 
                                             <tr>
                                                 <td>
@@ -241,28 +242,58 @@
                                                     }
                                                 </td>
                                                 <td>
-                                                    <span class="status-badge status-active">
-                                                        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                        </svg>
-                                                        Activo
-                                                    </span>
+                                                    @if (estaBloqueado)
+                                                    {
+                                                        <span class="status-badge status-inactive">
+                                                            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            Deshabilitado
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="status-badge status-active">
+                                                            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            Activo
+                                                        </span>
+                                                    }
                                                 </td>
                                                 <td>@usuario.FechaRegistro.ToString("dd/MM/yyyy")</td>
                                                 <td>
                                                     <div class="action-group">
-                                                        <!-- Formulario Eliminar Usuario -->
-                                                        <form asp-action="EliminarUsuarioActivo" asp-controller="Admin" method="post" 
-                                                              onsubmit="return confirm('¿Está seguro de deshabilitar a @usuario.Nombre @usuario.Apellido (@rolPrincipal)? El usuario no podrá iniciar sesión pero sus datos se mantendrán en el sistema.');">
-                                                            @Html.AntiForgeryToken()
-                                                            <input type="hidden" name="userId" value="@usuario.Id" />
-                                                            <button type="submit" class="btn-action btn-delete" title="Deshabilitar usuario">
-                                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                                                    <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd" />
-                                                                </svg>
-                                                                Deshabilitar
-                                                            </button>
-                                                        </form>
+                                                        @if (estaBloqueado)
+                                                        {
+                                                            <!-- Botón Habilitar -->
+                                                            <form asp-action="HabilitarUsuario" asp-controller="Admin" method="post"
+                                                                  onsubmit="return confirm('¿Está seguro de habilitar a @usuario.Nombre @usuario.Apellido (@rolPrincipal)? El usuario podrá volver a iniciar sesión.');">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="userId" value="@usuario.Id" />
+                                                                <button type="submit" class="btn-action btn-approve" title="Habilitar usuario">
+                                                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                                    </svg>
+                                                                    Habilitar
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        else
+                                                        {
+                                                            <!-- Botón Deshabilitar -->
+                                                            <form asp-action="EliminarUsuarioActivo" asp-controller="Admin" method="post"
+                                                                  onsubmit="return confirm('¿Está seguro de deshabilitar a @usuario.Nombre @usuario.Apellido (@rolPrincipal)? El usuario no podrá iniciar sesión pero sus datos se mantendrán en el sistema.');">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="userId" value="@usuario.Id" />
+                                                                <button type="submit" class="btn-action btn-delete" title="Deshabilitar usuario">
+                                                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd" />
+                                                                    </svg>
+                                                                    Deshabilitar
+                                                                </button>
+                                                            </form>
+                                                        }
                                                     </div>
                                                 </td>
                                             </tr>
@@ -276,7 +307,7 @@
                             <!-- Estado vacío -->
                             <div class="empty-state">
                                 <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />      
                                 </svg>
                                 <h3>No hay usuarios activos</h3>
                                 <p>No se han aprobado usuarios todavía</p>
@@ -299,7 +330,7 @@
             // Remover clase active de todos los botones y contenidos
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
+
             // Agregar clase active al botón y contenido seleccionado
             event.target.closest('.tab-button').classList.add('active');
             document.getElementById('tab-' + tabName).classList.add('active');

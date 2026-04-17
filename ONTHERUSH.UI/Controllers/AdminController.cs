@@ -533,5 +533,33 @@ namespace ONTHERUSH.UI.Controllers
             var vehiculo = vehiculoObj as VehiculoDto;
             return View(vehiculo);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HabilitarUsuario(string userId)
+        {
+            var usuario = await _userManager.FindByIdAsync(userId);
+            
+            if (usuario == null)
+            {
+                TempData["Error"] = "Usuario no encontrado.";
+                return RedirectToAction("GestionarUsuarios");
+            }
+
+            // Habilitar usuario (quitar bloqueo)
+            usuario.LockoutEnd = null;
+            var result = await _userManager.UpdateAsync(usuario);
+
+            if (result.Succeeded)
+            {
+                TempData["Exito"] = $"Usuario {usuario.Nombre} {usuario.Apellido} habilitado correctamente.";
+            }
+            else
+            {
+                TempData["Error"] = "Error al habilitar el usuario.";
+            }
+
+            return RedirectToAction("GestionarUsuarios");
+        }
     }
 }
