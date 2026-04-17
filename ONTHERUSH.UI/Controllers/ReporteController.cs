@@ -46,10 +46,10 @@ namespace ONTHERUSH.UI.Controllers
         {
 
             var vm = new ReporteUsuariosVM
-             {
-                 FechaInicio = DateTime.Now.AddDays(-30),
-                 FechaFin = DateTime.Now
-             };
+            {
+                FechaInicio = DateTime.Now.AddDays(-30),
+                FechaFin = DateTime.Now
+            };
 
             vm.Usuarios = _reporteService.ObtenerUsuarios((DateTime)vm.FechaInicio, (DateTime)vm.FechaFin);
             return View(vm);
@@ -90,7 +90,7 @@ namespace ONTHERUSH.UI.Controllers
         {
             var fechaFin = DateTime.Now;
             var fechaInicio = fechaFin.AddDays(-30);
-            
+
             var datos = _reporteService.ObtenerUsuarios(fechaInicio, fechaFin);
             var pdf = PdfHelper.GenerarReporteUsuarios(datos);
 
@@ -111,6 +111,29 @@ namespace ONTHERUSH.UI.Controllers
             var pdf = PdfHelper.GenerarReporteReservas(datos);
 
             return File(pdf, "application/pdf", "ReporteReservas.pdf");
+        }
+
+        [HttpGet]
+        public IActionResult Incidentes(DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            var vm = new ReporteIncidenteVM
+            {
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin
+            };
+
+            vm.Incidentes = _reporteService.ObtenerIncidentes(fechaInicio, fechaFin);
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public IActionResult ExportarIncidentesPdf(DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            var datos = _reporteService.ObtenerIncidentes(fechaInicio, fechaFin);
+            var pdf = PdfHelper.GenerarReporteIncidentes(datos);
+
+            return File(pdf, "application/pdf", "ReporteIncidentes.pdf");
         }
     }
 }

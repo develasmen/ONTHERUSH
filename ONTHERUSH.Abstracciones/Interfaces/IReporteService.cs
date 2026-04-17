@@ -13,5 +13,6 @@ namespace ONTHERUSH.Abstracciones.Interfaces
         public List<UsuarioReporteDTO> ObtenerUsuarios(DateTime fechaInicio, DateTime fechaFin);
         public List<VehiculoReporteDTO> ObtenerVehiculos();
         public List<ReservaReporteDTO> ObtenerReservas(DateTime? fechaInicio, DateTime? fechaFin);
+        public List<IncidenteDto> ObtenerIncidentes(DateTime? fechaInicio, DateTime? fechaFin);
     }
 }

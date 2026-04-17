@@ -80,12 +80,48 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
                 .Select(r => new ReservaReporteDTO
                 {
                     ReservaId = r.ReservaId,
-                    Cliente = r.Usuario.Nombre, 
+                    Cliente = r.Usuario.Nombre,
                     Ruta = r.Viaje.NombreRuta,
                     FechaReserva = r.FechaReserva,
                     Estado = r.Estado
                 })
                 .OrderByDescending(r => r.FechaReserva)
+                .ToList();
+        }
+        public List<IncidenteDto> ObtenerIncidentes(DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            var query = _context.Incidentes.AsQueryable();
+
+            if (fechaInicio.HasValue)
+                query = query.Where(i => i.Fecha >= fechaInicio.Value);
+
+            if (fechaFin.HasValue)
+                query = query.Where(i => i.Fecha <= fechaFin.Value);
+
+            return query
+                .GroupJoin(
+                    _context.Users,
+                    incidente => incidente.ConductorId,
+                    usuario => usuario.Id,
+                    (incidente, usuarios) => new { incidente, usuarios }
+                )
+                .SelectMany(
+                    x => x.usuarios.DefaultIfEmpty(),
+                    (x, usuario) => new IncidenteDto
+                    {
+                        Id = x.incidente.Id,
+                        ConductorId = x.incidente.ConductorId,
+                        ViajeId = x.incidente.ViajeId,
+                        Tipo = x.incidente.Tipo,
+                        Descripcion = x.incidente.Descripcion,
+                        Fecha = x.incidente.Fecha,
+                        Estado = x.incidente.Estado,
+                        NombreConductor = usuario != null
+                            ? usuario.Nombre + " " + usuario.Apellido
+                            : x.incidente.ConductorId
+                    }
+                )
+                .OrderByDescending(i => i.Fecha)
                 .ToList();
         }
     }
