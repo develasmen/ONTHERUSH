@@ -956,4 +956,53 @@ body {
     }
 }
 
+.trip-route-alert {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
 
+.trip-summary-value-vehicle {
+    font-size: 20px;
+}
+
+.trip-summary-icon {
+    display: inline;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.action-icon {
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.completion-icon {
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.destination-card {
+    grid-column: span 2;
+}
+
+.trip-summary-value.pending {
+    color: #d97706;
+}
+
+.trip-summary-value.success {
+    color: #16a34a;
+}
+
+@media (max-width: 768px) {
+    .trip-route-alert {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .destination-card {
+        grid-column: span 1;
+    }
+}

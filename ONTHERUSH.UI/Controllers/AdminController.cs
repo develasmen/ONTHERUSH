@@ -167,7 +167,7 @@ namespace ONTHERUSH.UI.Controllers
             var reservasObj = await _reservaService.ObtenerReservasPendientes();
             var reservas = reservasObj.Cast<Reserva>().ToList();
             var vehiculosObj = await _vehiculoService.ObtenerVehiculos();
-            
+
             var vehiculos = vehiculosObj
                 .Where(v => v.Estado == "Activo")
                 .ToList();
@@ -482,13 +482,35 @@ namespace ONTHERUSH.UI.Controllers
             return RedirectToAction(nameof(GestionarSolicitudesRuta));
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GestionarIncidentes()
         {
             var incidentes = await _incidenteService.ObtenerTodosLosIncidentesAsync();
-            return View(incidentes);
+
+            var pendientes = incidentes
+                .Where(i => i.Estado == "Pendiente")
+                .ToList();
+
+            return View(pendientes);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarcarIncidenteRevisado(int id)
+        {
+            try
+            {
+                await _incidenteService.MarcarIncidenteRevisadoAsync(id);
+                TempData["Exito"] = "Incidente marcado como revisado correctamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(GestionarIncidentes));
+        }
 
         [HttpGet]
         public IActionResult AgregarVehiculoForm()
@@ -501,7 +523,7 @@ namespace ONTHERUSH.UI.Controllers
         {
             var vehiculos = await _vehiculoService.ObtenerVehiculos();
             var vehiculoObj = vehiculos.FirstOrDefault(v => v.VehiculoId == id);
-            
+
             if (vehiculoObj == null)
             {
                 TempData["Error"] = "Vehículo no encontrado.";
