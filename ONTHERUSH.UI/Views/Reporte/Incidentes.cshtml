@@ -1,0 +1,116 @@
+@model ONTHERUSH.UI.Models.ReporteIncidenteVM
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Reporte de Incidentes";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reporte de Incidentes - ON THE RUSH</title>
+    <link rel="stylesheet" href="~/css/pages/table-base.css" />
+</head>
+
+<body>
+    <div class="table-page-container">
+
+        <header class="table-header">
+            <div class="table-header-content">
+                <a href="@Url.Action("Index", "Reporte")" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                              clip-rule="evenodd" />
+                    </svg>
+                    <span>Volver a reportes</span>
+                </a>
+
+                <div class="table-header-info">
+                    <h1 class="table-title">Reporte de Incidentes</h1>
+                    <p class="table-subtitle">Consulte y descargue los incidentes reportados por los conductores</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="table-main">
+            <div class="table-container">
+
+                <form method="get" asp-action="Incidentes" asp-controller="Reporte" class="mb-4">
+                    <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:end; margin-bottom:24px;">
+                        <div>
+                            <label for="fechaInicio">Fecha inicio</label><br />
+                            <input type="date" id="fechaInicio" name="fechaInicio"
+                                   value="@(Model.FechaInicio?.ToString("yyyy-MM-dd"))" />
+                        </div>
+
+                        <div>
+                            <label for="fechaFin">Fecha fin</label><br />
+                            <input type="date" id="fechaFin" name="fechaFin"
+                                   value="@(Model.FechaFin?.ToString("yyyy-MM-dd"))" />
+                        </div>
+
+                        <div>
+                            <button type="submit" class="btn-action btn-approve">Filtrar</button>
+                        </div>
+
+                        <div>
+                            <a class="btn-action btn-maps"
+                                   href="@Url.Action("ExportarIncidentesPdf", "Reporte", new { fechaInicio = Model.FechaInicio?.ToString("yyyy-MM-dd"), fechaFin = Model.FechaFin?.ToString("yyyy-MM-dd") })">
+                                Descargar PDF
+                            </a>
+                        </div>
+                    </div>
+                </form>
+
+                @if (Model.Incidentes == null || !Model.Incidentes.Any())
+                {
+                    <div class="empty-state">
+                        <h3>No hay incidentes registrados</h3>
+                        <p>No se encontraron incidentes con los filtros seleccionados.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Conductor</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Incidentes)
+                                {
+                                    <tr>
+                                        <td>@item.Id</td>
+                                        <td>@item.NombreConductor</td>
+                                        <td>@item.Tipo</td>
+                                        <td>@item.Descripcion</td>
+                                        <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@item.Estado</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+            </div>
+        </main>
+
+        <footer class="table-footer">
+            <p>© @DateTime.Now.Year ON THE RUSH · Reportes</p>
+        </footer>
+    </div>
+</body>
+
+</html>

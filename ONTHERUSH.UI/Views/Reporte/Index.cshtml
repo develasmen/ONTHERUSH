@@ -4,6 +4,7 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,6 +12,7 @@
     <link rel="stylesheet" href="~/css/pages/dashboard-base.css" />
     <link rel="stylesheet" href="~/css/pages/table-base.css" />
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Header del dashboard -->
@@ -18,9 +20,12 @@
             <div class="header-content">
                 <div class="header-left">
                     <!-- Botón de volver (estilo consistente) -->
-                    <a href="@Url.Action("PanelAdministrador", "Admin")" class="back-button" style="margin-right: 20px;">
+                    <a href="@Url.Action("PanelAdministrador", "Admin")" class="back-button"
+                           style="margin-right: 20px;">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd"
+                                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                                  clip-rule="evenodd" />
                         </svg>
                         <span>Volver al panel</span>
                     </a>
@@ -36,7 +41,8 @@
                 <div class="header-right">
                     <span class="role-badge">
                         <svg class="badge-icon" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                  clip-rule="evenodd" />
                         </svg>
                         Administrador
                     </span>
@@ -61,7 +67,9 @@
                         <a href="@Url.Action("Viajes", "Reporte")" class="btn btn-primary">
                             <span>Generar reporte</span>
                             <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                                      clip-rule="evenodd" />
                             </svg>
                         </a>
                     </div>
@@ -71,55 +79,82 @@
                 <div class="dashboard-card col-sm-3">
                     <div class="card-content">
                         <h3 class="card-title">Reporte de nuevos usuarios</h3>
-                        <p class="card-description">Descargue el reporte generado de los usuarios nuevos en los últimos 30 días en formato PDF</p>
+                        <p class="card-description">Descargue el reporte generado de los usuarios nuevos en los últimos
+                            30 días en formato PDF</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="@Url.Action("Usuarios", "Reporte")" class="btn btn-primary">
+                                <span>Generar reporte</span>
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                          d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                                          clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <a href="@Url.Action("Usuarios", "Reporte")" class="btn btn-primary">
-                            <span>Generar reporte</span>
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
 
-                <!-- Tarjeta: Reporte de -->
-                <div class="dashboard-card col-sm-3">
-                    <div class="card-content">
-                        <h3 class="card-title">Reporte de Vehículos</h3>
-                        <p class="card-description">Descargue el reporte generado de los vehículos en formato PDF</p>
+                    <!-- Tarjeta: Reporte de -->
+                    <div class="dashboard-card col-sm-3">
+                        <div class="card-content">
+                            <h3 class="card-title">Reporte de Vehículos</h3>
+                            <p class="card-description">Descargue el reporte generado de los vehículos en formato PDF</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="@Url.Action("Vehiculos", "Reporte")" class="btn btn-primary">
+                                <span>Generar reporte</span>
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                          d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                                          clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <a href="@Url.Action("Vehiculos", "Reporte")" class="btn btn-primary">
-                            <span>Generar reporte</span>
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
 
-                <div class="dashboard-card col-sm-3">
-                    <div class="card-content">
-                        <h3 class="card-title">Reporte de Reservas</h3>
-                        <p class="card-description">Descargue el reporte generado de las reservas en formato PDF por rango de fechas</p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="@Url.Action("Reservas", "Reporte")" class="btn btn-primary">
-                            <span>Generar Reporte</span>
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </main>
+                    <div class="dashboard-card col-sm-3">
+                        <div class="card-content">
+                            <h3 class="card-title">Reporte de Reservas</h3>
+                            <p class="card-description">Descargue el reporte generado de las reservas en formato PDF por
+                                rango de fechas</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="@Url.Action("Reservas", "Reporte")" class="btn btn-primary">
+                                    <span>Generar Reporte</span>
+                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                                              clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
 
-        <!-- Footer -->
-        <footer class="dashboard-footer">
-            <p>© @DateTime.Now.Year ON THE RUSH · Reportes</p>
-        </footer>
-    </div>
-</body>
-</html>
+                        <div class="dashboard-card col-sm-3">
+                            <div class="card-content">
+                                <h3 class="card-title">Reporte de Incidentes</h3>
+                                <p class="card-description">Descargue el reporte generado de los incidentes en formato PDF por
+                                    rango de fechas</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="@Url.Action("Incidentes", "Reporte")" class="btn btn-primary">
+                                        <span>Generar Reporte</span>
+                                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                                                  clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+
+                    <!-- Footer -->
+                    <footer class="dashboard-footer">
+                        <p>© @DateTime.Now.Year ON THE RUSH · Reportes</p>
+                    </footer>
+                </div>
+            </body>
+
+        </html>

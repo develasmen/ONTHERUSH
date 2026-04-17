@@ -271,5 +271,79 @@
 
             return document.GeneratePdf();
         }
+
+        public static byte[] GenerarReporteIncidentes(List<IncidenteDto> datos)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(30);
+
+                    page.Header().Column(col =>
+                    {
+                        col.Item().Text("Reporte de Incidentes")
+                            .FontSize(20)
+                            .Bold()
+                            .AlignCenter();
+
+                        col.Item().Text($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm}")
+                            .FontSize(10)
+                            .AlignCenter();
+                    });
+
+                    page.Content().PaddingVertical(10).Table(table =>
+                    {
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.ConstantColumn(45);
+                            columns.RelativeColumn(2);
+                            columns.RelativeColumn(2);
+                            columns.RelativeColumn(3);
+                            columns.RelativeColumn(2);
+                            columns.RelativeColumn(2);
+                        });
+
+                        table.Header(header =>
+                        {
+                            header.Cell().Element(CellStyle).Text("ID").Bold();
+                            header.Cell().Element(CellStyle).Text("Conductor").Bold();
+                            header.Cell().Element(CellStyle).Text("Tipo").Bold();
+                            header.Cell().Element(CellStyle).Text("Descripción").Bold();
+                            header.Cell().Element(CellStyle).Text("Fecha").Bold();
+                            header.Cell().Element(CellStyle).Text("Estado").Bold();
+
+                            static IContainer CellStyle(IContainer c) =>
+                                c.Padding(5)
+                                 .Background(Colors.Grey.Lighten2)
+                                 .Border(1);
+                        });
+
+                        foreach (var item in datos)
+                        {
+                            table.Cell().Element(Cell).Text(item.Id.ToString());
+                            table.Cell().Element(Cell).Text(item.NombreConductor ?? "");
+                            table.Cell().Element(Cell).Text(item.Tipo ?? "");
+                            table.Cell().Element(Cell).Text(item.Descripcion ?? "");
+                            table.Cell().Element(Cell).Text(item.Fecha.ToString("dd/MM/yyyy HH:mm"));
+                            table.Cell().Element(Cell).Text(item.Estado ?? "");
+
+                            static IContainer Cell(IContainer c) =>
+                                c.Padding(5).Border(1);
+                        }
+                    });
+
+                    page.Footer().AlignCenter().Text(x =>
+                    {
+                        x.Span("Página ");
+                        x.CurrentPageNumber();
+                    });
+                });
+            });
+
+            return document.GeneratePdf();
+        }
     }
 }
