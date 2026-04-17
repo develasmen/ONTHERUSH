@@ -168,9 +168,10 @@ namespace ONTHERUSH.UI.Controllers
                     Id = r.ReservaId,
                     Orden = orden++,
                     NombreCliente = r.Usuario != null
-                        ? $"{r.Usuario.Nombre} {r.Usuario.Apellido}"
-                        : $"Usuario {r.UserId}",
+                    ? $"{r.Usuario.Nombre} {r.Usuario.Apellido}"
+                    : $"Usuario {r.UserId}",
                     Direccion = $"{r.Provincia}, {r.Canton}, {r.Distrito}",
+                    Coordenadas = r.Usuario?.Direccion ?? "",
                     Estado = r.Estado
                 });
             }
@@ -222,9 +223,10 @@ namespace ONTHERUSH.UI.Controllers
                                 Id = r.ReservaId,
                                 Orden = orden++,
                                 NombreCliente = r.Usuario != null
-                                    ? $"{r.Usuario.Nombre} {r.Usuario.Apellido}"
-                                    : $"Usuario {r.UserId}",
+                                ? $"{r.Usuario.Nombre} {r.Usuario.Apellido}"
+                                : $"Usuario {r.UserId}",
                                 Direccion = $"{r.Provincia}, {r.Canton}, {r.Distrito}",
+                                Coordenadas = r.Usuario?.Direccion ?? "",
                                 Estado = r.Estado
                             });
                         }
@@ -331,7 +333,7 @@ namespace ONTHERUSH.UI.Controllers
             {
                 var viajeObj = await _viajeService.ObtenerViajePorId(grupo.Key);
                 var viaje = viajeObj as Viaje;
-                
+
                 if (viaje != null && viaje.Estado != "Finalizado" && viaje.Estado != "Completado")
                 {
                     viajeActivo = viaje;
@@ -352,7 +354,7 @@ namespace ONTHERUSH.UI.Controllers
             // Configurar ViewBag con datos del viaje activo
             ViewBag.EstadoViaje = viajeActivo.Estado;
             ViewBag.RutaViaje = viajeActivo.NombreRuta;
-            
+
             if (viajeActivo.Vehiculo != null)
             {
                 ViewBag.Vehiculo = $"{viajeActivo.Vehiculo.Placa} - {viajeActivo.Vehiculo.Marca} {viajeActivo.Vehiculo.Modelo}";
@@ -378,9 +380,10 @@ namespace ONTHERUSH.UI.Controllers
                     Id = r.ReservaId,
                     Orden = orden++,
                     NombreCliente = r.Usuario != null
-                        ? $"{r.Usuario.Nombre} {r.Usuario.Apellido}"
-                        : $"Usuario {r.UserId}",
+                    ? $"{r.Usuario.Nombre} {r.Usuario.Apellido}"
+                    : $"Usuario {r.UserId}",
                     Direccion = $"{r.Provincia}, {r.Canton}, {r.Distrito}",
+                    Coordenadas = r.Usuario?.Direccion ?? "",
                     Estado = r.Estado
                 });
             }
