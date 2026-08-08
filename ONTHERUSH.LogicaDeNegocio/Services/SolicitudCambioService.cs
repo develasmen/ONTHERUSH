@@ -2,6 +2,9 @@ using ONTHERUSH.Abstracciones.DTOs;
 using ONTHERUSH.Abstracciones.Interfaces;
 using ONTHERUSH.AccesoADatos.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Globalization;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
 
 namespace ONTHERUSH.LogicaDeNegocio.Services
 {
@@ -23,17 +26,19 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
 
         public async Task<ResultadoOperacion> SolicitarCambioEmail(string userId, string nuevoEmail)
         {
-            // Validaciones
-            if (string.IsNullOrWhiteSpace(nuevoEmail))
+            nuevoEmail = nuevoEmail?.Trim() ?? string.Empty;
+
+            if (!EsCorreoValido(nuevoEmail))
             {
                 return new ResultadoOperacion
                 {
                     Exito = false,
-                    Mensaje = "El nuevo email es requerido"
+                    Mensaje = "Ingrese un correo electrónico válido. Ejemplo: usuario@dominio.com"
                 };
             }
 
             var usuarioObj = await _usuarioRepository.ObtenerPorId(userId);
+
             if (usuarioObj == null)
             {
                 return new ResultadoOperacion
@@ -45,22 +50,36 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
 
             var usuario = (ApplicationUser)usuarioObj;
 
-            // Validams que sean diferentes los correos
-            if (usuario.Email == nuevoEmail)
+            if (string.Equals(
+                usuario.Email,
+                nuevoEmail,
+                StringComparison.OrdinalIgnoreCase))
             {
                 return new ResultadoOperacion
                 {
                     Exito = false,
-                    Mensaje = "El nuevo email es igual al actual"
+                    Mensaje = "El nuevo correo es igual al correo actual"
                 };
             }
 
-            // Creamos la solicitud
+            var usuarioConMismoCorreo =
+                await _userManager.FindByEmailAsync(nuevoEmail);
+
+            if (usuarioConMismoCorreo != null &&
+                usuarioConMismoCorreo.Id != userId)
+            {
+                return new ResultadoOperacion
+                {
+                    Exito = false,
+                    Mensaje = "El correo electrónico ya está registrado por otro usuario"
+                };
+            }
+
             var solicitud = new SolicitudCambio
             {
                 UsuarioId = userId,
                 TipoCambio = "Email",
-                ValorActual = usuario.Email ?? "",
+                ValorActual = usuario.Email ?? string.Empty,
                 ValorNuevo = nuevoEmail,
                 Estado = "Pendiente",
                 FechaSolicitud = DateTime.Now
@@ -68,20 +87,21 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
 
             return await _solicitudRepository.CrearSolicitud(solicitud);
         }
-
         public async Task<ResultadoOperacion> SolicitarCambioDireccion(string userId, string nuevaDireccion)
         {
-            // Validacion
-            if (string.IsNullOrWhiteSpace(nuevaDireccion))
+            if (!TryNormalizarCoordenadas(
+                nuevaDireccion,
+                out var coordenadasNormalizadas))
             {
                 return new ResultadoOperacion
                 {
                     Exito = false,
-                    Mensaje = "La nueva dirección es requerida"
+                    Mensaje = "Ingrese coordenadas válidas en el formato latitud, longitud. Ejemplo: 9.998514, -84.205716"
                 };
             }
 
             var usuarioObj = await _usuarioRepository.ObtenerPorId(userId);
+
             if (usuarioObj == null)
             {
                 return new ResultadoOperacion
@@ -93,13 +113,12 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
 
             var usuario = (ApplicationUser)usuarioObj;
 
-            // Crear solicitud
             var solicitud = new SolicitudCambio
             {
                 UsuarioId = userId,
                 TipoCambio = "Direccion",
-                ValorActual = usuario.Direccion ?? "",
-                ValorNuevo = nuevaDireccion,
+                ValorActual = usuario.Direccion ?? string.Empty,
+                ValorNuevo = coordenadasNormalizadas,
                 Estado = "Pendiente",
                 FechaSolicitud = DateTime.Now
             };
@@ -178,6 +197,99 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
         public async Task<ResultadoOperacion> RechazarSolicitud(int solicitudId, string motivoRechazo)
         {
             return await _solicitudRepository.RechazarSolicitud(solicitudId, motivoRechazo);
+        }
+
+        private static bool EsCorreoValido(string correo)
+        {
+            if (string.IsNullOrWhiteSpace(correo) ||
+                correo.Length > 256 ||
+                correo.Any(char.IsWhiteSpace))
+            {
+                return false;
+            }
+
+            if (!MailAddress.TryCreate(correo, out var direccion) ||
+                !string.Equals(
+                    direccion.Address,
+                    correo,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var posicionArroba = correo.LastIndexOf('@');
+
+            if (posicionArroba <= 0 ||
+                posicionArroba == correo.Length - 1)
+            {
+                return false;
+            }
+
+            var dominio = correo[(posicionArroba + 1)..];
+            var partesDominio = dominio.Split('.');
+
+            if (partesDominio.Length < 2)
+            {
+                return false;
+            }
+
+            foreach (var parte in partesDominio)
+            {
+                if (string.IsNullOrWhiteSpace(parte) ||
+                    parte.StartsWith('-') ||
+                    parte.EndsWith('-') ||
+                    !Regex.IsMatch(parte, "^[A-Za-z0-9-]+$"))
+                {
+                    return false;
+                }
+            }
+
+            return Regex.IsMatch(
+                partesDominio[^1],
+                "^[A-Za-z]{2,63}$");
+        }
+
+        private static bool TryNormalizarCoordenadas(string coordenadas, out string resultado)
+        {
+            resultado = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(coordenadas))
+            {
+                return false;
+            }
+
+            var partes = coordenadas.Split(',');
+
+            const NumberStyles formatoNumero =
+                NumberStyles.AllowLeadingSign |
+                NumberStyles.AllowDecimalPoint;
+
+            if (partes.Length != 2 ||
+                !decimal.TryParse(
+                    partes[0].Trim(),
+                    formatoNumero,
+                    CultureInfo.InvariantCulture,
+                    out var latitud) ||
+                !decimal.TryParse(
+                    partes[1].Trim(),
+                    formatoNumero,
+                    CultureInfo.InvariantCulture,
+                    out var longitud))
+            {
+                return false;
+            }
+
+            if (latitud < -90 || latitud > 90 ||
+                longitud < -180 || longitud > 180)
+            {
+                return false;
+            }
+
+            resultado =
+                $"{latitud.ToString("G29", CultureInfo.InvariantCulture)}, " +
+                $"{longitud.ToString("G29", CultureInfo.InvariantCulture)}";
+
+            return true;
         }
     }
 }
