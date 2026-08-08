@@ -120,8 +120,8 @@
                                 </svg>
                                 Correo electrónico
                             </label>
-                            <input type="email" id="correo" name="correo" class="form-input"
-                                   placeholder="tucorreo@ejemplo.com" required autocomplete="email" />
+                            <input type="email" id="correo" name="correo" class="form-input" placeholder="tucorreo@ejemplo.com" pattern="^[^\s@@]+@@[^\s@@]+\.[A-Za-z]{2,}$"
+                            title="Ingrese un correo válido, por ejemplo: usuario@dominio.com" required autocomplete="email" />
                         </div>
 
                         <!-- Ubicación -->
@@ -134,12 +134,9 @@
                                 </svg>
                                 Ubicación
                             </label>
-                            <input type="text" id="ubicacion" name="ubicacion" class="form-input"
-                                   placeholder="Ej: 9.998514, -84.205716" pattern="^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$"
-                                   required />
-                            <small class="form-hint">
-                                Ingrese las coordenadas en formato: Latitud, Longitud
-                            </small>
+                            <input type="text"id="ubicacion" name="ubicacion" class="form-input"placeholder="Ej: 9.998514, -84.205716"
+                            pattern="^\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*,\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*$"
+                            title="Ingrese latitud y longitud separadas por una coma. Ejemplo: 9.998514, -84.205716" required />
                         </div>
 
                         <!-- Contraseña -->

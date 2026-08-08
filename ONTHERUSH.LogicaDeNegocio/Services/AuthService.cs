@@ -4,6 +4,9 @@ using ONTHERUSH.AccesoADatos.Models;
 using Microsoft.Extensions.Configuration;
 using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Globalization;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
 
 namespace ONTHERUSH.LogicaDeNegocio.Services
 {
@@ -25,6 +28,8 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
 
         public async Task<ResultadoOperacion> RegistrarUsuario(RegistroUsuarioDto dto)
         {
+            dto.Correo = dto.Correo?.Trim() ?? string.Empty;
+
             if (string.IsNullOrWhiteSpace(dto.Cedula) ||
                 string.IsNullOrWhiteSpace(dto.Nombre) ||
                 string.IsNullOrWhiteSpace(dto.Apellido) ||
@@ -37,6 +42,26 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
                 {
                     Exito = false,
                     Mensaje = "Por favor complete los campos requeridos."
+                };
+            }
+
+            if (!EsCorreoValido(dto.Correo))
+            {
+                return new ResultadoOperacion
+                {
+                    Exito = false,
+                    Mensaje = "Ingrese un correo electrónico válido. Ejemplo: usuario@dominio.com"
+                };
+            }
+
+            if (!TryNormalizarCoordenadas(
+                dto.Ubicacion,
+                out var coordenadasNormalizadas))
+            {
+                return new ResultadoOperacion
+                {
+                    Exito = false,
+                    Mensaje = "Ingrese coordenadas válidas en el formato latitud, longitud. Ejemplo: 9.998514, -84.205716"
                 };
             }
 
@@ -53,19 +78,22 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
             {
                 UserName = dto.Correo,
                 Email = dto.Correo,
-                Nombre = dto.Nombre,
-                Apellido = dto.Apellido,
-                Cedula = dto.Cedula,
-                Direccion = dto.Ubicacion,
+                Nombre = dto.Nombre.Trim(),
+                Apellido = dto.Apellido.Trim(),
+                Cedula = dto.Cedula.Trim(),
+                Direccion = coordenadasNormalizadas,
                 EmailConfirmed = true,
                 Estado = true
             };
 
-            var resultado = await _usuarioRepository.CrearUsuario(usuario, dto.Contrasena);
+            var resultado = await _usuarioRepository.CrearUsuario(
+                usuario,
+                dto.Contrasena);
 
             if (resultado.Exito)
             {
-                resultado.Mensaje = "Registro exitoso. Su cuenta está pendiente de aprobación por un administrador.";
+                resultado.Mensaje =
+                    "Registro exitoso. Su cuenta está pendiente de aprobación por un administrador.";
             }
 
             return resultado;
@@ -267,6 +295,99 @@ namespace ONTHERUSH.LogicaDeNegocio.Services
         public Task CerrarSesion()
         {
             return Task.CompletedTask;
+        }
+
+        private static bool EsCorreoValido(string correo)
+        {
+            if (string.IsNullOrWhiteSpace(correo) ||
+                correo.Length > 256 ||
+                correo.Any(char.IsWhiteSpace))
+            {
+                return false;
+            }
+
+            if (!MailAddress.TryCreate(correo, out var direccion) ||
+                !string.Equals(
+                    direccion.Address,
+                    correo,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var posicionArroba = correo.LastIndexOf('@');
+
+            if (posicionArroba <= 0 ||
+                posicionArroba == correo.Length - 1)
+            {
+                return false;
+            }
+
+            var dominio = correo[(posicionArroba + 1)..];
+            var partesDominio = dominio.Split('.');
+
+            if (partesDominio.Length < 2)
+            {
+                return false;
+            }
+
+            foreach (var parte in partesDominio)
+            {
+                if (string.IsNullOrWhiteSpace(parte) ||
+                    parte.StartsWith('-') ||
+                    parte.EndsWith('-') ||
+                    !Regex.IsMatch(parte, "^[A-Za-z0-9-]+$"))
+                {
+                    return false;
+                }
+            }
+
+            return Regex.IsMatch(
+                partesDominio[^1],
+                "^[A-Za-z]{2,63}$");
+        }
+
+        private static bool TryNormalizarCoordenadas(string coordenadas, out string resultado)
+        {
+            resultado = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(coordenadas))
+            {
+                return false;
+            }
+
+            var partes = coordenadas.Split(',');
+
+            const NumberStyles formatoNumero =
+                NumberStyles.AllowLeadingSign |
+                NumberStyles.AllowDecimalPoint;
+
+            if (partes.Length != 2 ||
+                !decimal.TryParse(
+                    partes[0].Trim(),
+                    formatoNumero,
+                    CultureInfo.InvariantCulture,
+                    out var latitud) ||
+                !decimal.TryParse(
+                    partes[1].Trim(),
+                    formatoNumero,
+                    CultureInfo.InvariantCulture,
+                    out var longitud))
+            {
+                return false;
+            }
+
+            if (latitud < -90 || latitud > 90 ||
+                longitud < -180 || longitud > 180)
+            {
+                return false;
+            }
+
+            resultado =
+                $"{latitud.ToString("G29", CultureInfo.InvariantCulture)}, " +
+                $"{longitud.ToString("G29", CultureInfo.InvariantCulture)}";
+
+            return true;
         }
     }
 }
